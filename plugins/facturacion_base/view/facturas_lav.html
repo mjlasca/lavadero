@@ -1,0 +1,144 @@
+{include="header"}
+
+
+<script type="text/javascript">
+    
+    function pagar_fact_contado(){
+        bootbox.confirm("¿Segur@ quiere pagar todas las facturas contado?", function(result){ 
+            if(result){
+                location.href = "{$fsc->url()}"+"&pagar_facturas_all=1";
+            }
+        });
+    }
+    
+</script>
+
+
+<div class="container-fluid" style="margin-bottom: 10px;">
+   <div class="row">
+      <div class="col-md-2">
+         <div class="btn-group hidden-xs">
+            <a class="btn btn-sm btn-default" href="{$fsc->url()}" title="Recargar la página">
+               <span class="glyphicon glyphicon-refresh"></span>
+            </a>
+            {if="$fsc->page->is_default()"}
+            <a class="btn btn-sm btn-default active" href="{$fsc->url()}&amp;default_page=FALSE" title="Marcada como página de inicio (pulsa de nuevo para desmarcar)">
+               <i class="fa fa-bookmark" aria-hidden="true"></i>
+            </a>
+            {else}
+            <a class="btn btn-sm btn-default" href="{$fsc->url()}&amp;default_page=TRUE" title="Marcar como página de inicio">
+               <i class="fa fa-bookmark-o" aria-hidden="true"></i>
+            </a>
+            {/if}
+         </div>
+        
+      </div>
+       <div class="col-md-8">
+       
+        
+            <form action="{$fsc->url()}" method="POST">
+                
+                <div class="col-lg-4 text-right">
+                <label class="control-label"> <h5>Ordenar por : </h5> </label>
+                </div>
+                <div class="col-lg-4">
+                <select class="form-control" id="sele_fact" name="sele_fact" onchange="this.form.submit()">
+                    <option value="cli" {if="$fsc->sele_fact=='cli'"} selected="" {/if}>Clientes</option>
+                    <option value="prov" {if="$fsc->sele_fact=='prov'"} selected="" {/if}>Proveedores</option>
+                </select>
+                </div>
+                
+                <div class="col-lg-4 text-right">
+                    <input type="text" class="form-control" id="buscar" name="buscar" value="{$fsc->buscar}" placeholder="Buscar...">
+                </div>
+            </form>
+        </div>
+       <div class="col-md-2 text-right">
+            <button type="button" onclick="return pagar_fact_contado()" class="btn btn-primary" title="Pagar todas las facturas contado" >
+                    <span class="fa fa-money"></span>
+             </button>
+       </div>
+           
+       
+   </div>
+</div>
+
+    
+
+
+
+<!-- Nav tabs -->
+<ul class="nav nav-tabs" id="myTab" role="tablist">
+  <li class="nav-item active">
+    <a class="nav-link active" id="home-tab" data-toggle="tab" href="#home" role="tab" aria-controls="home" aria-selected="true" >En proceso</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" id="profile-tab" data-toggle="tab" href="#profile" role="tab" aria-controls="profile" aria-selected="false">Crédito</a>
+  </li>
+</ul>
+
+<!-- Tab panes -->
+<div class="tab-content">
+  <div class="tab-pane active tarjetas" id="home" role="tabpanel" aria-labelledby="home-tab">
+      
+			
+           {loop="$fsc->enProceso"}
+		   <div class="row" >
+                       <h3>{if="$value['nombre']=='0'"} ARTÍCULOS {else}  {$value['nombre']} {/if}<a href="{$fsc->url()}&pagar_facturas={$value['nombre']}"> <span class="fa fa-money"></span> </a></h3>
+				
+				{loop="$fsc->listado_facturas($value['nombre'],   1)"}
+					<div class="col-12 col-md-2">
+						<div class="card color{$key1}">
+						  <div class="card-header">
+						   {$value['nombrecliente'].' / '} {if="$value['proveedor_servicio']=='0'"} ARTÍCULOS {else}  {$value['proveedor_servicio']} {/if} | ${$value['total']}
+						  </div>
+						  <div class="card-body">
+							<p class="card-text">{$value['observaciones']}</p>
+                                                        <div class="btn-group">
+							<a href="index.php?page=ventas_factura&id={$value['idfactura']}"  class="btn btn-primary">PAGAR</a>
+                                                        <a href="index.php?page=tpv_recambios&factura_editar={$value['idfactura']}"  class="btn btn-success">EDITAR</a>
+                                                        </div>
+						  </div>
+						</div>
+					</div>
+				{/loop}
+			</div>
+			<hr />
+           {/loop}
+        	
+       
+    </div>
+
+    <div class="tab-pane tarjetas" id="profile" role="tabpanel" aria-labelledby="profile-tab">
+       
+           {loop="$fsc->creditos"}
+		   <div class="row">
+			<h3 >{if="$value['nombre']=='0'"} ARTÍCULOS {else}  {$value['nombre']} {/if}</h3>
+				
+				{loop="$fsc->listado_facturas($value['nombre'],   2)"}
+					<div class="col-12 col-md-2">
+						<div class="card color{$key1}">
+						  <div class="card-header">
+						   {$value['nombrecliente'].' / '} {if="$value['proveedor_servicio']=='0'"} ARTÍCULOS {else}  {$value['proveedor_servicio']} {/if}
+						  </div>
+						  <div class="card-body">
+							<p class="card-text">{$value['observaciones']}</p>
+                                                        <div class="btn-group">
+							<a href="index.php?page=ventas_factura&id={$value['idfactura']}" class="btn btn-primary">PAGAR</a>
+                                                        <a href="index.php?page=tpv_recambios&factura_editar={$value['idfactura']}"  class="btn btn-success">EDITAR</a>
+                                                        </div>
+						  </div>
+						</div>
+					</div>
+				{/loop}
+			</div>
+           {/loop}
+    </div>        
+    
+</div>
+
+
+
+{include="footer"}
+
+

@@ -1,0 +1,170 @@
+{include="header"}
+
+<script type="text/javascript" src="{$fsc->get_js_location('liquidacion_servicios_lav.js')}"></script>
+
+  <script type="text/javascript">
+      $(document).ready(function() {
+         tpv_url = "{$fsc->url()}";
+      });
+   </script>
+
+
+<!-- Nav tabs -->
+<ul class="nav nav-tabs" id="myTab" role="tablist">
+  <li class="nav-item active">
+    <a class="nav-link active" id="home-tab" data-toggle="tab" href="#home" role="tab" aria-controls="home" aria-selected="true" >Liquidación Servicios</a>
+  </li>
+  <li class="nav-item ">
+    <a class="nav-link" id="masivo-tab" data-toggle="tab" href="#masivo" role="tab" aria-controls="masivo" aria-selected="true" >Valores Masivos</a>
+  </li>
+</ul>
+
+<!-- Tab panes -->
+<div class="tab-content">
+  <div class="tab-pane active tarjetas" id="home" role="tabpanel" aria-labelledby="home-tab">
+      
+      <div class="rows col-12 col-md-6">
+            
+          
+          <form action="{$fsc->url()}" method="post" class="form">
+          <div class="col-md-4">  
+                    <input type="text"  class="form-control"  value="{$fsc->busqueda}" placeholder="Buscar..." id="busqueda" name="busqueda" >
+           </div>      
+                
+                    <button type="submit" class="btn btn-primary">Enviar</button>
+                
+            </form>
+              
+          </br>
+      </div>
+      
+      
+      <table class="table">
+          
+            <thead>
+               <tr >
+                   <th scope="col" rowspan="2">Servicio</th>
+                
+                <th scope="col" colspan="2" class="bg-info text-center">Lunes a Viernes</th>
+                
+                
+                <th scope="col" colspan="2"  class="bg-warning  text-center">Sábados y Domingos</th>
+                
+                
+                <th scope="col" colspan="2"  class="bg-primary  text-center">Festivos</th>
+                
+              </tr>
+              <tr>
+
+                <th scope="col" class="bg-info">Valor fijo($)</th>
+                <th scope="col" class="bg-info">Porcentaje(%)</th>
+                
+                <th scope="col" class="bg-warning">Valor fijo($)</th>
+                <th scope="col" class="bg-warning">Porcentaje(%)</th>
+                
+                <th scope="col" class="bg-primary">Valor fijo($)</th>
+                <th scope="col" class="bg-primary">Porcentaje(%)</th>
+              </tr>
+            </thead>
+            <tbody>
+                    {loop="$fsc->servicios_lav"}
+                        <tr id="{$value['referencia']}">
+                            <td>{$value["descripcion"]}</td>
+                           
+                            <td class="bg-info"><input type="text" value="{$fsc->consulta_liquidacion($value['referencia'], 'valor_fijo1')}" class="form-control text-right " name="val_fijo1_{$value['referencia']}" id="val_fijo1_{$value['referencia']}"></td>
+                            <td class="bg-info"><input type="text"   value="{$fsc->consulta_liquidacion($value['referencia'], 'porcentaje1')}" class="form-control text-right" name="porcentaje1_{$value['referencia']}" id="porcentaje1_{$value['referencia']}" ></div></td>
+                            
+                            <td class="bg-warning"><input type="text" value="{$fsc->consulta_liquidacion($value['referencia'], 'valor_fijo2')}" class="form-control text-right" name="val_fijo2_{$value['referencia']}" id="val_fijo2_{$value['referencia']}" ></td>
+                            <td class="bg-warning"> <input type="text"   value="{$fsc->consulta_liquidacion($value['referencia'], 'porcentaje2')}" class="form-control text-right" name="porcentaje2_{$value['referencia']}" id="porcentaje2_{$value['referencia']}" ></div></td>
+                            
+                            <td class="bg-primary"><input type="text" value="{$fsc->consulta_liquidacion($value['referencia'], 'valor_fijo3')}" class="form-control text-right" name="val_fijo3_{$value['referencia']}" id="val_fijo3_{$value['referencia']}"></td>
+                            <td class="bg-primary"><input type="text"   value="{$fsc->consulta_liquidacion($value['referencia'], 'porcentaje3')}" class="form-control text-right" name="porcentaje3_{$value['referencia']}" id="porcentaje3_{$value['referencia']}"></div></td>
+
+                            <td><button  type="submit" id="bot_guardar_{$value['referencia']}" value="{$value['referencia']}" class="btn btn-primary glyphicon glyphicon-floppy-disk bot_guardar"></button></td>
+                            
+                        </tr>
+                    {/loop}
+            </tbody>
+        </table>
+  </div>
+  
+  <div class="tab-pane tarjetas" id="masivo" role="masivo" aria-labelledby="masivo-tab">
+      
+      <div class="panel panel-danger">
+               <div class="panel-heading">
+                   <h3 class="panel-title">Precio de venta y precio combo</h3> 
+               </div>     
+                  <div class="panel-body">
+                      <div class="rows">
+                          <form action="{$fsc->url()}" name="form_masivo_vta" id="form_masivo_vta">
+                        <div class="col-md-4">
+                                       <span class="input-group-addon">Familia</span>
+                                        <select  class="form-control"  name="familia_masivo1"  id="familia_masivo1" >
+                                            <option value="" selected  >TODOS LOS ARTÍCULOS</option>
+                                        {loop="$fsc->familia->all()"}
+                                                <option value="{$value->codfamilia}" >{$value->descripcion}</option>
+                                        {/loop}
+                                        </select>
+
+                        </div>
+                          
+                        <div class="col-md-4">
+                            <span class="input-group-addon">Porcentaje(%)</span>
+                            <input type="text"  class="form-control"  value="" required="" id="masivo_precio" name="masivo_precio" >
+                        </div>
+                        <div class="col-md-4">
+                            <button type="submit" class="btn btn-primary text-right">Enviar</button>
+                        </div>
+                              
+                        </form>
+                          
+                      </div>
+                      
+                  </div>
+                <div class="panel-footer">
+                    <p>Luego de seleccionar la familia escriba el porcentaje que cambiará, escriba un valor positivo para aumentar el precio de venta y el precio combo o un valor negativo para bajar el precio de venta y el precio combo </p>
+
+                </div>
+        </div>	
+      <div class="panel panel-danger">
+               <div class="panel-heading">
+                   <h3 class="panel-title">Valor comisión de productos</h3> 
+               </div>     
+                  <div class="panel-body">
+                      <div class="rows">
+                      <form action="{$fsc->url()}" name="form_masivo_com" id="form_masivo_com"> 
+                        <div class="col-md-4">
+                                                        <span class="input-group-addon">Familia</span>
+                                        <select  class="form-control"  name="familia_masivo2"  id="familia_masivo2" >
+                                            <option value="" selected  >TODOS LOS ARTÍCULOS</option>
+                                        {loop="$fsc->familia->all()"}
+                                                <option value="{$value->codfamilia}" >{$value->descripcion}</option>
+                                        {/loop}
+                                        </select>
+
+                        </div>
+                        <div class="col-md-4">
+                            <span class="input-group-addon">Porcentaje(%)</span>
+                            <input type="text"  class="form-control"  value="" required=""  id="masivo_comision" name="masivo_comision" >
+                        </div>
+                        <div class="col-md-4">
+                            <button type="submit" class="btn btn-primary text-right">Enviar</button>
+                        </div>
+                          
+                         
+                        </form>
+                      </div>
+                      
+                  </div>
+                <div class="panel-footer">
+                    <p>Luego de seleccionar la familia escriba el porcentaje de liquidación para modificar </p>
+
+                </div>
+        </div>	
+</div>
+
+
+
+{include="footer"}
+
+

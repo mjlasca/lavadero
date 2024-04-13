@@ -1,0 +1,198 @@
+{include="header"}
+
+<script type="text/javascript" src="{$fsc->get_js_location('servicios_lav.js')}"></script>
+<input type="hidden" value="{$fsc->bandera_aviso}" name="bandera_aviso" id="bandera_aviso">
+<div class="container-fluid" style="margin-bottom: 10px;">
+   <div class="row">
+      <div class="col-xs-12">
+         <div class="btn-group hidden-xs">
+            <a class="btn btn-sm btn-default" href="{$fsc->url()}" title="Recargar la página">
+               <span class="glyphicon glyphicon-refresh"></span>
+            </a>
+            {if="$fsc->page->is_default()"}
+            <a class="btn btn-sm btn-default active" href="{$fsc->url()}&amp;default_page=FALSE" title="Marcada como página de inicio (pulsa de nuevo para desmarcar)">
+               <i class="fa fa-bookmark" aria-hidden="true"></i>
+            </a>
+            {else}
+            <a class="btn btn-sm btn-default" href="{$fsc->url()}&amp;default_page=TRUE" title="Marcar como página de inicio">
+               <i class="fa fa-bookmark-o" aria-hidden="true"></i>
+            </a>
+            {/if}
+         </div>
+        
+      </div>
+   </div>
+</div>
+
+
+<!-- Nav tabs -->
+<ul class="nav nav-tabs" id="myTab" role="tablist">
+  <li class="nav-item active">
+    <a class="nav-link active" id="home-tab" data-toggle="tab" href="#home" role="tab" aria-controls="home" aria-selected="true" >Nuevo Combo</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" id="profile-tab" data-toggle="tab" href="#profile" role="tab" aria-controls="profile" aria-selected="false">Listado de Combos</a>
+  </li>
+</ul>
+
+
+
+<div class="tab-content">
+  <div class="tab-pane active tarjetas" id="home" role="tabpanel" aria-labelledby="home-tab">
+        <div class="tarjetas col col-lg-10">
+    <input type="hidden" class="form-control"  name="bandera"  id="bandera" value="{$fsc->bandera}">
+      <form id="form_servicios" action="{$fsc->url()}" method="post">
+          
+          <input type="hidden" class="form-control"  name="fecha"  id="fecha" value="{$fsc->today()}">
+          <input type="hidden" class="form-control"  name="hora"  id="hora" value="{$fsc->hour()}">
+          <input type="hidden" class="form-control"  name="bandera_lav"  id="bandera_lav" value="{$fsc->bandera}">
+          <input type="hidden" class="form-control"  name="actualizar_lav"  id="actualizar_lav" value="{$fsc->actualiza_ban}">
+          <input type="hidden" class="form-control"  name="cant_conjunto"  id="cant_conjunto" {if="$fsc->conjunto_combo_cant>0"} value="{$fsc->conjunto_combo_cant}" {else} value="0" {/if}>
+        
+        
+          <div class="form-group row">
+            <!--<label for="cod_servicio" class="col-sm-2 col-form-label">Código </label>-->
+            <div class="col-sm-10">
+                <input type="hidden" class="form-control" name="cod_servicio" id="cod_servicio" placeholder="Código combo"   value="{$fsc->consultar_indi('idcombo')}" >
+            </div>
+          </div>  
+
+          <div class="form-group row">
+              
+            <label for="des_servicio" class="col-sm-2 col-form-label">Descripción</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control" name="des_servicio" required=""  id="des_servicio" placeholder="Descripción combo" value="{$fsc->consultar_indi('descripcion')}" >
+            </div>
+          </div>
+
+          <div class="form-group row" id="servicios_adicion">
+              <div class="col-sm-2" ></div>
+            <div class="col-sm-5">
+                <div class="row">
+                      <div class="col-sm-10">
+                    Servicios
+                    <select  class="form-control"  name="ad1"  id="ad1" >
+                            <option value="0" selected="selected">---</option>
+                        {loop="$fsc->adi1"}
+                                <option value="{$value['descripcion']}">{$value['descripcion']}</option>
+                        {/loop}
+                    </select>
+                    </div>
+                    <div class="col-sm-1">
+                        ADD
+                    <a id="bot_servicios" type="submit" href="#" class="btn btn-default btn-sm">+</a>
+                    </div>
+                   
+                </div>  
+            </div>
+              
+              <div class="col-sm-5">
+                  <div class="row">
+                      <div class="col-sm-10">
+                Artículos
+               <select  class="form-control"  name="art1"  id="art1" >
+                        <option value="0" selected="selected">---</option>
+                    {loop="$fsc->art1"}
+                        <option value="{$value['descripcion']}">{$value['descripcion']}</option>
+                    {/loop}
+               </select>
+                      </div>
+                <div class="col-sm-1">
+                    ADD
+               <a id="bot_articulos" type="submit" href="#" class="btn btn-default btn-sm">+</a>
+                </div>
+                  </div>
+            </div>
+          </div>
+          
+          <div class="form-group row" >
+            
+              <div class="row">
+              <div class="col-sm-2"></div>
+              <div class="col-sm-10" id="articulos_adicion">
+                  
+                  {if="$fsc->actualiza_ban"}
+                  
+                  {loop="$fsc->consulta_combos_conjunto"}
+                    <input type="hidden" class="form-control"  name="cant_act"  id="cant_act" value="{$fsc->cont_lav++}">
+                    <div class='col-sm-2' id="frag{$fsc->cont_lav}">
+                        <input type='text' class='form-control'  name="ad{$fsc->cont_lav}"    id="ad{$fsc->cont_lav}"   value="{$fsc->busq_articulo($value['articulo'])}" readonly='readonly'> <a href='#' class='glyphicon glyphicon-trash' onClick="return borrar_control({$fsc->cont_lav})"></a>
+                        
+                    </div>
+                  {/loop}
+
+                  {/if}
+                  
+              </div>
+              </div>
+
+          </div>
+          
+
+          
+          <div class="form-group row">
+            <div class="col-sm-10">
+              <button type="submit" class="btn btn-primary">Guardar</button>
+            </div>
+          </div>
+        </form>
+
+
+        </div>
+    </div>
+    
+    <div class="tab-pane tarjetas" id="profile" role="tabpanel" aria-labelledby="profile-tab">
+        <table class="table">
+            <thead>
+              <tr>
+                <th scope="col">REFERENCIA</th>
+                <th scope="col">Descripción</th>
+                <th scope="col" class="text-right">Valor</th>
+                <th scope="col">Servicios / Artículos</th>
+                <th scope="col">Editar</th>
+              </tr>
+            </thead>
+            <tbody>
+              {loop="$fsc->consulta_combos"}  
+                <tr>
+                  <td>COMBO{$value['idcombo']}</td>
+                  <td>{$value['descripcion']}</td>
+                  <td class="text-right">{$fsc->formato_moneda($fsc->valor_combo($value['idcombo']))}</td>
+                  <td>{$fsc->conjunto_consulta($value['idcombo'])}</td>
+                  <td>
+                      <div class="form-group row">
+                          {if="$fsc->allow_delete"}
+                          <a href="{$fsc->url().'&ref='.$value['idcombo']}"><button class="btn btn-sm btn-primary">+</button></a>
+                          <a href="#" onclick="return eliminar_combo({$value['idcombo']})"><button class="btn btn-sm btn-danger"><span class="glyphicon glyphicon-trash"></span></button></a>
+                          {/if}
+                      </div>
+                  </td>
+                </tr>
+              {/loop}
+            </tbody>
+        </table>
+    </div>
+    
+</div>      
+      
+<script type="text/javascript">
+    
+    function eliminar_combo(id){
+        
+        bootbox.confirm({
+            message: '¿Realmente desea eliminar el combo?',
+            title: '<b>Atención</b>',
+            callback: function(result) {
+               if (result) {
+                  window.location.href = '{$fsc->url()}&eliminar='+id;
+               }
+            }
+         });
+    }
+    
+</script>
+
+
+{include="footer"}
+
+

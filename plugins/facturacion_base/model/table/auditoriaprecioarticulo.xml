@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Document   : cajas.xml
+    Author     : Carlos Garcia Gomez
+    Description:
+        Estructura de la tabla auditoriaprecioarticulo.
+-->
+<tabla>
+    <columna>
+        <nombre>reg</nombre>
+        <tipo>serial</tipo>
+        <nulo>NO</nulo>
+        <defecto>nextval('auditoriaprecioarticulo_reg_seq'::regclass)</defecto>
+    </columna>
+    <columna>
+        <nombre>precioanterior</nombre>
+        <tipo>DOUBLE</tipo>
+        <nulo>YES</nulo>
+    </columna>
+    <columna>
+        <nombre>precio</nombre>
+        <tipo>DOUBLE</tipo>
+        <nulo>YES</nulo>
+    </columna>
+    <columna>
+        <nombre>costoanterior</nombre>
+        <tipo>DOUBLE</tipo>
+        <nulo>YES</nulo>
+    </columna>
+    <columna>
+        <nombre>costo</nombre>
+        <tipo>DOUBLE</tipo>
+        <nulo>YES</nulo>
+    </columna>
+    <columna>
+        <nombre>preciocomboanterior</nombre>
+        <tipo>DOUBLE</tipo>
+        <nulo>YES</nulo>
+    </columna>
+    <columna>
+        <nombre>preciocombo</nombre>
+        <tipo>DOUBLE</tipo>
+        <nulo>YES</nulo>
+    </columna>
+    <columna>
+        <nombre>ivaanterior</nombre>
+        <tipo>DOUBLE</tipo>
+        <nulo>YES</nulo>
+    </columna>
+    <columna>
+        <nombre>iva</nombre>
+        <tipo>DOUBLE</tipo>
+        <nulo>YES</nulo>
+    </columna>
+    <columna>
+        <nombre>idarticulo</nombre>
+        <tipo>VARCHAR(100)</tipo>
+        <nulo>YES</nulo>
+    </columna>
+    <columna>
+        <nombre>ultmod</nombre>
+        <tipo>datetime</tipo>
+        <nulo>YES</nulo>
+    </columna>
+    <columna>
+        <nombre>useredit</nombre>
+        <tipo>VARCHAR(100)</tipo>
+        <nulo>YES</nulo>
+    </columna>
+    <columna>
+        <nombre>nombreempleado</nombre>
+        <tipo>varchar(100)</tipo>
+        <nulo>YES</nulo>
+    </columna>
+    <restriccion>
+        <nombre>auditoriaprecioarticulo_pkey</nombre>
+        <consulta>PRIMARY KEY (reg)</consulta>
+    </restriccion>
+</tabla>

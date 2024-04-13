@@ -1,0 +1,1 @@
+a:5:{i:0;a:3:{s:3:"tag";s:2:"14";s:7:"expires";i:1704515191;s:5:"count";i:1;}i:1;a:3:{s:3:"tag";s:3:"146";s:7:"expires";i:1704515191;s:5:"count";i:1;}i:2;a:3:{s:3:"tag";s:4:"1461";s:7:"expires";i:1704515191;s:5:"count";i:1;}i:3;a:3:{s:3:"tag";s:5:"14616";s:7:"expires";i:1704515308;s:5:"count";i:1;}i:4;a:3:{s:3:"tag";s:10:"a14616plus";s:7:"expires";i:1704523796;s:5:"count";i:1;}}

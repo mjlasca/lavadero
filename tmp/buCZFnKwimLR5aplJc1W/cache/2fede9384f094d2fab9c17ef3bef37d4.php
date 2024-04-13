@@ -1,0 +1,1 @@
+a:1:{i:0;a:4:{s:5:"texto";s:24:"Factura Cliente 00119225";s:3:"url";s:39:"index.php?page=ventas_factura&id=119692";s:5:"nuevo";b:0;s:6:"cambio";s:19:"05-01-2024 07:07:43";}}

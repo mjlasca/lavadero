@@ -1,0 +1,117 @@
+{include="header"}
+<div class="container-fluid" style="margin-top: 10px;">
+   <div class="row">
+      <div class="col-sm-6">
+         <div class="btn-group hidden-xs">
+            <a class="btn btn-sm btn-default" href="{$fsc->url()}" title="Recargar la página">
+               <span class="glyphicon glyphicon-refresh"></span>
+            </a>
+            {if="$fsc->page->is_default()"}
+            <a class="btn btn-sm btn-default active" href="{$fsc->url()}&amp;default_page=FALSE" title="desmarcar como página de inicio">
+               <span class="glyphicon glyphicon-home"></span>
+            </a>
+            {else}
+            <a class="btn btn-sm btn-default" href="{$fsc->url()}&amp;default_page=TRUE" title="marcar como página de inicio">
+               <span class="glyphicon glyphicon-home"></span>
+            </a>
+            {/if}
+         </div>
+         
+         <div class="btn-group">
+            {loop="$fsc->extensions"}
+               {if="$value->type=='button'"}
+               <a href="index.php?page={$value->from}{$value->params}" class="btn btn-sm btn-default">{$value->text}</a>
+               {/if}
+            {/loop}
+         </div>
+      </div>
+      <div class="col-sm-6 text-right">
+         <h2 style="margin-top: 0px;">Certificados DIAN</h2>
+      </div>
+   </div>
+</div>
+
+<div class="table-responsive">
+    <table class="table table-condensed">
+        <thead>
+            <tr>
+                <th class="text-left">Identificador</th>
+                <th class="text-left">Número</th>
+                <th class="text-left">Fecha Inicio</th>
+                <th class="text-left">Fecha Fin</th>
+                <th class="text-right">Contador Inicial</th>
+                <th class="text-right">Contador Final</th>
+                <th class="text-right" width="120">Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+         {loop="$fsc->listar_certificados()"}
+         <form action="{$fsc->url()}" method="post" class="form">
+            <input type="hidden" name="idcertificado" value="{$value->idcertificado}"/>
+            <tr>
+               <td>
+                  <div class="form-control">{$value->idcertificado}</div>
+               </td>
+               <td>
+                  <input class="form-control" type="text" name="numero" value="{$value->numero}" autocomplete="off"/>
+               </td>
+               <td>
+                  <input class="form-control datepicker" type="text" name="fecha_inicio" value="{$value->fecha_inicio}" autocomplete="off"/>
+               </td>
+               <td>
+                  <input class="form-control datepicker" type="text" name="fecha_fin" value="{$value->fecha_fin}" autocomplete="off"/>
+               </td>
+               <td>
+                  <input class="form-control text-right" type="number" name="contador_inicial" value="{$value->contador_inicial}"/>
+               </td>
+               <td>
+                  <input class="form-control text-right" type="number" name="contador_final" value="{$value->contador_final}"/>
+               </td>
+               <td class="text-right">
+                  <div class="btn-group">
+                     <a class="btn btn-sm btn-danger" href="{$fsc->url()}&delete={$value->idcertificado}" title="Eliminar">
+                        <span class="glyphicon glyphicon-trash"></span>
+                     </a>
+                     <button class="btn btn-sm btn-primary" type="submit" onclick="this.disabled=true; this.form.submit();" title="Guardar">
+                        <span class="glyphicon glyphicon-floppy-disk"></span>
+                     </button>
+                  </div>
+               </td>
+            </tr>
+         </form>
+         {/loop}
+         
+         {if condition="$fsc->query==''"}
+         <form action="{$fsc->url()}" method="post" class="form">
+            <tr class="bg-info">
+               <td>
+                  <div class="form-control">Nuevo</div>
+               </td>
+               <td>
+                  <input class="form-control" type="text" name="numero" autocomplete="off"/>
+               </td>
+               <td>
+                  <input class="form-control datepicker" type="text" name="fecha_inicio" autocomplete="off" value="{$fsc->today()}"/>
+               </td>
+               <td>
+                  <input class="form-control datepicker" type="text" name="fecha_fin" autocomplete="off" value="{$fsc->today()}"/>
+               </td>
+               <td>
+                  <input class="form-control text-right" type="number" name="contador_inicial" value="0"/>
+               </td>
+               <td>
+                  <input class="form-control text-right" type="number" name="contador_final" value="0"/>
+               </td>
+               <td class="text-right">
+                  <button class="btn btn-sm btn-primary" type="submit" onclick="this.disabled=true; this.form.submit();" title="Guardar">
+                     <span class="glyphicon glyphicon-floppy-disk"></span>
+                  </button>
+               </td>
+            </tr>
+         </form>
+         {/if}
+        </tbody>
+    </table>
+</div>
+
+{include="footer"}

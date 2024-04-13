@@ -1,0 +1,263 @@
+/*!
+ * This file is part of FacturaScripts
+ * Copyright (C) 2013-2017  Carlos Garcia Gomez  neorazorx@gmail.com
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+ul.dropdown-menu li a:first-letter {
+   text-transform: uppercase;
+}
+
+.well {
+   margin: 5px;
+}
+
+.alert {
+   margin: 5px;
+}
+
+.alert a {
+   color: white;
+   text-decoration: underline;
+}
+
+.modal-header .close {
+   color: #222222;
+}
+
+.modal-footer {
+   margin: 0px;
+}
+
+.autocomplete-suggestions { border: 1px solid #999; background: #FFF; overflow: auto; }
+.autocomplete-suggestion { padding: 2px 5px; white-space: nowrap; overflow: hidden; }
+.autocomplete-selected { background: #D9EDF7; }
+.autocomplete-suggestions strong { font-weight: normal; color: #3399FF; }
+
+.clickable, .clickableRow:hover {
+   cursor: pointer;
+}
+
+.modal-dialog {
+   z-index: 1050;
+}
+
+iframe {
+   border: 0px;
+}
+
+.vertical-align-bottom {
+    float:none;
+    vertical-align: bottom !important;
+}
+
+.vertical-align-top {
+    float:none;
+    vertical-align: top !important;
+}
+
+.vertical-align-middle {
+    float:none;
+    vertical-align: middle !important;
+}
+
+#articuloscinta{
+  display: block;
+  overflow-y: scroll;
+  height: 120px;
+  position:  relative;
+}
+
+#articuloscinta td{
+  text-align: center;
+   padding: 5px;
+}
+
+#articuloscinta td a{
+  padding: 0px;
+}
+
+#articuloscinta td p {
+  background-color: rgba(255,255,255,.8);
+  display: block;
+  left: 0;
+    padding: 0px;
+  width: 100%;
+  position: relative;
+}
+
+#familiaCinta {
+  background-color: rgba(239, 235, 237,.8);
+}
+
+#familiaCinta a{
+  padding: 5px;
+}
+
+.warning{
+  background-color: #fcf8e3;
+}
+
+.success{
+  background-color: #dff0d8;
+}
+#comunidad{
+   display : none; 
+}
+
+#totalArriba{
+
+  font-size: 24px;
+}
+
+#parabotguardar{
+  padding-top: 21px;
+}
+
+#parabotguardar button{
+  width: 100%;
+}
+
+.verduras{
+  background-color: #3E5F8A;
+  color: white;
+}
+
+.btn-apagado{
+  background-color: #D1D1D1;
+  color: white;
+}
+
+.navbar-default {
+    background-color: #3E5F8A;
+  }
+
+  .btn-primary {
+    background-color: #3E5F8A;
+  }
+
+.disabled {
+    pointer-events:none;
+    opacity:0.6;        
+}
+
+.card {
+    position: relative;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    -ms-flex-direction: column;
+    flex-direction: column;
+    min-width: 0;
+    word-wrap: break-word;
+    background-color: #fff;
+    background-clip: border-box;
+    border: 1px solid rgba(0,0,0,.125);
+    border-radius: .25rem;
+}
+
+.card-body {
+    -webkit-box-flex: 1;
+    -ms-flex: 1 1 auto;
+    flex: 1 1 auto;
+    padding: 1.25rem;
+}
+
+.card-header {
+    padding: .75rem 1.25rem;
+    margin-bottom: 0;
+    background-color: rgba(0,0,0,.03);
+    border-bottom: 1px solid rgba(0,0,0,.125);
+}
+
+.card-header:first-child {
+    border-radius: calc(.25rem - 1px) calc(.25rem - 1px) 0 0;
+}
+
+.tarjetas{
+    padding: 20px;
+}
+
+.mostrador{
+    padding: 5px;
+    font-size: 18px;
+}
+
+
+.validandoCajas{
+    background-color: #F6CECE;
+}
+
+
+.color0
+{
+	background-color: #F7F8E0;
+	
+}
+.color1
+{
+	background-color: #F0CEEC;
+	
+}
+
+.color2
+{
+	background-color: #E6F8E0;
+	
+}
+
+.color3
+{
+	background-color: #D8CEF6;
+	
+}
+
+.color4
+{
+	background-color: #E0F8E6;
+}
+
+.color5
+{
+	background-color: #CECEF6;
+}
+
+.color6
+{
+	background-color: #E0F8EC;
+}
+
+.color7
+{
+	background-color: #CEE3F6;
+}
+
+.color8
+{
+	background-color: #E0F8F1;
+}
+
+.color9
+{
+	background-color: #F8E0E0;
+}
+
+.color10
+{
+	background-color: #F2F2F2;
+}
+
