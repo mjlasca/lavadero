@@ -96,6 +96,7 @@ class ventas_cliente extends fbase_controller
     private function modificar()
     {
         $this->cliente->nombre = $_POST['nombre'];
+        $this->cliente->nombre2 = $_POST['nombre2'] ?? "";
         $this->cliente->razonsocial = $_POST['razonsocial'];
         $this->cliente->tipoidfiscal = $_POST['tipoidfiscal'];
         $this->cliente->cifnif = $_POST['cifnif'];

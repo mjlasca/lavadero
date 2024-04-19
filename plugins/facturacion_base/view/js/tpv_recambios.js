@@ -59,6 +59,93 @@ function usar_cliente(codcliente)
     }
 }
 
+function getClient(placa)
+{
+    const modal_save = document.querySelector('#modal_guardar');
+    if (tpv_url !== '') {
+        $.getJSON(tpv_url, 'placa=' + placa, function (json) {
+            let flag = false;
+            
+            if(json){
+                if( json.nombre2 == "" || json.email == "" || json.telefono1 == ""){
+                    flag = true;       
+                }
+                document.querySelector('input[name="nombrecliente"]').value = placa
+                document.querySelector('input[name="cifnif"]').value = json.cifnif;
+                document.querySelector('input[name="nombre2"]').value = json.nombre2;
+                document.querySelector('select[name="tipoidfiscal"]').value = json.tipoidfiscal;
+                document.querySelector('input[name="telefono1"]').value = json.telefono1;
+                document.querySelector('input[name="email"]').value = json.email;
+            }else{
+                flag = true;
+                document.querySelector('input[name="nombrecliente"]').value = placa
+            }
+
+            if(flag)
+            {
+                const foot = modal_save.querySelector('.modal-footer');
+                if(foot){
+                    foot.classList.add('hidden_modal');
+                    const tab_data = modal_save.querySelector('a[aria-controls="tab_cliente"]');
+                    tab_data.click();
+                }
+            }
+        });
+    }
+}
+
+function setdataclient(){
+    const data_client = document.querySelector('#tab_cliente');
+    const placa = data_client.querySelector('input[name="nombrecliente"]').value
+
+    const data = {
+        cifnif: data_client.querySelector('input[name="cifnif"]').value,
+        nombre2: data_client.querySelector('input[name="nombre2"]').value,
+        tipo_cifnif: data_client.querySelector('select[name="tipoidfiscal"]').value,
+        cifnif: data_client.querySelector('input[name="cifnif"]').value,
+        telefono1: data_client.querySelector('input[name="telefono1"]').value,
+        email: data_client.querySelector('input[name="email"]').value,
+        razonsocial: data_client.querySelector('input[name="razonsocial"]').value,
+    };
+
+    
+    let errors = "";
+    if(data.cifnif == "")
+        errors += "La identificación es obligatoria<br>";
+    if(data.nombre2 == "")
+        errors += "El nombre del usuario es obligatorio<br>";
+    if(data.telefono1 == "")
+        errors += "El teléfono es obligatorio<br>";
+    if(data.tipo_cifnif == "")
+        errors += "El tipo de documento es obligatorio<br>";
+    if(data.email == "")
+        errors += "El email es obligatorio<br>";
+    if(data.tipo_cifnif == "NIT" && data.razonsocial == "")
+        errors += "La razón social es obligatorio cuando es NIT<br>";    
+    if(data.cifnif == placa)
+        errors += "Identificación incorrecta<br>";    
+    if(data.email != "" && validarEmail(data.email) == false) {
+        errors += "El email está mal escrito<br>"
+    }
+
+    const err = data_client.querySelector('.msg-data');
+    err.innerHTML = "";
+    if(errors == ""){
+        crear_cliente_tpv(placa,data);
+    }
+    else{
+        err.innerHTML = errors;
+    }
+    
+
+}
+
+function validarEmail(email) {
+    // Expresión regular para validar el formato del email
+    var regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return regex.test(email);
+}
+
 function cliente_db()
 {
     if (tpv_url !== '') {
@@ -1167,8 +1254,30 @@ function show_pvp_iva(pvp, codimpuesto)
 
 function botonfactura(){
     //console.log("--------------->"+$("#cliente_existe").val());
+    const modal_save = document.querySelector('#modal_guardar');
+    if(modal_save){
+        const foot = modal_save.querySelector('.modal-footer');
+        if(foot)
+            foot.classList.remove('hidden_modal');
+        const tab_data = modal_save.querySelector('a[aria-controls="tab_pago"]');
+        if(tab_data)
+            tab_data.click();
+    }
+
+    const data_client = document.querySelector('#tab_cliente');
+    const err = data_client.querySelector('.msg-data');
+    if(err){
+        if(err.classList.contains('msg-data--green'))
+            err.classList.remove('msg-data--green')
+        err.innerHTML = "";
+    }
+    
+
     var totalito = $("#tpv_total3").val();
         if($("#cliente_existe").val()>0){
+            
+            getClient($("#ac_cliente").val());
+            
             if(parseFloat(totalito)>=0){
                 if(verificar_combo_lineas()){
                     $("#modal_guardar").modal('show');
@@ -1252,29 +1361,63 @@ function revisar_proveedores(datico){
 
 //función para crear el cliente en tpv sin ir al formulario para hacerlo
 //solamente escribirá el cliente y dará clic
-function crear_cliente_tpv(dato)
+function crear_cliente_tpv(dato, more_data = null)
 {
+    
     dato = dato.toUpperCase();
     $("#ac_cliente").val(dato);
+    
     var resultado = false;
     if (tpv_url !== '') {
-        $.getJSON(tpv_url, 'crear_cliente=' + dato, function (json) {
-            
-            
+        let concat = "";
+        if(more_data != null){
+            if(more_data.nombre2)
+                concat += "&nombre2="+more_data.nombre2;
+            if(more_data.tipo_cifnif)
+                concat += "&tipo_cifnif="+more_data.tipo_cifnif;
+            if(more_data.cifnif)
+                concat += "&cifnif="+more_data.cifnif;
+            if(more_data.telefono1)
+                concat += "&telefono1="+more_data.telefono1;
+            if(more_data.email)
+                concat += "&email="+more_data.email;
+            if(more_data.razonsocial)
+                concat += "&razonsocial="+more_data.razonsocial;
+                
+        }
+        if(document.f_tpv.cliente_existe.value == 1){
+            concat += "&cod="+document.f_tpv.cliente.value;
+        }
+
+        $.getJSON(tpv_url+concat, 'crear_cliente=' + dato, function (json) {
+
             if(json.exito)
             {
-                
-                //location.href=tpv_url+"&cliente_nuevo="+dato;
-                //console.log(">>"+ JSON.stringify(json.cod));
                 cliente = JSON.stringify(json.cod);
-                
-                //$("#ac_cliente").val("");
                 document.f_tpv.cliente.value = json.cod.codcliente;
                 document.f_tpv.nombrecliente.value = dato;
-                document.f_tpv.cifnif.value = dato;
+                document.f_tpv.cifnif.value = json.cod.cifnif;
                 document.f_tpv.cliente_existe.value = 1;
                 $("#bot_nuevo_cliente").hide();
                 resultado = true;
+
+                const modal_save = document.querySelector('#modal_guardar');
+                const foot = modal_save.querySelector('.modal-footer');
+                if(foot){
+                    foot.classList.remove('hidden_modal');
+                    const tab_data = modal_save.querySelector('a[aria-controls="tab_pago"]');
+                    if(tab_data)
+                        tab_data.click();
+                }
+
+                const data_client = document.querySelector('#tab_cliente');
+                const err = data_client.querySelector('.msg-data');
+                err.classList.add('msg-data--green')
+                err.innerHTML = "Datos guardados con éxito";
+                setTimeout(() => {
+                    err.innerHTML = "";
+                }, 3000);
+                
             }
             
         });
@@ -1380,17 +1523,19 @@ function traer_lineas_editar(id_fact){
     
 
 function verificar_cliente(){
+    
     var estado = 0;
     var dato_escogido ="";
     var buscar = $("#ac_cliente").val();
+    
     if(buscar.length>4){
             $("#bot_nuevo_cliente").show();
             document.f_tpv.cliente_existe.value = 0;
+            
                 for(i=0 ; i < clientes_db.length ; i++){
                         
                         //if(clientes_db[i].nombre.indexOf(buscar.toUpperCase()) != -1){
                         if(clientes_db[i].nombre.toUpperCase() == buscar.toUpperCase()){
-                           //document.f_tpv.cliente_existe.value = 0;
                            estado = 1;
                            dato_escogido = clientes_db[i].nombre;
                            //console.log(clientes_db[i].nombre+"---> "+clientes_db[i].nombre.indexOf(buscar.toUpperCase()));
@@ -1593,15 +1738,24 @@ $(document).ready(function () {
     
     $("#bot_nuevo_cliente").click(function () {
         if($("#ac_cliente").val().length > 2){
-            crear_cliente_tpv($("#ac_cliente").val());
+            $("#modal_guardar").modal('show');
+            $("#ac_cliente").val($("#ac_cliente").val().toUpperCase());
+            getClient($("#ac_cliente").val());
+            document.f_tpv.tpv_efectivo.focus();
+            //crear_cliente_tpv($("#ac_cliente").val());
         }
                 
     });
     
     //Si el cliente no existe, se muestra el botón bot_nuevo_cliente para crearlo
     $("#ac_cliente").keyup(function (e) {
-        
-                verificar_cliente();
+        let inputText = $(this).val(); // Obtener el valor del input
+        let alphanumericRegex = /^[a-zA-Z0-9]*$/;
+        if (!alphanumericRegex.test(inputText)) {
+            // Si el valor no coincide con el patrón alfanumérico, eliminar los caracteres no permitidos
+            $(this).val(inputText.replace(/[^a-zA-Z0-9]/g, ''));
+        }
+        verificar_cliente();
     });
     
     $("#ac_cliente").change(function (e) {

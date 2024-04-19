@@ -39,6 +39,12 @@ class cliente extends \fs_model
     public $nombre;
 
     /**
+     * Se crea el campo nombre 2 para obtener el nombre real del cliente, ya que el nombre se usa para la placa
+     * @var string 
+     */
+    public $nombre2;
+
+    /**
      * Razón social del cliente, es decir, el nombre oficial. El que aparece en las facturas.
      * @var string
      */
@@ -158,7 +164,8 @@ class cliente extends \fs_model
         if ($data) {
             $this->codcliente = $data['codcliente'];
             $this->nombre = $data['nombre'];
-
+            $this->nombre2 = $data['nombre2'];
+            
             if (is_null($data['razonsocial'])) {
                 $this->razonsocial = $data['nombrecomercial'];
             } else {
@@ -195,6 +202,7 @@ class cliente extends \fs_model
         } else {
             $this->codcliente = NULL;
             $this->nombre = '';
+            $this->nombre2 = '';
             $this->razonsocial = '';
             $this->tipoidfiscal = FS_CIFNIF;
             $this->cifnif = '';
@@ -312,6 +320,21 @@ class cliente extends \fs_model
     public function get($cod)
     {
         $data = $this->db->select("SELECT * FROM " . $this->table_name . " WHERE codcliente = " . $this->var2str($cod) . ";");
+        if ($data) {
+            return new \cliente($data[0]);
+        }
+
+        return FALSE;
+    }
+
+    /**
+     * Devuelve el cliente que tenga ese codcliente.
+     * @param string $cod
+     * @return \cliente|boolean
+     */
+    public function get_placa($placa)
+    {
+        $data = $this->db->select("SELECT * FROM " . $this->table_name . " WHERE nombre = " . $this->var2str($placa) . ";");
         if ($data) {
             return new \cliente($data[0]);
         }
@@ -518,7 +541,7 @@ class cliente extends \fs_model
             $this->new_error_msg("Código de cliente no válido: " . $this->codcliente);
         } else if (strlen($this->nombre) < 1 || strlen($this->nombre) > 100) {
             $this->new_error_msg("Nombre de cliente no válido: " . $this->nombre);
-        } else if (strlen($this->razonsocial) < 1 || strlen($this->razonsocial) > 100) {
+        } else if (strlen($this->razonsocial) > 1 && strlen($this->razonsocial) > 100) {
             $this->new_error_msg("Razón social del cliente no válida: " . $this->razonsocial);
         } else {
             $status = TRUE;
@@ -529,11 +552,14 @@ class cliente extends \fs_model
 
     public function save()
     {
+
+        
         if ($this->test()) {
             $this->clean_cache();
 
             if ($this->exists()) {
                 $sql = "UPDATE " . $this->table_name . " SET nombre = " . $this->var2str($this->nombre)
+                    . ", nombre2 = " . $this->var2str($this->nombre2)
                     . ", razonsocial = " . $this->var2str($this->razonsocial)
                     . ", tipoidfiscal = " . $this->var2str($this->tipoidfiscal)
                     . ", cifnif = " . $this->var2str($this->cifnif)
@@ -562,7 +588,7 @@ class cliente extends \fs_model
                 $sql = "INSERT INTO " . $this->table_name . " (codcliente,nombre,razonsocial,tipoidfiscal,
                cifnif,telefono1,telefono2,fax,email,web,codserie,coddivisa,codpago,codagente,codgrupo,
                debaja,fechabaja,fechaalta,observaciones,regimeniva,recargo,personafisica,diaspago,
-               codproveedor,codtarifa) VALUES
+               codproveedor,codtarifa,nombre2) VALUES
                       (" . $this->var2str($this->codcliente)
                     . "," . $this->var2str($this->nombre)
                     . "," . $this->var2str($this->razonsocial)
@@ -587,9 +613,10 @@ class cliente extends \fs_model
                     . "," . $this->var2str($this->personafisica)
                     . "," . $this->var2str($this->diaspago)
                     . "," . $this->var2str($this->codproveedor)
-                    . "," . $this->var2str($this->codtarifa) . ");";
+                    . "," . $this->var2str($this->codtarifa)
+                    . "," . $this->var2str($this->nombre2) . ");";
             }
-
+            
             return $this->db->exec($sql);
         }
 
@@ -639,13 +666,13 @@ class cliente extends \fs_model
 
         $consulta = "SELECT * FROM " . $this->table_name . " WHERE debaja = FALSE AND ";
         if (is_numeric($query)) {
-            $consulta .= "(nombre LIKE '%" . $query . "%' OR razonsocial LIKE '%" . $query . "%'"
+            $consulta .= "(nombre LIKE '%" . $query . "%' OR nombre2 LIKE '%" . $query . "%' OR razonsocial LIKE '%" . $query . "%'"
                 . " OR codcliente LIKE '%" . $query . "%' OR cifnif LIKE '%" . $query . "%'"
                 . " OR telefono1 LIKE '" . $query . "%' OR telefono2 LIKE '" . $query . "%'"
                 . " OR observaciones LIKE '%" . $query . "%')";
         } else {
             $buscar = str_replace(' ', '%', $query);
-            $consulta .= "(lower(nombre) LIKE '%" . $buscar . "%' OR lower(razonsocial) LIKE '%" . $buscar . "%'"
+            $consulta .= "(lower(nombre) LIKE '%" . $buscar . "%' OR lower(nombre2) LIKE '%" . $buscar . "%' OR lower(razonsocial) LIKE '%" . $buscar . "%'"
                 . " OR lower(cifnif) LIKE '%" . $buscar . "%' OR lower(observaciones) LIKE '%" . $buscar . "%'"
                 . " OR lower(email) LIKE '%" . $buscar . "%')";
         }

@@ -531,7 +531,7 @@ class terminal_caja extends \fs_model
         $this->add_linea(
             $this->center_text($this->sanitize($empresa->direccion) . " - " . $this->sanitize($empresa->ciudad)) . "\n"
         );
-        $this->add_linea($this->center_text(FS_CIFNIF . ": " . $empresa->cifnif));
+        //$this->add_linea($this->center_text(FS_CIFNIF . ": " . $empresa->cifnif));
         $this->add_linea("\n\n");
 
         if ($empresa->horario != '') {

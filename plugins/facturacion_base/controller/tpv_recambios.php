@@ -94,7 +94,9 @@ class tpv_recambios extends fbase_controller
             $this->fbase_buscar_cliente($_REQUEST['buscar_cliente']);
         } else if (isset($_REQUEST['datoscliente'])) {
             $this->datos_cliente();
-        } else if (isset($_REQUEST['combo_seleccionado'])) {
+        } else if (isset($_REQUEST['placa'])) {
+            $this->datos_cliente_placa();
+        }else if (isset($_REQUEST['combo_seleccionado'])) {
             $this->datos_combo($_REQUEST['combo_seleccionado']);
         } else if (isset($_REQUEST['crear_cliente'])) {
             $this->crear_cliente($_REQUEST['crear_cliente']);
@@ -278,6 +280,15 @@ class tpv_recambios extends fbase_controller
         header('Content-Type: application/json');
         echo json_encode($this->cliente->get($_REQUEST['datoscliente']));
     }
+
+    private function datos_cliente_placa()
+    {
+        /// desactivamos la plantilla HTML
+        $this->template = FALSE;
+
+        header('Content-Type: application/json');
+        echo json_encode($this->cliente->get_placa($_REQUEST['placa']));
+    }
     
     
     private function lineas_factura_editar()
@@ -329,19 +340,33 @@ class tpv_recambios extends fbase_controller
         
         $cliente_nuevo = new cliente();
         
-        $cliente_nuevo->cifnif = $dato;
+        
         $cliente_nuevo->coddivisa = "COP";
         $cliente_nuevo->codpago = "CONT";
         $cliente_nuevo->fechaalta = date("Y-m-d");
         $cliente_nuevo->nombre = $dato;
-        $cliente_nuevo->razonsocial = $dato;
+        if(isset($_REQUEST['cod']))
+            $cliente_nuevo->codcliente = $_REQUEST['cod'];
+        if(isset($_REQUEST['razonsocial']) && $_REQUEST['razonsocial'] != "")
+            $cliente_nuevo->razonsocial = $_REQUEST['razonsocial'];
+        if(isset($_REQUEST['nombre2']))
+            $cliente_nuevo->nombre2 = $_REQUEST['nombre2'];
+        if(isset($_REQUEST['telefono1']))
+            $cliente_nuevo->telefono1 = $_REQUEST['telefono1'];
+        if(isset($_REQUEST['email']))
+            $cliente_nuevo->email = $_REQUEST['email'];
+        if(isset($_REQUEST['cifnif']))
+            $cliente_nuevo->cifnif = $_REQUEST['cifnif'];
+        if(isset($_REQUEST['tipo_cifnif']))
+            $cliente_nuevo->tipoidfiscal = $_REQUEST['tipo_cifnif'];
         $cliente_nuevo->regimeniva = "General";
         $cliente_nuevo->personafisica = 1;
         
         if($cliente_nuevo->save()){
             $resultadito["exito"] = true;
-            $resultadito["cod"] = $cliente_nuevo->get_by_cifnif($dato);
+            $resultadito["cod"] = $cliente_nuevo->get_by_cifnif($cliente_nuevo->cifnif);
         }
+        
 		//$resultadito["hola"] = $sql;
         header('Content-Type: application/json');
         echo json_encode($resultadito);
@@ -634,7 +659,7 @@ class tpv_recambios extends fbase_controller
 
             /// función auxiliar para implementar en los plugins que lo necesiten
             if (!fs_generar_numero2($factura)) {
-                $factura->numero2 = $_POST['numero2'];
+                $factura->numero2 = $_POST['numero2'] ?? null;
             }
             
             //En ésta línea se hace una condición para que la factura sea editada y no cree una nueva
@@ -840,7 +865,7 @@ class tpv_recambios extends fbase_controller
                 $this->terminal->cod_letra_tickect();
                 $this->terminal->anchopapel = 28;
                 $this->terminal->add_linea_big("\nCIERRE DE CAJA:\n\n");
-                $this->terminal->add_linea("Empleado: " . $this->user->codagente . " \n " . $this->agente->get_fullname() . "\n");
+                $this->terminal->add_linea("Turno: " . $this->user->codagente . " \n " . $this->agente->get_fullname() . "\n");
                 $this->terminal->add_linea("Caja: " . $this->caja->fs_id ."  ID Arqueo: ".$this->caja->id." \n");
                 $this->terminal->add_linea("Fecha Arqueo: \n" . date("Y-m-d H:i:s"). "\n");
                 $this->terminal->add_linea("Fecha ini: \n" . $this->caja->fecha_inicial . "\n");
