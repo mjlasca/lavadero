@@ -334,7 +334,7 @@ class cliente extends \fs_model
      */
     public function get_placa($placa)
     {
-        $data = $this->db->select("SELECT * FROM " . $this->table_name . " WHERE nombre = " . $this->var2str($placa) . ";");
+        $data = $this->db->select("SELECT * FROM " . $this->table_name . " WHERE lower(nombre) = lower(" . $this->var2str($placa) . ");");
         if ($data) {
             return new \cliente($data[0]);
         }

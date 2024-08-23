@@ -325,11 +325,13 @@ class ventas_facturas extends fbase_controller
         if ($this->query) {
             $query = $this->agente->no_html(mb_strtolower($this->query, 'UTF8'));
             $sql .= $where;
+
+
             if (is_numeric($query)) {
                 $sql .= "(codigo LIKE '%" . $query . "%' OR numero2 LIKE '%" . $query . "%' "
-                    . "OR observaciones LIKE '%" . $query . "%' OR cifnif LIKE '" . $query . "%')";
+                    . "OR observaciones LIKE '%" . $query . "%' OR cifnif LIKE '" . $query . "%' OR lower(nombrecliente) LIKE '%" . $query . "%' )";
             } else {
-                $sql .= "(lower(codigo) LIKE '%" . $query . "%' OR lower(numero2) LIKE '%" . $query . "%' "
+                $sql .= "(lower(codigo) LIKE '%" . $query . "%'  OR lower(nombrecliente) LIKE '%" . $query . "%'  OR lower(numero2) LIKE '%" . $query . "%' "
                     . "OR lower(cifnif) LIKE '" . $query . "%' "
                     . "OR lower(observaciones) LIKE '%" . str_replace(' ', '%', $query) . "%')";
             }
