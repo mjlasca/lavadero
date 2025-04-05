@@ -573,14 +573,14 @@ class informes_lav extends fs_controller {
                 $espacio = "\t   ";
                 
                 if($this->allow_delete){
-                    $this->terminal->add_linea("BENEFICIO".$espacio."DEDUCCIONES\n");
+                    $this->terminal->add_linea("UTILIDAD NETA".$espacio."DEDUCCIONES\n");
                     $this->terminal->add_linea($this->formato_moneda($_REQUEST["comision_imp"])."   ".$this->formato_moneda($_REQUEST["deduccion_imp"])."\n");
                     if($_REQUEST["comision_imp_aux"] > 0)
                         $this->terminal->add_linea("ABONO     : ".$this->formato_moneda(($_REQUEST["comision_imp"] - $_REQUEST["comision_imp_aux"]))."     ");
                     else
                         $this->terminal->add_linea("ABONO     : ".$this->formato_moneda($_REQUEST["comision_imp_aux"])."     ");
                 }else{
-                    $this->terminal->add_linea("BENEFICIO  : ");
+                    $this->terminal->add_linea("UTILIDAD NETA  : ");
                     $this->terminal->add_linea($this->formato_moneda($_REQUEST["comision_imp"])."\n");
                 }
                 $this->terminal->add_linea("\nTOTAL     : ".$this->formato_moneda($_REQUEST["total_imp"])."\n\n");

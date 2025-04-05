@@ -865,7 +865,7 @@ class tpv_recambios extends fbase_controller
                 $this->terminal->cod_letra_tickect();
                 $this->terminal->anchopapel = 28;
                 $this->terminal->add_linea_big("\nCIERRE DE CAJA:\n\n");
-                $this->terminal->add_linea("Turno: " . $this->user->codagente . " \n " . $this->agente->get_fullname() . "\n");
+                $this->terminal->add_linea("Gestor: " . $this->user->codagente . " \n " . $this->agente->get_fullname() . "\n");
                 $this->terminal->add_linea("Caja: " . $this->caja->fs_id ."  ID Arqueo: ".$this->caja->id." \n");
                 $this->terminal->add_linea("Fecha Arqueo: \n" . date("Y-m-d H:i:s"). "\n");
                 $this->terminal->add_linea("Fecha ini: \n" . $this->caja->fecha_inicial . "\n");
