@@ -1,1 +1,0 @@
-a:1:{i:0;a:4:{s:5:"texto";s:29:"Factura Proveedor FAC2024A22C";s:3:"url";s:38:"index.php?page=compras_factura&id=2437";s:5:"nuevo";b:1;s:6:"cambio";s:19:"06-01-2024 13:06:28";}}
