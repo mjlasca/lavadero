@@ -17,6 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+use FacturaScripts\model\factura_cliente;
+
 require_once 'plugins/facturacion_base/extras/fbase_controller.php';
 
 class tpv_recambios extends fbase_controller
@@ -42,7 +44,7 @@ class tpv_recambios extends fbase_controller
     public $terminal;
     public $ultimas_compras;
     public $ultimas_ventas;
-    
+    public $current_invoice;
     
     public $aviso_ne;
     
@@ -72,13 +74,14 @@ class tpv_recambios extends fbase_controller
         $this->impuesto = new impuesto();
         $this->results = array();
         $this->factura_editar = -1;
+        $fact_ = new factura_cliente();
+        $this->current_invoice = FALSE;
         
         
         if (isset($_REQUEST['factura_editar'])) {
             $this->factura_editar = $_REQUEST['factura_editar'];
-            
+            $this->current_invoice = $fact_->get($this->factura_editar);
         }
-        
         
         if (isset($_REQUEST['editando_lineas'])) {
             $this->factura_editar = $_REQUEST['editando_lineas'];
