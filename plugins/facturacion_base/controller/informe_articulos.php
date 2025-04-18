@@ -341,6 +341,7 @@ class informe_articulos extends fbase_controller
                             'articulo' => $art0,
                             'unidades' => floatval($l['unidades']),
                             'total' => $this->euro_convert(floatval($l['total'])),
+                            'coste' =>  floatval($l['unidades']) * $art0->preciocoste(),
                             'beneficio' => $this->euro_convert(floatval($l['total'])) - ( floatval($l['unidades']) * $art0->preciocoste() ),
                             'familia' => $l['familia'],
                             'servicio' => $l['servicio']
