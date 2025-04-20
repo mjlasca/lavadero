@@ -353,6 +353,15 @@
                            </div>
                         </div>
                         <div class="form-group">
+                           <a href="{$fsc->metodo_pago->url()}">Método de pago</a>:
+                           <select name="metodo_pago" class="form-control">
+                              <option value="">--Seleccione método de pago--</option>
+                           {loop="$fsc->metodo_pago->all()"}
+                              <option value="{$value->id}">{$value->nombre}</option>
+                           {/loop}
+                           </select>
+                        </div>
+                        <div class="form-group">
                            <a href="{$fsc->forma_pago->url()}">Forma de pago</a>:
                            <!--<p>{$fsc->cliente->codpago}</p>-->
                            <select name="forma_pago" class="form-control">

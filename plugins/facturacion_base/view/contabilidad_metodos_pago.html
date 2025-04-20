@@ -1,0 +1,114 @@
+{include="header"}
+
+<script type="text/javascript">
+   function eliminar_fp(cod)
+   {
+      bootbox.confirm({
+         message: '¿Realmente desea eliminar la forma de pago '+cod+'?',
+         title: '<b>Atención</b>',
+         callback: function(result) {
+            if (result) {
+               window.location.href = '{$fsc->url()}&delete='+encodeURIComponent(cod);
+            }
+         }
+      });
+   }
+   function cannot_delete()
+   {
+      bootbox.alert({
+         message: 'No puedes eliminar la forma de pago predeterminada.',
+         title: "<b>Atención</b>"
+      });
+   }
+</script>
+
+<div class="container-fluid">
+   <div class="row">
+      <div class="col-sm-12">
+         <div class="page-header">
+            <h1>
+               Métodos de pago
+               <a class="btn btn-xs btn-default" href="{$fsc->url()}" title="Recargar la página">
+                  <span class="glyphicon glyphicon-refresh"></span>
+               </a>
+               <span class="btn-group">
+               {loop="$fsc->extensions"}
+                  {if="$value->type=='button'"}
+                  <a href="index.php?page={$value->from}{$value->params}" class="btn btn-xs btn-default">{$value->text}</a>
+                  {/if}
+               {/loop}
+               </span>
+            </h1>
+            <p class="help-block">
+               {if="$fsc->button_plazos"}
+                  Usa el botón &nbsp;
+                  <span class="glyphicon glyphicon-calendar" aria-hidden="true"></span> &nbsp;
+                  para definir los plazos de pago de cada forma de pago.
+               {/if}
+            </p>
+         </div>
+      </div>
+   </div>
+</div>
+
+<div class="table-responsive">
+   <table class="table table-hover">
+      <thead>
+         <tr>
+            <th  class="text-left">Nombre</th>
+            <th class="text-left">Descripción</th>
+            <th width="150" class="text-left">Modificado por</th>
+            <th width="150" class="text-left">Fecha modificación</th>
+            <th class="text-right" width="120">Acciones</th>
+         </tr>
+      </thead>
+      {loop="$fsc->metodo_pago->all()"}
+      <form action="{$fsc->url()}#{$value->id}" method="post" class="form" role="form">
+            <input type="hidden" name="id" value="{$value->id}">
+            <tr>
+               <td> <input class="form-control" type="text" name="nombre" id="" value="{$value->nombre}"> </td>
+               <td><input class="form-control" type="text" name="descripcion" id="" value="{$value->descripcion}"></td>
+               <td><input class="form-control" disabled type="text" name="user_mod" id="" value="{$value->user_mod}"></td>
+               <td><input class="form-control" disabled type="text" name="ultmod" id="" value="{$value->ultmod}"></td>
+               <div class="btn-group">
+                  <td>
+                  {if="$fsc->allow_delete"}
+                     <a href="{$fsc->url()}?disabled={$value->id}" class="btn btn-sm btn-warning" title="Deshabilitar" >
+                        <span class="glyphicon glyphicon-lock"></span>
+                     </a>
+                  {/if}
+                  <button class="btn btn-sm btn-primary" type="submit" onclick="this.disabled=true;this.form.submit();" title="Guardar">
+                     <span class="glyphicon glyphicon-floppy-disk"></span>
+                  </button>
+                  </td>
+                  
+               </div>
+            </td>
+         </tr>
+      </form>
+      {/loop}
+      <form action="{$fsc->url()}" method="post" class="form" role="form">
+         <tr class="info">
+            <td >
+                <input class="form-control" type="text" name="nombre" autocomplete="off" placeholder="Nombre"  maxlength="50"  required=""/>
+            </td>
+            <td colspan="3">
+               <input class="form-control" type="text" name="descripcion" maxlength="200" autocomplete="off" placeholder="Descripción del método de pago" required=""/>
+            </td>
+            
+            <td class="text-right">
+               <div class="btn-group">
+                  <button class="btn btn-sm btn-primary" type="submit" title="Nueva">
+                     <span class="glyphicon glyphicon-plus-sign"></span>
+                     <span class="hidden-sm">&nbsp;Nueva</span>
+                  </button>
+               </div>
+            </td>
+         </tr>
+      </form>
+   </table>
+</div>
+
+
+
+{include="footer"}

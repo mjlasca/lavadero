@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Document   : metodospago.xml
+    Author     : Mario Lasluisa Castaño
+    Description:
+        Estructura de la tabla metodospago.
+-->
+<tabla>
+    <columna>
+        <nombre>id</nombre>
+        <tipo>serial</tipo>
+        <nulo>NO</nulo>
+        <defecto>nextval('metodospago_id_seq'::regclass)</defecto>
+    </columna>
+    <columna>
+        <nombre>nombre</nombre>
+        <tipo>character varying(50)</tipo>
+        <nulo>NO</nulo>
+    </columna>
+    <columna>
+        <nombre>user_mod</nombre>
+        <tipo>character varying(12)</tipo>
+        <nulo>NO</nulo>
+    </columna>
+    <columna>
+        <nombre>ultmod</nombre>
+        <tipo>timestamp</tipo>
+        <nulo>NO</nulo>
+        <defecto>CURRENT_TIMESTAMP</defecto>
+    </columna>
+    <columna>
+        <nombre>descripcion</nombre>
+        <tipo>character varying(200)</tipo>
+        <nulo>YES</nulo>
+    </columna>
+    <columna>
+        <nombre>codestado</nombre>
+        <tipo>int(1)</tipo>
+        <nulo>NO</nulo>
+        <defecto>1</defecto>
+    </columna>
+    <restriccion>
+        <nombre>metodospago_pkey</nombre>
+        <consulta>PRIMARY KEY (id)</consulta>
+    </restriccion>
+</tabla>

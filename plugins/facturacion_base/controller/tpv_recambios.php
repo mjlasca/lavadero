@@ -42,6 +42,7 @@ class tpv_recambios extends fbase_controller
     public $terminal;
     public $ultimas_compras;
     public $ultimas_ventas;
+    public $metodo_pago;
     
     
     public $aviso_ne;
@@ -71,6 +72,7 @@ class tpv_recambios extends fbase_controller
         $this->familia = new familia();
         $this->impuesto = new impuesto();
         $this->results = array();
+        $this->metodo_pago = new metodo_pago();
         $this->factura_editar = -1;
         
         
