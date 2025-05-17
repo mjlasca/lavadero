@@ -267,15 +267,6 @@ function recalcular()
     $("#are").html(number_format(total_recargo, fs_nf0, '.', ''));
     $("#airpf").html(number_format(total_irpf, fs_nf0, '.', ''));
     $("#atotal").html(Math.round(total));
-
-
-    console.log("---------");
-    console.log("Neto: " + neto);
-    console.log("IVA: " + total_iva);
-    console.log("RE: " + total_recargo);
-    console.log("IRPF: " + total_irpf);
-    console.log("Total: " + (neto + total_iva - total_irpf + total_recargo));
-
     if (total_recargo == 0 && !cliente.recargo) {
         $(".recargo").hide();
     } else {
@@ -415,7 +406,6 @@ function traer_combos(ref_combo)
         ref_combo = ref_combo.replace("COMBO", "");
     if (tpv_url !== '') {
         $.getJSON(tpv_url, 'combo_seleccionado=' + ref_combo, function (json) {
-                console.log(json);
                 if(json.length>0){
                     
 			for(i=0; i < json.length ; i++)
@@ -449,7 +439,6 @@ function verificar_combo_lineas()
       
         for(i=1; i<= numlineas; i++){
             if ($("#linea_" + i).length > 0) {
-                console.log("#desc_"+i+" // "+$("#desc_"+i).val().indexOf("_COMBO"));
                 if($("#desc_"+i).val().indexOf("_COMBO") != -1){
                     cont++;
                 }
@@ -590,7 +579,6 @@ function traerPesoBalanza(ref)
             data    : "ipUsuario=" + ipUsuario +"&peticion=" + "peso"
         })
         .done(function(data){
-                         console.log("--> "+data.exito);
                 if(data.exito != null){
                     
                     if(data.estad == 0){
@@ -599,7 +587,6 @@ function traerPesoBalanza(ref)
                     else{
                         
                         $("#cantidad_" + ref).val(data.exito);
-                        console.log(ref+" / "+data.exito+ " *--* "+data.estad);
                     }
                 }
                 else{
@@ -638,8 +625,6 @@ function permitirPeso(dat)
             if(data.estado)
             {
 				$("#balanza").removeClass("btn-apagado").addClass("btn-warning");
-                console.log("Balanza ESTADO "+data.estado);
-                //alert("No se pudo tener precio de la balanza");
             }
         });
 }
@@ -686,7 +671,6 @@ function buscar_articulos()
             var conti = 0;
 
                 $.each(json, function (key, val) {
-                    //console.log("---> "+  json);
                     conti++;
                 
                     contadorColumnas++;
@@ -1251,9 +1235,18 @@ function show_pvp_iva(pvp, codimpuesto)
     return show_precio(pvp + pvp * iva / 100);
 }
 
+function metodoPagoSelected(){
+    const metodo =  document.querySelector('#metodo_pago');
+    const modal_save = document.querySelector('#modal_guardar');
+    const foot = modal_save.querySelector('.modal-footer');
+    if(metodo.value != "")
+        foot.classList.remove('hidden_modal');
+    else
+        foot.classList.add('hidden_modal');
+    
+}
 
 function botonfactura(){
-    //console.log("--------------->"+$("#cliente_existe").val());
     const modal_save = document.querySelector('#modal_guardar');
     if(modal_save){
         const foot = modal_save.querySelector('.modal-footer');
@@ -1271,7 +1264,7 @@ function botonfactura(){
             err.classList.remove('msg-data--green')
         err.innerHTML = "";
     }
-    
+    metodoPagoSelected();
 
     var totalito = $("#tpv_total3").val();
         if($("#cliente_existe").val()>0){
@@ -1327,13 +1320,7 @@ function botonfactura(){
            .done(function(data){
                if(data.cierrecaja)
                {
-                   //alert("Resultado cierre caja "+data.cierrecaja);
-                   console.log("Total crédito "+data.sumacredito);
-                   console.log("Total Asiento "+data.asientos);
-                   console.log("Consulta Asiento "+data.consultaasiento);
-                   console.log("Consulta crédito "+data.consultacredito);
-
-                   //alert("No se pudo tener precio de la balanza");
+                 
                }
            });
 
@@ -1432,7 +1419,6 @@ function llenar_personas_servicios(datico)
 {
 	for(i=0; i < arreglo_lineas_servicios.length; i++ )
 	{
-		//console.log("COMBO ACTIVO "+combo_activo);
 		$("#prov_"+arreglo_lineas_servicios[i]).val(persona_servicio);
 	}
 }
@@ -1538,7 +1524,6 @@ function verificar_cliente(){
                         if(clientes_db[i].nombre.toUpperCase() == buscar.toUpperCase()){
                            estado = 1;
                            dato_escogido = clientes_db[i].nombre;
-                           //console.log(clientes_db[i].nombre+"---> "+clientes_db[i].nombre.indexOf(buscar.toUpperCase()));
                         }
 
                 }
@@ -1594,19 +1579,7 @@ $(document).ready(function () {
 
     $("#addCombo").hide();
     $("#bot_nuevo_cliente").hide();
-    
-
-   /*  getIPs(function(ip){
-            ipUsuario = ip;
-            //console.log("saludos hermandad :D !");
-        });
-*/
-
     var familiaInicial = traerfamilia();
-
-    //Artículos en la  cinta inicial
-    //mostrarArticulos("0");
-    
 
     $("#b_codbar").keypress(function (e) {
         if (e.which == 13) {

@@ -487,6 +487,7 @@ class factura_cliente extends \fs_model
                     ", idimprenta = " . $this->var2str($this->idimprenta) .
                     ", numdocs = " . $this->var2str($this->numdocs) .
                     ", id_arqueo = " . $this->var2str($this->id_arqueo) .
+                    ", idmetodopago = " . $this->var2str($this->idmetodopago) .
                     "  WHERE idfactura = " . $this->var2str($this->idfactura) . ";";
                 
                 
@@ -501,7 +502,7 @@ class factura_cliente extends \fs_model
                codagente,netosindto,neto,dtopor1,dtopor2,dtopor3,dtopor4,dtopor5,totaliva,total,totaleuros,
                irpf,totalirpf,porcomision,tasaconv,totalrecargo,pagada,anulada,observaciones,hora,numero2,
                vencimiento,femail,codtrans,codigoenv,nombreenv,apellidosenv,apartadoenv,direccionenv,
-               codpostalenv,ciudadenv,provinciaenv,codpaisenv,idimprenta,numdocs,id_arqueo) VALUES ("
+               codpostalenv,ciudadenv,provinciaenv,codpaisenv,idimprenta,numdocs,id_arqueo,idmetodopago) VALUES ("
                 . $this->var2str($this->idasiento) .
                 "," . $this->var2str($this->idasientop) .
                 "," . $this->var2str($this->idfacturarect) .
@@ -559,7 +560,8 @@ class factura_cliente extends \fs_model
                 "," . $this->var2str($this->envio_codpais) .
                 "," . $this->var2str($this->idimprenta) .
                 "," . $this->var2str($this->numdocs) .
-                "," . $this->var2str($this->id_arqueo) . ");";
+                "," . $this->var2str($this->id_arqueo) .
+                "," . $this->var2str($this->idmetodopago) . ");";
 
             
             

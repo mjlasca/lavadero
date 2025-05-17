@@ -333,6 +333,13 @@ trait documento_venta
      */
     public $id_arqueo;
 
+    /**
+     * Id método de pago
+     * @var integer
+     */
+    public $idmetodopago;
+
+
     private function load_data_trait($data)
     {
         $this->codigo = $data['codigo'];
@@ -401,6 +408,7 @@ trait documento_venta
         $this->envio_codpais = $data['codpaisenv'];
 
         $this->numdocs = intval($data['numdocs']);
+        $this->idmetodopago = intval($data['idmetodopago']);
     }
 
     /**
@@ -461,6 +469,7 @@ trait documento_venta
         $this->envio_codpais = NULL;
 
         $this->numdocs = 0;
+        $this->idmetodopago = NULL;
     }
 
     public function show_hora($segundos = TRUE)

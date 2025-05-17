@@ -59,8 +59,6 @@ class tpv_recambios extends fbase_controller
     {
         parent::private_core();
         
-        
-        
         //$this->cambiar_();
         $this->jefeopro = "Proveedor de servicio";
         $this->share_extensions();
@@ -602,7 +600,7 @@ class tpv_recambios extends fbase_controller
         if ($continuar) {
 			
 			$ssql = "";
-			
+			$factura->idmetodopago = $_POST['metodo_pago'] ?? NULL;
             $factura->codejercicio = $ejercicio->codejercicio;
             $factura->codserie = $serie->codserie;
             

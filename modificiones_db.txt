@@ -1,0 +1,3 @@
+crear llave foranea del idmetodopago en facturas clientes
+Se crea campo idmetodopago como 
+index fk_idmetodopago
