@@ -6,6 +6,7 @@
    {
       window.location.href = '{$fsc->url_recarga}';
    }
+
    $(document).ready(function()
    {
       setTimeout(recargar, 1000);
@@ -150,6 +151,7 @@
                         <th>ITEM</th>
                         <th class="text-right">Vendido</th>
                         <th class="text-right">Total</th>
+                        <th class="text-right">Costo</th>
                         <th class="text-right">Beneficio</th>
                      </tr>
                   </thead>
@@ -163,6 +165,7 @@
                      <td class="text-center">{$value['servicio']}</td>
                      <td class="text-right">{$fsc->show_numero($value['unidades'])}</td>
                      <td class="text-right">{$fsc->show_precio($value['total'])}</td>
+                     <td class="text-right">{$fsc->show_precio($value['coste'])}</td>
                      {if="$value['beneficio']>0"}
                      <td class='text-right success'>{$fsc->show_precio($value['beneficio'])}</td>
                      {else}
