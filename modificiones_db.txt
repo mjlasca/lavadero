@@ -1,3 +1,25 @@
 crear llave foranea del idmetodopago en facturas clientes
 Se crea campo idmetodopago como 
 index fk_idmetodopago
+
+
+ALTER TABLE facturascli
+ADD COLUMN idmetodopago INT(11);
+
+ALTER TABLE facturascli
+ADD CONSTRAINT fk_idmetodopago_fcli
+FOREIGN KEY (idmetodopago) REFERENCES metodospago(id);
+
+ALTER TABLE facturasprov
+ADD COLUMN idmetodopago INT(11);
+
+ALTER TABLE facturasprov
+ADD CONSTRAINT fk_idmetodopago_fpr
+FOREIGN KEY (idmetodopago) REFERENCES metodospago(id);
+
+ALTER TABLE comision_empleados
+ADD COLUMN idmetodopago INT(11);
+
+ALTER TABLE comision_empleados
+ADD CONSTRAINT fk_idmetodopago_ce
+FOREIGN KEY (idmetodopago) REFERENCES metodospago(id);

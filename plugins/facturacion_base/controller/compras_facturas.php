@@ -43,6 +43,8 @@ class compras_facturas extends fbase_controller
     public $serie;
     public $total_resultados;
     public $total_resultados_txt;
+    public $metodo_pago;
+    public $idmetodopago;
 
     public function __construct()
     {
@@ -52,7 +54,7 @@ class compras_facturas extends fbase_controller
     protected function private_core()
     {
         parent::private_core();
-
+        $this->metodo_pago = new metodo_pago();
         $this->agente = new agente();
         $this->almacenes = new almacen();
         $this->factura = new factura_proveedor();
@@ -83,6 +85,8 @@ class compras_facturas extends fbase_controller
             $this->order = $_COOKIE['compras_fac_order'];
         }
 
+        
+
         if (isset($_POST['buscar_lineas'])) {
             $this->buscar_lineas();
         } else if (isset($_REQUEST['buscar_proveedor'])) {
@@ -96,6 +100,7 @@ class compras_facturas extends fbase_controller
             $linea = new linea_factura_proveedor();
             $this->resultados = $linea->all_from_articulo($_GET['ref'], $this->offset);
         } else {
+            var_dump("test");
             $this->share_extension();
             $this->proveedor = FALSE;
             $this->codagente = '';
@@ -107,6 +112,7 @@ class compras_facturas extends fbase_controller
             $this->num_resultados = '';
             $this->total_resultados = array();
             $this->total_resultados_txt = '';
+            $this->idmetodopago = '';
 
             if (isset($_GET['delete'])) {
                 $this->delete_factura();
@@ -127,6 +133,9 @@ class compras_facturas extends fbase_controller
 
                 if (isset($_REQUEST['codagente'])) {
                     $this->codagente = $_REQUEST['codagente'];
+                }
+                if(isset($_REQUEST['metodo_pago'])){
+                    $this->idmetodopago = $_REQUEST['metodo_pago'];
                 }
 
                 if (isset($_REQUEST['codserie'])) {
@@ -291,6 +300,11 @@ class compras_facturas extends fbase_controller
 
         if ($this->codagente) {
             $sql .= $where . "codagente = " . $this->agente->var2str($this->codagente);
+            $where = ' AND ';
+        }
+
+        if ($this->idmetodopago) {
+            $sql .= $where . "idmetodopago = " . $this->agente->var2str($this->idmetodopago);
             $where = ' AND ';
         }
 

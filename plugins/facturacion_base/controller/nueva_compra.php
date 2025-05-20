@@ -17,6 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+use FacturaScripts\model\metodo_pago;
+
 require_once 'plugins/facturacion_base/extras/fbase_controller.php';
 
 class nueva_compra extends fbase_controller
@@ -36,6 +38,7 @@ class nueva_compra extends fbase_controller
     public $results;
     public $serie;
     public $tipo;
+    public $metodo_pago;
     
     //linea de cada combo 
     public $linea_combo;
@@ -51,7 +54,7 @@ class nueva_compra extends fbase_controller
         
         $this->linea_combo = 0;
         parent::private_core();
-
+        $this->metodo_pago = new metodo_pago();
         $this->articulo_prov = new articulo_proveedor();
         $this->fabricante = new fabricante();
         $this->familia = new familia();
@@ -732,7 +735,7 @@ class nueva_compra extends fbase_controller
         if ($continuar) {
             $this->nuevo_documento($factura, $proveedor, $almacen, $ejercicio, $serie, $forma_pago, $divisa);
             $factura->set_fecha_hora($_POST['fecha'], $_POST['hora']);
-
+            $factura->idmetodopago = $_POST['metodo_pago'] ?? NULL;
             if ($forma_pago->genrecibos == 'Pagados') {
                 $factura->pagada = TRUE;
             }

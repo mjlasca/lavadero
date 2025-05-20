@@ -159,6 +159,12 @@ trait documento_compra
      */
     public $numdocs;
 
+    /**
+     * Id método pago
+     * @var integer 
+     */
+    public $idmetodopago;
+
     private function load_data_trait($data)
     {
         $this->cifnif = $data['cifnif'];
@@ -190,6 +196,7 @@ trait documento_compra
         $this->totaliva = floatval($data['totaliva']);
         $this->totalrecargo = floatval($data['totalrecargo']);
         $this->numdocs = intval($data['numdocs']);
+        $this->idmetodopago = intval($data['idmetodopago']);
     }
 
     /**
@@ -222,6 +229,7 @@ trait documento_compra
         $this->totaliva = 0.0;
         $this->totalrecargo = 0.0;
         $this->numdocs = 0;
+        $this->idmetodopago = NULL;
     }
 
     public function show_hora($segundos = TRUE)

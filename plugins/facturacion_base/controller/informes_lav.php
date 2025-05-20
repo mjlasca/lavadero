@@ -6,7 +6,7 @@
  * and open the template in the editor.
  */
 
-
+use FacturaScripts\model\metodo_pago;
 
 /**
  * Description of servicios_lav
@@ -34,6 +34,7 @@ class informes_lav extends fs_controller {
         
 	public $info_provee;
 	public $nav_activo;
+    public $metodo_pago;
         
         public $consolidado;
         public $terminal;
@@ -67,6 +68,7 @@ class informes_lav extends fs_controller {
 		 $this->fecha_final = date("d-m-Y");
 		 $this->info_provee = "";
 		 $this->info_lavaderos_total=0;
+         $this->metodo_pago = new metodo_pago();
                  $this->nav_activo = 1;
                  $this->vista_cambio_valores = FALSE;
                  
@@ -229,12 +231,12 @@ class informes_lav extends fs_controller {
                     $sql = "INSERT INTO comision_empleados(tipo_empleado,nombre_empleado,fecha_inicial,fecha_final,comision, deducciones, total, ultMod, user_responsable)"
                         . "VAlUES( '".$tipo_empleado."','".$empleado."','".$fecha_inicio."','".$fecha_final."', '".$_REQUEST["comision_imp"]."', '".($_REQUEST["comision_imp"] - $_REQUEST["comision_imp_aux"])."', '".($_REQUEST["comision_imp_aux"])."', '".date("Y-m-d H:i:s")."', '".$this->user->nick."'  ) ";
                 }else{
-                    $sql = "INSERT INTO comision_empleados(tipo_empleado,nombre_empleado,fecha_inicial,fecha_final,comision, deducciones, total, ultMod, user_responsable)"
-                        . "VAlUES( '".$tipo_empleado."','".$empleado."','".$fecha_inicio."','".$fecha_final."', '".$_REQUEST["comision_imp"]."', '".($_REQUEST["comision_imp_aux"])."', '".($_REQUEST["comision_imp"])."', '".date("Y-m-d H:i:s")."', '".$this->user->nick."'  ) ";
+                    $sql = "INSERT INTO comision_empleados(tipo_empleado,nombre_empleado,fecha_inicial,fecha_final,comision, deducciones, total, ultMod, user_responsable,idmetodopago)"
+                        . "VAlUES( '".$tipo_empleado."','".$empleado."','".$fecha_inicio."','".$fecha_final."', '".$_REQUEST["comision_imp"]."', '".($_REQUEST["comision_imp_aux"])."', '".($_REQUEST["comision_imp"])."', '".date("Y-m-d H:i:s")."', '".$this->user->nick."', '".$_POST['metodo_pago']."'  ) ";
                 }
                 if($this->db->exec($sql)){
                     $this->pagar_creditos_lavadores($_REQUEST["abono_deducciones"], $_REQUEST["lavador_imp"]);
-                    $sql = "SELECT MAX(reg) as reg FROM comision_empleados";
+                    $sql = "SELECT MAX(reg) as reg FROM comision_empleados WHERE nombre_empleado='".$empleado."'";
                     $this->consecutivo = $this->db->select($sql)[0]["reg"];
                     $this->new_message("La liquidación del ".$this->titulo_proveedor.$_REQUEST["lavador_imp"]." se ha generado con éxito");
                     return TRUE;

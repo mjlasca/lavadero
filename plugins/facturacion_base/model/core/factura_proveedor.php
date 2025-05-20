@@ -376,6 +376,7 @@ class factura_proveedor extends \fs_model
                     . ", fecha = " . $this->var2str($this->fecha)
                     . ", hora = " . $this->var2str($this->hora)
                     . ", numdocs = " . $this->var2str($this->numdocs)
+                    . ", idmetodopago = " . $this->var2str($this->idmetodopago)
                     . "  WHERE idfactura = " . $this->var2str($this->idfactura) . ";";
 
                 return $this->db->exec($sql);
@@ -385,7 +386,7 @@ class factura_proveedor extends \fs_model
             $sql = "INSERT INTO " . $this->table_name . " (codigo,total,neto,cifnif,pagada,anulada,observaciones,
                codagente,codalmacen,irpf,totaleuros,nombre,codpago,codproveedor,idfacturarect,numproveedor,
                codigorect,codserie,idasiento,idasientop,totalirpf,totaliva,coddivisa,numero,codejercicio,tasaconv,
-               totalrecargo,fecha,hora,numdocs) VALUES (" . $this->var2str($this->codigo)
+               totalrecargo,fecha,hora,numdocs,idmetodopago) VALUES (" . $this->var2str($this->codigo)
                 . "," . $this->var2str($this->total)
                 . "," . $this->var2str($this->neto)
                 . "," . $this->var2str($this->cifnif)
@@ -414,7 +415,8 @@ class factura_proveedor extends \fs_model
                 . "," . $this->var2str($this->totalrecargo)
                 . "," . $this->var2str($this->fecha)
                 . "," . $this->var2str($this->hora)
-                . "," . $this->var2str($this->numdocs) . ");";
+                . "," . $this->var2str($this->numdocs)
+                . "," . $this->var2str($this->idmetodopago) . ");";
 
             if ($this->db->exec($sql)) {
                 $this->idfactura = $this->db->lastval();

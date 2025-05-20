@@ -356,9 +356,14 @@
                            <a href="{$fsc->metodo_pago->url()}">Método de pago</a>:
                            <select name="metodo_pago" id="metodo_pago" class="form-control" onChange="metodoPagoSelected();">
                               <option value="">--Seleccione método de pago--</option>
-                           {loop="$fsc->metodo_pago->all()"}
-                              <option value="{$value->id}">{$value->nombre}</option>
-                           {/loop}
+                              {loop="$fsc->metodo_pago->all()"}
+                                 {if="$value->id == $fsc->current_invoice->idmetodopago"}
+                                    <option value="{$value->id}" selected>{$value->nombre}</option>
+                                 {else}
+                                    <option value="{$value->id}">{$value->nombre}</option>
+                                 {/if}
+
+                              {/loop}
                            </select>
                         </div>
                         <div class="form-group">
