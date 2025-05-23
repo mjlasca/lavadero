@@ -198,6 +198,22 @@
          </div>
          <div class="col-sm-2">
             <div class="form-group">
+               <select name="metodo_pago" id="metodo_pago" class="form-control" onChange="metodoPagoSelected();" required>
+                     <option value="">--Seleccione método de pago {$fsc->idmetodopago}--</option>
+                     {loop="$fsc->metodo_pago->all()"}
+                        {if="$value->id == $fsc->idmetodopago"}
+                        <option value="{$value->id}" selected>{$value->nombre}</option>
+                        {else}
+                        <option value="{$value->id}">{$value->nombre}</option>
+                        {/if}
+
+                     {/loop}
+               </select>
+               <a href="{$fsc->metodo_pago->url()}">Método de pago</a>
+            </div>
+         </div>
+         <div class="col-sm-2">
+            <div class="form-group">
                <select class="form-control" name="codserie" onchange="this.form.submit()">
                   <option value="">Cualquier {#FS_SERIE#}</option>
                   <option value="">-----</option>

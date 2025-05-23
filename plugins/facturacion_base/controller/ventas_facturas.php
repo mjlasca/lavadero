@@ -17,6 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+use FacturaScripts\model\metodo_pago;
+
 require_once 'plugins/facturacion_base/extras/fbase_controller.php';
 
 class ventas_facturas extends fbase_controller
@@ -50,6 +52,8 @@ class ventas_facturas extends fbase_controller
     public $total_resultados_comision;
     public $total_resultados_txt;
     public $idarqueo;
+    public $metodo_pago;
+    public $idmetodopago;
 
     public function __construct()
     {
@@ -67,7 +71,7 @@ class ventas_facturas extends fbase_controller
         $this->grupo = new grupo_clientes();
         $this->huecos = array();
         $this->serie = new serie();
-
+        $this->metodo_pago = new metodo_pago();
         $this->mostrar = 'todo';
         if (isset($_GET['mostrar'])) {
             $this->mostrar = $_GET['mostrar'];
@@ -163,6 +167,10 @@ class ventas_facturas extends fbase_controller
                     $this->codserie = $_REQUEST['codserie'];
                 }
 
+                if(isset($_REQUEST['metodo_pago'])){
+                    $this->idmetodopago = $_REQUEST['metodo_pago'];
+                }
+
                 if (isset($_REQUEST['desde'])) {
                     $this->desde = $_REQUEST['desde'];
                     $this->hasta = $_REQUEST['hasta'];
@@ -197,6 +205,7 @@ class ventas_facturas extends fbase_controller
                     }
                 }
             } else if ($this->mostrar == 'buscar') {
+                var_dump($this->idmetodopago);
                 $this->buscar($order2);
             } else {
                 $this->resultados = $this->factura->all($this->offset, FS_ITEM_LIMIT, $this->order . $order2);
@@ -230,6 +239,7 @@ class ventas_facturas extends fbase_controller
                 . "&codgrupo=" . $this->codgrupo
                 . "&codpago=" . $this->codpago
                 . "&codserie=" . $this->codserie
+                . "&idmetodopago=" . $this->idmetodopago
                 . "&desde=" . $this->desde
                 . "&estado=" . $this->estado
                 . "&hasta=" . $this->hasta;
@@ -368,9 +378,14 @@ class ventas_facturas extends fbase_controller
             $sql .= $where . "codpago = " . $this->agente->var2str($this->codpago);
             $where = ' AND ';
         }
-
+        var_dump($this->idmetodopago);
         if ($this->codserie != '') {
             $sql .= $where . "codserie = " . $this->agente->var2str($this->codserie);
+            $where = ' AND ';
+        }
+
+        if ($this->idmetodopago != '') {
+            $sql .= $where . "idmetodopago = " . $this->agente->var2str($this->idmetodopago);
             $where = ' AND ';
         }
 
