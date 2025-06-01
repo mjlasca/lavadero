@@ -192,6 +192,11 @@
         <tipo>integer</tipo>
         <defecto>0</defecto>
     </columna>
+    <columna>
+        <nombre>idarqueo</nombre>
+        <tipo>integer</tipo>
+        <nulo>YES</nulo>
+    </columna>
     <restriccion>
         <nombre>uniq_codigo_facturasprov</nombre>
         <consulta>UNIQUE (codigo)</consulta>

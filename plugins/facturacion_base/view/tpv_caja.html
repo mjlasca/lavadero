@@ -215,9 +215,9 @@
                   <td class="text-right">{$fsc->show_precio($value->facturascontado + $value->facturascredito)}</td>
                   <td class="text-right">{$fsc->show_precio($value->facturascredito)}</td>
                   <td class="text-right">{$fsc->show_precio($value->dinero_inicial +  $value->facturascontado)}</td>
-                    
-                    <td class="text-right">{$fsc->show_precio($value->cierremanual)}</td>
-                                 <td class="text-right">{$value->tickets}</td>
+                  <td class="text-right">{$fsc->show_precio($value->cierremanual)}</td>
+                  <td class="text-right">{$value->tickets}</td>
+                  <td class="text-right">{$fsc->show_precio($value->gastos)}</td>
                   <td class="text-right">
                      {if="$fsc->allow_delete"}
                      <div class="btn-group">

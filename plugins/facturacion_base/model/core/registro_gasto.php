@@ -174,6 +174,21 @@ class registro_gasto extends \fs_model
     }
 
     /**
+     * Devuelve la suma total de un idarqueo
+     * @param integer $id
+     * @return boolean|\int
+     */
+    public function get_sum_idarqueo($id)
+    {
+        $data = $this->db->select("SELECT sum(total) as sumtotal FROM " . $this->table_name . " WHERE idarqueo = " . $this->var2str($id) . ";");
+        if ($data) {
+            return $data[0]['sumtotal'];
+        }
+
+        return FALSE;
+    }
+
+    /**
      * Devuelve la factura de compra con el id proporcionado.
      * @param integer $id
      * @return boolean|\registro_gasto
@@ -377,6 +392,7 @@ class registro_gasto extends \fs_model
                     . ", hora = " . $this->var2str($this->hora)
                     . ", numdocs = " . $this->var2str($this->numdocs)
                     . ", idmetodopago = " . $this->var2str($this->idmetodopago)
+                    . ", idarqueo = " . $this->var2str($this->idarqueo)
                     . "  WHERE idfactura = " . $this->var2str($this->idfactura) . ";";
 
                 return $this->db->exec($sql);
@@ -386,7 +402,7 @@ class registro_gasto extends \fs_model
             $sql = "INSERT INTO " . $this->table_name . " (codigo,total,neto,cifnif,pagada,anulada,observaciones,
                codagente,codalmacen,irpf,totaleuros,nombre,codpago,codproveedor,idfacturarect,numproveedor,
                codigorect,codserie,idasiento,idasientop,totalirpf,totaliva,coddivisa,numero,codejercicio,tasaconv,
-               totalrecargo,fecha,hora,numdocs,idmetodopago) VALUES (" . $this->var2str($this->codigo)
+               totalrecargo,fecha,hora,numdocs,idmetodopago,idarqueo) VALUES (" . $this->var2str($this->codigo)
                 . "," . $this->var2str($this->total)
                 . "," . $this->var2str($this->neto)
                 . "," . $this->var2str($this->cifnif)
@@ -416,7 +432,8 @@ class registro_gasto extends \fs_model
                 . "," . $this->var2str($this->fecha)
                 . "," . $this->var2str($this->hora)
                 . "," . $this->var2str($this->numdocs)
-                . "," . $this->var2str($this->idmetodopago) . ");";
+                . "," . $this->var2str($this->idmetodopago)
+                . "," . $this->var2str($this->idarqueo) . ");";
             
             if ($this->db->exec($sql)) {
                 $this->idfactura = $this->db->lastval();

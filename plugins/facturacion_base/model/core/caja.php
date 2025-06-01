@@ -85,6 +85,7 @@ class caja extends \fs_model
 
     public $facturascontado;
     public $facturascredito;
+    public $gastos;
 
     public function __construct($data = FALSE)
     {
@@ -139,6 +140,7 @@ class caja extends \fs_model
                 $this->agente = $ag->get($this->codagente);
                 self::$agentes[] = $this->agente;
             }
+            $this->gastos = $data['gastos'] ?? NULL;
         } else {
             $this->id = NULL;
             $this->fs_id = NULL;
@@ -159,6 +161,7 @@ class caja extends \fs_model
             }
 
             $this->agente = NULL;
+            $this->gastos = NULL;
         }
     }
 
@@ -288,8 +291,9 @@ class caja extends \fs_model
     public function all($offset = 0, $limit = FS_ITEM_LIMIT)
     {
         
-        $sql = "SELECT *,(SELECT  SUM(t1.total) FROM facturascli t1 WHERE t1.id_arqueo = t0.id AND  t1.codpago='CONT' AND t1.pagada=1 AND t1.anulada = 0 AND t1.codagente=t0.codagente) as facturascontado, (SELECT  SUM(t1.total) FROM facturascli t1 WHERE t1.id_arqueo = t0.id AND  t1.codpago !='CONT' AND t1.anulada = 0 AND t1.codagente=t0.codagente) as facturascredito  FROM " . $this->table_name . " t0 ORDER BY t0.id DESC";
-
+        $sql = "SELECT t0.*,(SELECT  SUM(t1.total) FROM facturascli t1 WHERE t1.id_arqueo = t0.id AND  t1.codpago='CONT' AND t1.pagada=1 AND t1.anulada = 0 AND t1.codagente=t0.codagente) as facturascontado, (SELECT  SUM(t1.total) FROM facturascli t1 WHERE t1.id_arqueo = t0.id AND  t1.codpago !='CONT' AND t1.anulada = 0 AND t1.codagente=t0.codagente) as facturascredito,
+        (SELECT SUM(t2.total) FROM registro_gastos t2 WHERE t2.idarqueo = t0.id AND t2.anulada = 0 ) as gastos  FROM " . $this->table_name . " t0 ORDER BY t0.id DESC";
+        
         return $this->all_from($sql, $offset, $limit);
         //return $this->all_from("SELECT * FROM " . $this->table_name . " ORDER BY id DESC", $offset, $limit);
     }

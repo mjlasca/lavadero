@@ -165,6 +165,11 @@ trait documento_compra
      */
     public $idmetodopago;
 
+    /**
+     * ID arqueo
+     */
+    public $idarqueo;
+
     private function load_data_trait($data)
     {
         $this->cifnif = $data['cifnif'];
@@ -197,6 +202,7 @@ trait documento_compra
         $this->totalrecargo = floatval($data['totalrecargo']);
         $this->numdocs = intval($data['numdocs']);
         $this->idmetodopago = intval($data['idmetodopago']);
+        $this->idarqueo = intval($data['idarqueo']);
     }
 
     /**
@@ -230,6 +236,7 @@ trait documento_compra
         $this->totalrecargo = 0.0;
         $this->numdocs = 0;
         $this->idmetodopago = NULL;
+        $this->idarqueo = NULL;
     }
 
     public function show_hora($segundos = TRUE)

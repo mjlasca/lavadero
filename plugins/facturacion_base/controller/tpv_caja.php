@@ -17,6 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+use FacturaScripts\model\registro_gasto;
+
 require_once 'plugins/facturacion_base/extras/fbase_controller.php';
 
 class tpv_caja extends fbase_controller
@@ -92,7 +94,6 @@ class tpv_caja extends fbase_controller
                         $this->terminal = new terminal_caja();
                         $t = new terminal_caja();
                         $t = $this->terminal->get_cod("TT");
-                        print_r($t);
                         $caja2 = new caja();
                         $this->agente = new agente();
                         
@@ -398,10 +399,12 @@ class tpv_caja extends fbase_controller
             return 0;
         
     }
+
+    
     
     private function cerrar_caja1($caja_im, $terminal)
     {
-        
+        $registrogasto = new registro_gasto();
             if ($this->terminal) {
                 $this->terminal->cod_letra_tickect();
                 $this->terminal->anchopapel = 28;
@@ -427,7 +430,7 @@ class tpv_caja extends fbase_controller
                 $this->terminal->add_linea("Fact. Cdito $". sprintf("%" . ($this->terminal->anchopapel - 12) . "s", $this->formato_moneda($this->facturas_credito($caja_im[0]["codagente"], $caja_im[0]["id"])). "\n") );
                 $this->terminal->add_linea("Dnero Manua $" .  sprintf("%" . ($this->terminal->anchopapel - 12) . "s", $this->formato_moneda($caja_im[0]["cierremanual"]) . "\n" ));
                 $this->terminal->add_linea("Dnero final $" .  sprintf("%" . ($this->terminal->anchopapel - 11) . "s", $this->formato_moneda($caja_im[0]["d_fin"] - $this->facturas_credito($caja_im[0]["codagente"], $caja_im[0]["id"])) . "\n\n" ));
-                
+                $this->terminal->add_linea("Gastos      $" .  sprintf("%" . ($this->terminal->anchopapel - 12) . "s", $this->formato_moneda($registrogasto->get_sum_idarqueo($caja_im[0]["id"])) . "\n" ));
                 $this->terminal->add_linea_big("Por Artículo \n\n");
                 
                 $articulos = $this->familiasCierre($caja_im[0]["id"]);

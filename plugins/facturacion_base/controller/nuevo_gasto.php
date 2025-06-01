@@ -42,6 +42,8 @@ class nuevo_gasto extends fbase_controller
     public $serie;
     public $tipo;
     public $metodo_pago;
+    public $caja;
+    public $terminal;
     
     //linea de cada combo 
     public $linea_combo;
@@ -125,7 +127,7 @@ class nuevo_gasto extends fbase_controller
             } else {
                 $this->agente = $this->user->get_agente();
             }
-
+            $this->getIdArqueo();
             $this->almacen = new almacen();
             $this->serie = new serie();
             $this->forma_pago = new forma_pago();
@@ -681,6 +683,24 @@ class nuevo_gasto extends fbase_controller
         }
     }
 
+    /**
+     * Función para obtener el id del arqueo actual
+     */
+    private function getIdArqueo(){
+        $this->caja = FALSE;
+        $this->terminal = FALSE;
+        $caja = new caja();
+
+        $terminal0 = new terminal_caja();
+        foreach ($caja->all_by_agente($this->agente->codagente) as $cj) {
+            if ($cj->abierta()) {
+                $this->caja = $cj;
+                $this->terminal = $terminal0->get($cj->fs_id);
+                break;
+            }
+        }
+    }
+
     private function nueva_factura_proveedor()
     {
         $continuar = TRUE;
@@ -739,6 +759,7 @@ class nuevo_gasto extends fbase_controller
             $this->nuevo_documento($factura, $proveedor, $almacen, $ejercicio, $serie, $forma_pago, $divisa);
             $factura->set_fecha_hora($_POST['fecha'], $_POST['hora']);
             $factura->idmetodopago = $_POST['metodo_pago'] ?? NULL;
+            $factura->idarqueo = $this->caja->id;
             if ($forma_pago->genrecibos == 'Pagados') {
                 $factura->pagada = TRUE;
             }

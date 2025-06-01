@@ -30,3 +30,7 @@ ADD COLUMN idmetodopago INT(11);
 ALTER TABLE registro_gastos
 ADD CONSTRAINT fk_idmetodopago_rg
 FOREIGN KEY (idmetodopago) REFERENCES metodospago(id);
+
+ALTER TABLE registro_gastos
+ADD CONSTRAINT fk_idarqueo_rg
+FOREIGN KEY (idarqueo) REFERENCES cajas(id);
