@@ -417,7 +417,7 @@ class registro_gasto extends \fs_model
                 . "," . $this->var2str($this->hora)
                 . "," . $this->var2str($this->numdocs)
                 . "," . $this->var2str($this->idmetodopago) . ");";
-            var_dump($sql);
+            
             if ($this->db->exec($sql)) {
                 $this->idfactura = $this->db->lastval();
                 return TRUE;

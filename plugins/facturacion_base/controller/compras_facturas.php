@@ -45,6 +45,7 @@ class compras_facturas extends fbase_controller
     public $total_resultados_txt;
     public $metodo_pago;
     public $idmetodopago;
+    public $arrPay;
 
     public function __construct()
     {
@@ -59,6 +60,10 @@ class compras_facturas extends fbase_controller
         $this->almacenes = new almacen();
         $this->factura = new factura_proveedor();
         $this->serie = new serie();
+        $this->arrPay[0] = "---";
+        foreach ($this->metodo_pago->all() as $k => $pay) {
+            $this->arrPay[$pay->id] = $pay->nombre;
+        }
 
         $this->mostrar = 'todo';
         if (isset($_GET['mostrar'])) {

@@ -366,6 +366,7 @@
             <th></th>
             <th class="text-left">Código + {#FS_NUMERO2#}</th>
             <th class="text-left">Cliente</th>
+            <th class="text-left">Método de pago</th>
             <th class="text-left">Cajero</th>
             <th class="text-left">ID Arqueo</th>
             <th class="hidden-sm"></th>
@@ -417,6 +418,9 @@
             <span class="label label-danger" title="Cliente desconocido">???</span>
             {/if}
             {if="!$value->cifnif"}<span class="label label-warning" title="Sin {#FS_CIFNIF#}"><s>{#FS_CIFNIF#}</s></span>{/if}
+         </td>
+         <td class="text-left hidden-sm">
+            {$fsc->arrPay[$value->idmetodopago]}
          </td>
          <td>
             {$fsc->agente_bus($value->codagente)}

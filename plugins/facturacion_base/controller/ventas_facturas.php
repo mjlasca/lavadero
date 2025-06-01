@@ -54,6 +54,7 @@ class ventas_facturas extends fbase_controller
     public $idarqueo;
     public $metodo_pago;
     public $idmetodopago;
+    public $arrPay;
 
     public function __construct()
     {
@@ -72,6 +73,10 @@ class ventas_facturas extends fbase_controller
         $this->huecos = array();
         $this->serie = new serie();
         $this->metodo_pago = new metodo_pago();
+        $this->arrPay[0] = "---";
+        foreach ($this->metodo_pago->all() as $k => $pay) {
+            $this->arrPay[$pay->id] = $pay->nombre;
+        }
         $this->mostrar = 'todo';
         if (isset($_GET['mostrar'])) {
             $this->mostrar = $_GET['mostrar'];

@@ -440,7 +440,7 @@ class nuevo_gasto extends fbase_controller
 
             /// función auxiliar para implementar en los plugins que lo necesiten
             if (!fs_generar_numproveedor($pedido)) {
-                $pedido->numproveedor = $_POST['numproveedor'];
+                $pedido->numproveedor = $_POST['numproveedor'] ?? NULL;
             }
 
             if ($pedido->save()) {
@@ -587,7 +587,7 @@ class nuevo_gasto extends fbase_controller
 
             /// función auxiliar para implementar en los plugins que lo necesiten
             if (!fs_generar_numproveedor($albaran)) {
-                $albaran->numproveedor = $_POST['numproveedor'];
+                $albaran->numproveedor = $_POST['numproveedor'] ?? NULL;
             }
 
             if ($albaran->save()) {
@@ -745,7 +745,7 @@ class nuevo_gasto extends fbase_controller
 
             /// función auxiliar para implementar en los plugins que lo necesiten
             if (!fs_generar_numproveedor($factura)) {
-                $factura->numproveedor = $_POST['numproveedor'];
+                $factura->numproveedor = $_POST['numproveedor'] ?? NULL;
             }
 
             $regularizacion = new regularizacion_iva();

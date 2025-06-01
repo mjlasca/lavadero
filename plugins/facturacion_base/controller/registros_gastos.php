@@ -45,6 +45,7 @@ class registros_gastos extends fbase_controller
     public $total_resultados_txt;
     public $metodo_pago;
     public $idmetodopago;
+    public $arrPay;
 
     public function __construct()
     {
@@ -59,6 +60,10 @@ class registros_gastos extends fbase_controller
         $this->almacenes = new almacen();
         $this->registros_gastos = new registro_gasto();
         $this->serie = new serie();
+        $this->arrPay[0] = "---";
+        foreach ($this->metodo_pago->all() as $k => $pay) {
+            $this->arrPay[$pay->id] = $pay->nombre;
+        }
 
         $this->mostrar = 'todo';
         if (isset($_GET['mostrar'])) {
@@ -100,7 +105,6 @@ class registros_gastos extends fbase_controller
             $linea = new linea_registro_gasto();
             $this->resultados = $linea->all_from_articulo($_GET['ref'], $this->offset);
         } else {
-            var_dump("test");
             $this->share_extension();
             $this->proveedor = FALSE;
             $this->codagente = '';
@@ -352,6 +356,8 @@ class registros_gastos extends fbase_controller
             $this->num_resultados = intval($data[0]['total']);
 
             $data2 = $this->db->select_limit("SELECT *" . $sql . " ORDER BY " . $this->order . $order2, FS_ITEM_LIMIT, $this->offset);
+            
+            
             if ($data2) {
                 foreach ($data2 as $d) {
                     $this->resultados[] = new registro_gasto($d);
@@ -370,6 +376,8 @@ class registros_gastos extends fbase_controller
                 }
             }
         }
+
+        
     }
 
     private function delete_registros_gastos()
