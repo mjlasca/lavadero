@@ -1,0 +1,401 @@
+{include="header"}
+<style>
+   
+   .flex{
+      display: flex;
+   }
+   .consp{
+      padding: 10px;
+      text-align: center;
+      width: 100%;
+   }
+   .consp h3{
+      min-width: 300px;
+   }
+   .consp h4{
+      text-align: left;
+   }
+   .conss{
+      padding: 10px;
+      min-width: 200px;
+   }
+   .consd{
+      justify-content: space-between;
+      border-bottom: 1px solid #000;
+      padding: 5px;
+   }
+   .content-items{
+      width: 100%;
+   }
+   .items-total{
+      width: 80%;
+   }
+   .item-r{
+      display: flex;
+   }
+   .item-r:hover{
+      background-color: rgb(197, 197, 197);
+      padding: 6px;
+   }
+   .total-show{
+      font-weight: bolder;
+      padding: 1px;
+   }
+</style>
+
+<script type="text/javascript">
+   function buscar_lineas()
+   {
+      if(document.f_buscar_lineas.buscar_lineas.value == '')
+      {
+         $('#search_results').html('');
+      }
+      else
+      {
+         $.ajax({
+            type: 'POST',
+            url: '{$fsc->url()}',
+            dataType: 'html',
+            data: $('form[name=f_buscar_lineas]').serialize(),
+            success: function(datos) {
+               var re = /<!--(.*?)-->/g;
+               var m = re.exec( datos );
+               if( m[1] == document.f_buscar_lineas.buscar_lineas.value )
+               {
+                  $('#search_results').html(datos);
+               }
+            }
+         });
+      }
+   }
+   function clean_cliente()
+   {
+      document.f_custom_search.ac_cliente.value = '';
+      document.f_custom_search.codcliente.value = '';
+      document.f_custom_search.submit();
+   }
+   $(document).ready(function() {
+      
+      {if="$fsc->mostrar=='buscar'"}
+      document.f_custom_search.query.focus();
+      {/if}
+      
+      $('#b_huecos').click(function() {
+         $('#modal_huecos').modal('show');
+      });
+      $('#b_buscar_lineas').click(function(event) {
+         event.preventDefault();
+         $('#modal_buscar_lineas').modal('show');
+         document.f_buscar_lineas.buscar_lineas.focus();
+      });
+      $('#f_buscar_lineas').keyup(function() {
+         buscar_lineas();
+      });
+      $('#f_buscar_lineas').submit(function(event) {
+         event.preventDefault();
+         buscar_lineas();
+      });
+      $("#ac_cliente").autocomplete({
+         serviceUrl: '{$fsc->url()}',
+         paramName: 'buscar_cliente',
+         onSelect: function (suggestion) {
+            if(suggestion)
+            {
+               if(document.f_custom_search.codcliente.value != suggestion.data && suggestion.data != '')
+               {
+                  document.f_custom_search.codcliente.value = suggestion.data;
+                  document.f_custom_search.submit();
+               }
+            }
+         }
+      });
+   });
+</script>
+
+<div class="container-fluid" style="margin-top: 10px; margin-bottom: 10px;">
+   <div class="row">
+      <div class="col-sm-8 col-xs-6">
+         <div class="btn-group hidden-xs">
+            <a class="btn btn-sm btn-default" href="{$fsc->url()}" title="Recargar la página">
+               <span class="glyphicon glyphicon-refresh"></span>
+            </a>
+            {if="$fsc->page->is_default()"}
+            <a class="btn btn-sm btn-default active" href="{$fsc->url()}&amp;default_page=FALSE" title="Marcada como página de inicio (pulsa de nuevo para desmarcar)">
+               <i class="fa fa-bookmark" aria-hidden="true"></i>
+            </a>
+            {else}
+            <a class="btn btn-sm btn-default" href="{$fsc->url()}&amp;default_page=TRUE" title="Marcar como página de inicio">
+               <i class="fa fa-bookmark-o" aria-hidden="true"></i>
+            </a>
+            {/if}
+         </div>
+         <div class="btn-group">
+            <!--<a class="btn btn-sm btn-success" href="index.php?page=nueva_venta&tipo=factura">
+               <span class="glyphicon glyphicon-plus"></span>
+               <span class="hidden-xs">&nbsp;Nueva</span>
+            </a>-->
+            {if="$fsc->huecos"}
+            <button class="btn btn-sm btn-default" data-toggle="modal" data-target="#modal_huecos">
+               <span class="glyphicon glyphicon-exclamation-sign"></span>&nbsp; Huecos
+            </button>
+            {/if}
+            {loop="$fsc->extensions"}
+               {if="$value->type=='button'"}
+               <a href="index.php?page={$value->from}{$value->params}" class="btn btn-sm btn-default">{$value->text}</a>
+               {/if}
+            {/loop}
+         </div>
+      </div>
+      
+   </div>
+</div>
+
+<ul class="nav nav-tabs" role="tablist">
+   <li{if="$fsc->mostrar=='buscar'"} class="active"{/if}>
+      <a href="{$fsc->url()}&mostrar=buscar" title="Buscar">
+         <span class="glyphicon glyphicon-search"></span>
+         <span class="hidden-xs">Consolidado</span>
+      </a>
+   </li>
+</ul>
+
+{if="$fsc->mostrar=='buscar'"}
+<br/>
+<form name="f_custom_search" action="{$fsc->url()}" method="post" class="form">
+   {if="$fsc->cliente"}
+   <input type="hidden" name="codcliente" value="{$fsc->cliente->codcliente}"/>
+   {else}
+   <input type="hidden" name="codcliente"/>
+   {/if}
+   <div class="container-fluid">
+      <div class="row">
+         <input type="hidden" name="codalmacen" value=""/>
+         <div class="col-sm-2">
+            <div class="form-group">
+               <select name="metodo_pago" id="metodo_pago" class="form-control"  onchange="this.form.submit()" required>
+                     <option value="">--Seleccione método de pago {$fsc->idmetodopago}--</option>
+                     {loop="$fsc->metodo_pago->all()"}
+                        {if="$value->id == $fsc->idmetodopago"}
+                        <option value="{$value->id}" selected>{$value->nombre}</option>
+                        {else}
+                        <option value="{$value->id}">{$value->nombre}</option>
+                        {/if}
+
+                     {/loop}
+               </select>
+            </div>
+         </div>
+         <div class="col-sm-2">
+             
+            <div class="form-group">
+               <input type="date" name="desde" value="{$fsc->desde}" class="form-control" placeholder="Desde" autocomplete="off" onchange="this.form.submit()"/>
+            </div>
+         </div>
+         <div class="col-sm-2">
+            <div class="form-group">
+               <input type="date" name="hasta" value="{$fsc->hasta}" class="form-control " placeholder="Hasta" autocomplete="off" onchange="this.form.submit()"/>
+            </div>
+         </div>
+         
+      </div>
+   </div>
+</form>
+{/if}
+
+{if="in_array($fsc->mostrar, array('todo','sinpagar','buscar'))"}
+<div class="content-main">
+<div class="content-main--totals">
+      <div  class="bg-primary flex consp">
+         <h3>INGRESOS</h3>
+         <div class="content-items">
+            <div class="item-r">
+               <h4 class="conss">Facturas de venta<br><span class="total-show">{$fsc->show_numero($fsc->resultados['factcli_total'])}</span></h4>
+               <div class="items-total">
+                  {loop="$fsc->resultados['factcli']"}
+                  <div class="flex consd">
+                     <div>
+                        {$fsc->arrPay[$value['idmetodopago']]}
+                     </div>
+                     <div>
+                        {$fsc->show_numero($value['total'])}
+                     </div>
+                  </div>
+                  {/loop}
+               </div>
+            </div>
+         </div>
+      </div>
+      <div class="bg-danger flex consp">
+         <h3 >GASTOS</h3>
+         <div class="content-items">
+            <div class="item-r">
+               <h4 class="conss">Registro gastos<br><span class="total-show">{$fsc->show_numero($fsc->resultados['gastos_total'])}</span></h4>
+               <div class="items-total">
+                  {loop="$fsc->resultados['gastos']"}
+                  <div class="flex consd">
+                     <div>
+                        {$fsc->arrPay[$value['idmetodopago']]}
+                     </div>
+                     <div>
+                        {$fsc->show_numero($value['total'])}
+                     </div>
+                  </div>
+                  {/loop}
+               </div>
+            </div>
+         </div>
+      </div>
+      <div class="bg-success flex consp">
+         <h3 >COSTO DE VENTA</h3>
+         <div class="content-items">
+            <div class="item-r">
+               <h4 class="conss">Comisiones<br><span class="total-show">{$fsc->show_numero($fsc->resultados['comisiones_total'])}</span></h4>
+               <div class="items-total">
+                  {loop="$fsc->resultados['comisiones']"}
+                  <div class="flex consd">
+                     <div>
+                        {$fsc->arrPay[$value['idmetodopago']]}
+                     </div>
+                     <div>
+                        {$fsc->show_numero($value['total'])}
+                     </div>
+                  </div>
+                  {/loop}
+               </div>
+            </div>
+            <div class="item-r">
+               <h4 class="conss">Facturas de compra<br><span class="total-show">{$fsc->show_numero($fsc->resultados['factcompra_total'])}</span></h4>
+               <div class="items-total">
+                  {loop="$fsc->resultados['factcompra']"}
+                  <div class="flex consd">
+                     <div>
+                        {$fsc->arrPay[$value['idmetodopago']]}
+                     </div>
+                     <div>
+                        {$fsc->show_numero($value['total'])}
+                     </div>
+                  </div>
+                  {/loop}
+               </div>
+            </div>
+         </div>
+      </div>
+   </div>
+</div>
+   
+   
+
+
+<div class="container-fluid">
+   <div class="row">
+      <div class="col-sm-12 text-center">
+         <ul class="pagination">
+            {loop="$fsc->paginas()"}
+            <li{if="$value['actual']"} class="active"{/if}>
+               <a href="{$value['url']}">{$value['num']}</a>
+            </li>
+            {/loop}
+         </ul>
+      </div>
+   </div>
+</div>
+{else}
+   {loop="$fsc->extensions"}
+      {if="$value->type=='tab' && $fsc->mostrar=='ext_'.$value->name"}
+      <iframe src="index.php?page={$value->from}{$value->params}" width="100%" height="2000" frameborder="0"></iframe>
+      {/if}
+   {/loop}
+{/if}
+
+<div class="modal fade" id="modal_huecos">
+   <div class="modal-dialog">
+      <div class="modal-content">
+         <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+            <h4 class="modal-title">
+               <span class="glyphicon glyphicon-exclamation-sign"></span>
+               &nbsp; Huecos en la facturación
+            </h4>
+            <p class="help-block">
+               Si hay huecos en la facturación es debido a que faltan facturas.
+            </p>
+         </div>
+         <div class="table-responsive">
+            <table class="table table-hover">
+               <thead>
+                  <tr>
+                     <th class="text-center">Código</th>
+                     <th class="text-center">Fecha y hora</th>
+                  </tr>
+               </thead>
+               {loop="$fsc->huecos"}
+               <tr class="warning">
+                  <td class="text-center">{$value.codigo}</td>
+                  <td class="text-center">{$value.fecha} {$value.hora}</td>
+               </tr>
+               {else}
+               <tr class="success">
+                  <td colspan="2">No hay huecos en la numeración de facturas. Eso es bueno ;-)</td>
+               </tr>
+               {/loop}
+            </table>
+         </div>
+      </div>
+   </div>
+</div>
+
+<form class="form" role="form" id="f_buscar_lineas" name="f_buscar_lineas" action="{$fsc->url()}" method="post">
+   <div class="modal" id="modal_buscar_lineas">
+      <div class="modal-dialog" style="width: 99%; max-width: 950px;">
+         <div class="modal-content">
+            <div class="modal-header">
+               <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+               <h4 class="modal-title">Buscar en las líneas</h4>
+               {if="$fsc->cliente"}
+               <p class="help-block">
+                  Estas buscando en las líneas de las facturas de {$fsc->cliente->nombre}.
+               </p>
+               {else}
+               <p class="help-block">Si quieres, puede <a href="{$fsc->url()}&mostrar=buscar">filtrar por cliente</a>.</p>
+               {/if}
+            </div>
+            <div class="modal-body">
+               {if="$fsc->cliente"}
+               <input type="hidden" name="codcliente" value="{$fsc->cliente->codcliente}"/>
+               <div class="container-fluid">
+                  <div class="row">
+                     <div class="col-sm-6">
+                        <div class="input-group">
+                           <input class="form-control" type="text" name="buscar_lineas" placeholder="Referencia" autocomplete="off"/>
+                           <span class="input-group-btn">
+                              <button class="btn btn-primary" type="submit">
+                                 <span class="glyphicon glyphicon-search"></span>
+                              </button>
+                           </span>
+                        </div>
+                     </div>
+                     <div class="col-sm-6">
+                        <div class="form-group">
+                           <input class="form-control" type="text" name="buscar_lineas_o" placeholder="Observaciones" autocomplete="off"/>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+               {else}
+               <div class="input-group">
+                  <input class="form-control" type="text" name="buscar_lineas" placeholder="Referencia" autocomplete="off"/>
+                  <span class="input-group-btn">
+                     <button class="btn btn-primary" type="submit">
+                        <span class="glyphicon glyphicon-search"></span>
+                     </button>
+                  </span>
+               </div>
+               {/if}
+            </div>
+            <div id="search_results" class="table-responsive"></div>
+         </div>
+      </div>
+   </div>
+</form>
+
+{include="footer"}

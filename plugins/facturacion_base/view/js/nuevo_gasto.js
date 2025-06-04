@@ -31,7 +31,7 @@ var siniva = false;
 var irpf = 0;
 var tiene_recargo = false;
 var utilidad_general = 0;
-console.log("gasto.js");
+
 function usar_proveedor(codproveedor) {
   if (nueva_compra_url !== "") {
     $.getJSON(
@@ -519,7 +519,7 @@ function add_articulo(
         <input type="hidden" name="referencia_${numlineas}" value="${ref}"/>
         <input type="hidden" name="codcombinacion_${numlineas}" value="${codcombinacion}"/>
         <div class="form-control">
-            <small><a target="_blank" href="index.php?page=ventas_articulo&ref=${ref}">${ref}</a></small>
+            <small><a target="_blank" href="index.php?page=ventas_gasto&ref=${ref}">${ref}</a></small>
         </div>
     </td>
     <td><textarea class="form-control" id="desc_${numlineas}" name="desc_${numlineas}" rows="1">${desc}</textarea></td>

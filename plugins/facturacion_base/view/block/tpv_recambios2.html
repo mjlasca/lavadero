@@ -126,12 +126,12 @@
                    {if="$fsc->user->admin"}
                    
                         {if="$fsc->factura_editar >-1"}
-                            <input class="form-control" type="text" id="fecha" name="fecha"  readonly=""/>
+                            <input class="form-control" type="date" id="fecha" name="fecha"/>
                         {else}
-                            <input class="form-control datepicker" type="text" id="fecha" name="fecha" value="{$fsc->today()}" readonly=""/>
+                            <input class="form-control" type="date" id="fecha" name="fecha" value="{$fsc->today1()}" />
                         {/if}
                   {else}
-                  <input class="form-control" type="text" id="fecha" name="fecha" value="{$fsc->today()}" readonly=""/>
+                  <input class="form-control" type="date" id="fecha" name="fecha" value="{$fsc->today1()}"/>
                   {/if}
                </div>
             </div>

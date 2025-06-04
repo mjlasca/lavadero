@@ -563,8 +563,8 @@ class factura_cliente extends \fs_model
                 "," . $this->var2str($this->id_arqueo) .
                 "," . $this->var2str($this->idmetodopago) . ");";
 
-            
-            
+            var_dump($sql);
+            exit;
             if ($this->db->exec($sql)) {
                 $this->idfactura = $this->db->lastval();
                 return TRUE;

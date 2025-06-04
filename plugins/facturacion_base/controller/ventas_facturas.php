@@ -210,7 +210,6 @@ class ventas_facturas extends fbase_controller
                     }
                 }
             } else if ($this->mostrar == 'buscar') {
-                var_dump($this->idmetodopago);
                 $this->buscar($order2);
             } else {
                 $this->resultados = $this->factura->all($this->offset, FS_ITEM_LIMIT, $this->order . $order2);
@@ -383,7 +382,7 @@ class ventas_facturas extends fbase_controller
             $sql .= $where . "codpago = " . $this->agente->var2str($this->codpago);
             $where = ' AND ';
         }
-        var_dump($this->idmetodopago);
+        
         if ($this->codserie != '') {
             $sql .= $where . "codserie = " . $this->agente->var2str($this->codserie);
             $where = ' AND ';

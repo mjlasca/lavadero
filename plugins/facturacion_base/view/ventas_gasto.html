@@ -109,17 +109,11 @@
             <div class="container-fluid">
                <div class="row" style="padding-top: 10px;">
                   <div class="col-sm-3">
-                      <div class="form-group">
-                        ID:
-                        <input class="form-control" type="text"  value="{$fsc->gasto->id_gasto}" readonly=""  autocomplete="off"/>
-                     </div>      
                      <div class="form-group">
                         Referencia:
-                        <input class="form-control" type="text" name="nreferencia" value="{$fsc->gasto->referencia}" maxlength="18" autocomplete="off"/>
+                        <input class="form-control" type="text" name="nreferencia" value="{$fsc->gasto->referencia}" maxlength="18" autocomplete="off" readonly/>
                      </div>
                   </div>
-                   
-                     
                    
                   <div class="col-sm-9">
                      
@@ -129,8 +123,48 @@
                      </div>
                   </div>
                </div>
-             
+               <div class="row">
+                  <div class="col-sm-4">
+                     <input type="hidden" name="precioanterior" value="{$fsc->gasto->pvp}">
+                     <div class="form-group">
+                           Precio:
+                           <div class="input-group">
+                              <span class="input-group-addon">{$fsc->simbolo_divisa()}</span>
+                              <input type="text" class="form-control" id="pvp" name="pvp" value="{$fsc->gasto->pvp}" autocomplete="off" onkeyup="cambiar_pvp()" onclick="this.select()"/>
+                           </div>
+                           
+                     </div>
+                  </div>
+                  <div class="col-sm-4">
+                     <input type="hidden" name="ivaanterior" value="{$fsc->gasto->codimpuesto}">
+                     <div class="form-group">
+                           <a href="{$fsc->impuesto->url()}">{#FS_IVA#}</a>:
+                           <select class="form-control" name="codimpuesto" onchange="this.form.submit()">
+                              {loop="$fsc->impuesto->all()"}
+                              {if="$value->codimpuesto==$fsc->gasto->codimpuesto"}
+                              <option value="{$value->codimpuesto}" selected="">{$value->descripcion}</option>
+                              
+                              {else}
+                              <option value="{$value->codimpuesto}">{$value->descripcion}</option>
+                              {/if}
+                              {/loop}
+                           </select>
+                     </div>
+                  </div>
+                  <div class="col-sm-4">
+                     <div class="form-group">
+                           Precio+{#FS_IVA#}:
+                           <div class="input-group">
+                              <input type="text" class="form-control" id="pvpi" name="pvpiva" value="{$fsc->gasto->pvp_iva()}" autocomplete="off" onkeyup="cambiar_pvpi()" onclick="this.select()"/>
+                              <span class="input-group-addon" title="precio redondeado">{$fsc->show_precio($fsc->gasto->pvp_iva(), FALSE, TRUE, FS_NF0_ART)}</span>
+                           </div>
+                           <p class="help-block">Último cambio de precio: {$fsc->gasto->factualizado}</p>
+                     </div>
+                  </div>
+               </div>
+               <input class="btn btn-sm btn-primary" type="submit" value="Guardar">
             </div>
+            
          </form>
       </div>
    </div>

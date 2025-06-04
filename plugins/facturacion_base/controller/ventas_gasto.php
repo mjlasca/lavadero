@@ -223,33 +223,14 @@ class ventas_gasto extends fbase_controller
 
         if (isset($_POST['preciocoste'])) {
             $this->gasto->preciocoste = floatval($_POST['preciocoste']);
-            $this->gasto->preciocombo = floatval($_POST['preciocombo']);
         }
 
         if ($this->gasto->save()) {
-
-            $auditar = new auditoriapreciogasto();
-            $auditar->costo =  $this->gasto->preciocoste ;
-            $auditar->preciocombo =  $this->gasto->preciocombo;
-            $auditar->costoanterior =  $_POST['costoanterior'] ;
-            $auditar->preciocomboanterior =  $_POST['preciocomboanterior'];
             $impu = new impuesto();
             $impu = $impu->get($_POST['codimpuesto']);
-            $auditar->iva =  $impu->iva;
             $impu = $impu->get($_POST['ivaanterior']);
-            $auditar->ivaanterior =  $impu->iva;
-            $auditar->precio = $this->gasto->pvp;
-            $auditar->precioanterior = $_POST['precioanterior'];
-            $auditar->idgasto = $this->gasto->referencia;
-            $auditar->ultmod = date("Y-m-d H:i:s");
-            $auditar->useredit = $this->user->nick;
             $empleado = new agente();
             $empleado = $empleado->get($this->user->codagente);
-            $auditar->nombreempleado = $empleado->nombre." ".$empleado->apellidos;
-
-            $auditar->save();
-            
-            $this->new_message("Precio modificado correctamente.");
         } else {
             $this->new_error_msg("Error al modificar el precio.");
         }

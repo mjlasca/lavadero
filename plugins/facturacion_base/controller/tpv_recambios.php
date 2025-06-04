@@ -78,7 +78,6 @@ class tpv_recambios extends fbase_controller
         $fact_ = new factura_cliente();
         $this->current_invoice = FALSE;
         
-        
         if (isset($_REQUEST['factura_editar'])) {
             $this->factura_editar = $_REQUEST['factura_editar'];
             $this->current_invoice = $fact_->get($this->factura_editar);
@@ -244,7 +243,9 @@ class tpv_recambios extends fbase_controller
     }
 
     
-  
+    public function today1(){
+        return date('Y-m-d');
+    }
 
 
     private function comprobar_opciones()
@@ -614,9 +615,8 @@ class tpv_recambios extends fbase_controller
                 $factura->fecha = $_POST['fecha'];    
             else
                 $factura->set_fecha_hora($_POST['fecha'], $factura->hora);*/
-
+            
             $factura->fecha = $_POST['fecha'];    
-
             $factura->codalmacen = $_POST['almacen'];
             $factura->codpago = $forma_pago->codpago;
             $factura->coddivisa = $divisa->coddivisa;

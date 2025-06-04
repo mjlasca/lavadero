@@ -105,7 +105,6 @@ class compras_facturas extends fbase_controller
             $linea = new linea_factura_proveedor();
             $this->resultados = $linea->all_from_articulo($_GET['ref'], $this->offset);
         } else {
-            var_dump("test");
             $this->share_extension();
             $this->proveedor = FALSE;
             $this->codagente = '';

@@ -349,8 +349,6 @@ class nuevo_gasto extends fbase_controller
     {
         /// cambiamos la plantilla HTML
         $this->template = 'ajax/nuevo_gasto_precios';
-        var_dump("test");
-        exit;
         $articulo = new articulo();
         $this->articulo = $articulo->get($_POST['referencia4precios']);
     }
@@ -899,8 +897,6 @@ class nuevo_gasto extends fbase_controller
         $valorantesdeiva = round( $_REQUEST["pvta".$i] / (1 +($imp0->iva/100)),3);
         //consulta para hacer la actualización de los precios del artículo
         $sql = "UPDATE articulos SET preciocoste='".$_REQUEST["pvp_".$i]."',  pvp='".$valorantesdeiva."', preciocombo='".$_REQUEST["pcombo".$i]."', codimpuesto = '".$imp0->codimpuesto."' WHERE referencia='".$linea->referencia."' ";
-        var_dump($sql);
-        
         $this->db->exec($sql);
         
         //aumento de la línea de registros de compra
