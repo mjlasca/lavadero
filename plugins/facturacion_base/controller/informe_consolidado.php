@@ -113,10 +113,10 @@ class informe_consolidado extends fbase_controller
         if(isset($_REQUEST['desde']))
             $this->desde = $_REQUEST['desde'];
         
-        $sqlComision .= " AND ultmod >= '".$this->desde."' ";
-        $sqlFactcompra .= " AND fecha >= '".$this->desde."' ";
-        $sqlGastos .= " AND fecha >= '".$this->desde."' ";
-        $sqlFactcli .= " AND fecha >= '".$this->desde."' ";
+        $sqlComision .= " AND ultmod >= '".$this->desde." 00:00:01' ";
+        $sqlFactcompra .= " AND fecha >= '".$this->desde." 00:00:01' ";
+        $sqlGastos .= " AND fecha >= '".$this->desde." 00:00:01' ";
+        $sqlFactcli .= " AND fecha >= '".$this->desde." 00:00:01' ";
         
         if(isset($_REQUEST['hasta']))
             $this->hasta = $_REQUEST['hasta'];  
