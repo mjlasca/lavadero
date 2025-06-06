@@ -137,8 +137,8 @@ class factura_cliente extends \fs_model
                 $cambio = TRUE;
             }
 
-            $this->fecha = $fecha;
-            $this->hora = $hora;
+            //$this->fecha = $fecha;
+            //$this->hora = $hora;
         } else if ($fecha != $this->fecha) { /// factura existente y cambiamos fecha
             $cambio = TRUE;
 
@@ -156,8 +156,8 @@ class factura_cliente extends \fs_model
                         $this->new_error_msg('La factura se encuentra dentro de una regularización de '
                             . FS_IVA . '. No se puede modificar la fecha.');
                     } else {
-                        $this->fecha = $fecha;
-                        $this->hora = $hora;
+                        //$this->fecha = $fecha;
+                        //$this->hora = $hora;
                         $cambio = FALSE;
                     }
                 } else {
@@ -323,8 +323,8 @@ class factura_cliente extends \fs_model
         $this->numero = $num;
 
         if ($encontrado) {
-            $this->fecha = $fecha;
-            $this->hora = $hora;
+            //$this->fecha = $fecha;
+            //$this->hora = $hora;
         } else {
             /// nos guardamos la secuencia para abanq/eneboo
             $sec0 = new \secuencia();
@@ -562,7 +562,7 @@ class factura_cliente extends \fs_model
                 "," . $this->var2str($this->numdocs) .
                 "," . $this->var2str($this->id_arqueo) .
                 "," . $this->var2str($this->idmetodopago) . ");";
-
+            
             if ($this->db->exec($sql)) {
                 $this->idfactura = $this->db->lastval();
                 return TRUE;

@@ -679,7 +679,6 @@ class tpv_recambios extends fbase_controller
             
             $regularizacion = new regularizacion_iva();
             
-            
             if ($regularizacion->get_fecha_inside($factura->fecha)) {
                 $this->new_error_msg("El " . FS_IVA . " de ese periodo ya ha sido regularizado."
                     . " No se pueden añadir más facturas en esa fecha.");
