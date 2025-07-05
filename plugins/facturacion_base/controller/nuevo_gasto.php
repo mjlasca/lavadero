@@ -228,7 +228,7 @@ class nuevo_gasto extends fbase_controller
         /// desactivamos la plantilla HTML
         $this->template = FALSE;
 
-        $art0 = new articulo();
+        $art0 = new gasto();
         if ($_REQUEST['referencia'] != '') {
             $art0->referencia = $_REQUEST['referencia'];
         } else {

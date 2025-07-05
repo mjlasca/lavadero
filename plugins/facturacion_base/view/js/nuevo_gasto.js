@@ -227,13 +227,7 @@ function recalcular() {
   $("#airpf").html(number_format(total_irpf, fs_nf0, ".", ""));
   $("#atotal").val(total);
 
-  /* console.log("---------");
-    console.log("Neto: " + neto);
-    console.log("IVA: " + total_iva);
-    console.log("RE: " + total_recargo);
-    console.log("IRPF: " + total_irpf);
-    console.log("Total: " + (neto + total_iva - total_irpf + total_recargo));
-*/
+
   if (total_recargo == 0 && !tiene_recargo) {
     $(".recargo").hide();
     disable_inputs("recargo", true);
@@ -478,7 +472,6 @@ function calcular_precio_venta(linea) {
     );
 
     let centenas = Math.round(resultadito % 1000);
-    console.log("CENTENAS " + centenas);
     if (centenas > 0) {
       resultadito = resultadito - centenas + 1000;
     }
@@ -498,7 +491,6 @@ function add_articulo(
   codcombinacion
 ) {
 
-  console.log(pvp);
   if (typeof cantidad == "undefined") {
     cantidad = 1;
   }
@@ -655,7 +647,6 @@ function get_precios(ref) {
       data:
         "referencia4precios=" + ref + "&codproveedor=" + proveedor.codproveedor,
       success: function (datos) {
-        console.log(datos);
         $("#nav_articulos").hide();
         $("#search_results").html(datos);
       },
@@ -691,23 +682,14 @@ function new_articulo() {
           $("#li_mis_articulos").addClass("active");
           $("#search_results").show();
           $("#nuevo_articulo").hide();
-          if (precio_compra == "coste") {
-            add_articulo(
-              datos[0].referencia,
-              Base64.encode(datos[0].descripcion),
-              datos[0].coste,
-              0,
-              datos[0].codimpuesto
-            );
-          } else {
-            add_articulo(
-              datos[0].referencia,
-              Base64.encode(datos[0].descripcion),
-              datos[0].pvp,
-              0,
-              datos[0].codimpuesto
-            );
-          }
+          add_articulo(
+            datos[0].referencia,
+            Base64.encode(datos[0].descripcion),
+            datos[0].pvp,
+            0,
+            datos[0].codimpuesto
+          );
+          
         }
       },
       error: function () {
@@ -893,16 +875,14 @@ function buscar_articulos() {
 
             items.push(
               tr_aux +
-                '<td><a href="#" onclick="get_precios(\'' +
-                val.referencia +
-                '\')" title="más detalles">\n\
-                     <span class="glyphicon glyphicon-eye-open"></span></a>\n\
-                     &nbsp; <a href="#" onclick="return ' +
+                '<td><a href="#" onclick="return ' +
                 funcion2 +
+                '" title="actualizado el ' +
+                val.factualizado +
                 '">' +
                 val.referencia +
-                "</a> " +
                 descripcion_visible +
+                "</a> " +
                 '</td>\n\
                      <td class="text-right"><a href="#" onclick="return ' +
                 funcion1 +
@@ -915,10 +895,7 @@ function buscar_articulos() {
                 val.factualizado +
                 '">' +
                 show_precio(val.pvp, val.coddivisa) +
-                '</a></td>\n\
-                     <td class="text-right">' +
-                stock +
-                "</td></tr>"
+                '</a></tr>'
             );
 
             if (val.query == document.f_buscar_articulos.query.value) {
@@ -943,7 +920,6 @@ function buscar_articulos() {
                   <th class="text-left">Referencia + descripción</th>\n\
                   <th class="text-right" width="80">Compra</th>\n\
                   <th class="text-right" width="80">Venta</th>\n\
-                  <th class="text-right" width="80">Stock</th>\n\
                   </tr></thead>' +
                 items.join("") +
                 "</table></div>\n\
