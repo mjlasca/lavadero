@@ -956,6 +956,7 @@ class fs_controller
      */
     public function today()
     {
+         date_default_timezone_set('America/Bogota');
         return date('d-m-Y');
     }
 
