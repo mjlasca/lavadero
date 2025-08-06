@@ -41,6 +41,7 @@ class tpv_caja extends fbase_controller
 
     protected function private_core()
     {
+        echo Date('d-m-Y H:i:s');
         parent::private_core();
         
         $this->share_extensions();
