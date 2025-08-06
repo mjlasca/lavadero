@@ -167,7 +167,7 @@ class fs_controller
      */
     public function __construct($name = __CLASS__, $title = 'home', $folder = '', $admin = FALSE, $shmenu = TRUE, $important = FALSE)
     {
-        //date_default_timezone_set('America/Bogota');
+        date_default_timezone_set('America/Bogota');
         $tiempo = explode(' ', microtime());
         $this->uptime = $tiempo[1] + $tiempo[0];
         $this->extensions = array();
