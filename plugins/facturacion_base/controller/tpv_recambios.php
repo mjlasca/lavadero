@@ -18,6 +18,7 @@
  */
 
 use FacturaScripts\model\factura_cliente;
+use FacturaScripts\model\metodo_pago;
 
 require_once 'plugins/facturacion_base/extras/fbase_controller.php';
 
@@ -854,6 +855,13 @@ class tpv_recambios extends fbase_controller
             $this->new_error_msg('Terminal no encontrado.');
         }
     }
+
+    function getMetodosPagoVal($idarqueo) : array {
+        $result = [];
+        $metodopago = new metodo_pago();
+        
+        return $metodopago->getTotalCash($idarqueo) ?? [];
+    }
     
     
     private function cerrar_caja()
@@ -864,6 +872,7 @@ class tpv_recambios extends fbase_controller
             $this->caja->cierremanual = $_REQUEST["dinero_caja"];
         
         if ($this->caja->save()) {
+            $this->getMetodosPagoVal($this->caja->id);
             if ($this->terminal) {
                 $this->terminal->cod_letra_tickect();
                 $this->terminal->anchopapel = 28;
@@ -877,7 +886,14 @@ class tpv_recambios extends fbase_controller
                 $this->terminal->add_linea("Tickets: " . $this->caja->tickets . "\n\n");
                 $this->terminal->add_linea_big("Arqueo caja: \n\n");
                 
-                
+                $this->terminal->add_linea_big("Métodos de pago: \n");
+                foreach ($this->getMetodosPagoVal($this->caja->id) as $meth) {
+                    $this->terminal->add_linea($meth['nombre']."      $" .  sprintf("%" . ($this->terminal->anchopapel - 12) . "s", $this->formato_moneda($meth['total']) . "\n" ));
+                }
+                $registrogasto = new registro_gasto();
+                $this->terminal->add_linea("\nGastos      $" .  sprintf("%" . ($this->terminal->anchopapel - 12) . "s", $this->formato_moneda($registrogasto->get_sum_idarqueo($this->caja->id)) . "\n" ));
+                $this->terminal->add_linea_big("\n\n");
+
                 $this->terminal->add_linea("Dinero inic $" . sprintf("%" . ($this->terminal->anchopapel - 12) . "s",$this->formato_moneda($this->caja->dinero_inicial) . "\n"));
                 $this->terminal->add_linea("Fact. Ctado $". sprintf("%" . ($this->terminal->anchopapel - 12) . "s", $this->formato_moneda($this->facturas_contado($this->user->codagente, $this->caja->id)). "\n") );
                 $this->terminal->add_linea("Fact. Cdito $". sprintf("%" . ($this->terminal->anchopapel - 12) . "s", $this->formato_moneda($this->facturas_credito($this->user->codagente, $this->caja->id)). "\n") );

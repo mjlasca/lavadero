@@ -37,6 +37,7 @@ class metodo_pago extends \fs_model
     public $user_mod;
     public $codestado;
 
+    public $total;
 
     public function __construct($data = FALSE)
     {
@@ -167,6 +168,14 @@ class metodo_pago extends \fs_model
         }
 
         return $listaformas;
+    }
+
+    /**
+     * OBtener los totales por método de pago de las facturas cliente en un arqueo específico
+     */
+    public function getTotalCash($idarqueo){
+        $sql = "SELECT SUM(t1.total) as total,t2.nombre as nombre FROM facturascli t1 INNER JOIN metodospago t2 ON t1.idmetodopago = t2.id WHERE id_arqueo = $idarqueo GROUP BY idmetodopago";
+        return $this->db->select($sql);
     }
 
 

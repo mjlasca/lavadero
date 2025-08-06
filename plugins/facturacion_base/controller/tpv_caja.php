@@ -400,12 +400,18 @@ class tpv_caja extends fbase_controller
         
     }
 
-    
+    function getMetodosPagoVal($idarqueo) : array {
+        $result = [];
+        $metodopago = new metodo_pago();
+        
+        return $metodopago->getTotalCash($idarqueo) ?? [];
+    }
     
     private function cerrar_caja1($caja_im, $terminal)
     {
         $registrogasto = new registro_gasto();
             if ($this->terminal) {
+                
                 $this->terminal->cod_letra_tickect();
                 $this->terminal->anchopapel = 28;
                 $this->terminal->add_linea_big("\nCIERRE DE CAJA:\n\n");
@@ -414,13 +420,18 @@ class tpv_caja extends fbase_controller
                 $this->terminal->add_linea("Caja: " . $caja_im[0]["fs_id"] ."  ID Arqueo: ".$caja_im[0]["id"]." \n");
                 $this->terminal->add_linea("Fecha Arqueo: \n" . date("Y-m-d H:i:s"). "\n");
                 $this->terminal->add_linea("Fecha ini: \n" . $caja_im[0]["f_inicio"] . "\n");
-                
                 $this->terminal->add_linea("Fecha fin: \n" . $caja_im[0]["f_fin"] . "\n");
                 $this->terminal->add_linea("Diferencia: $ " . $this->formato_moneda($caja_im[0]["d_fin"] - $caja_im[0]["d_inicio"]) . "\n");
                 $this->terminal->add_linea("Tickets: " . $caja_im[0]["tickets"] . "\n\n");
+                
                 $this->terminal->add_linea_big("Arqueo caja: \n\n");
                 
-                
+                $this->terminal->add_linea_big("Métodos de pago: \n");
+                foreach ($this->getMetodosPagoVal($caja_im[0]["id"]) as $meth) {
+                    $this->terminal->add_linea($meth['nombre']."      $" .  sprintf("%" . ($this->terminal->anchopapel - 12) . "s", $this->formato_moneda($meth['total']) . "\n" ));
+                }
+                $this->terminal->add_linea("\nGastos      $" .  sprintf("%" . ($this->terminal->anchopapel - 12) . "s", $this->formato_moneda($registrogasto->get_sum_idarqueo($caja_im[0]["id"])) . "\n" ));
+                $this->terminal->add_linea_big("\n\n");
                 /*
                  * sprintf sirve para alinear la impresión a la derecha, el número en $this->terminal->anchopapel - 16 determina los espacios después del título
                  * y así acomoda cada resultado alineado a la derecha
@@ -430,7 +441,7 @@ class tpv_caja extends fbase_controller
                 $this->terminal->add_linea("Fact. Cdito $". sprintf("%" . ($this->terminal->anchopapel - 12) . "s", $this->formato_moneda($this->facturas_credito($caja_im[0]["codagente"], $caja_im[0]["id"])). "\n") );
                 $this->terminal->add_linea("Dnero Manua $" .  sprintf("%" . ($this->terminal->anchopapel - 12) . "s", $this->formato_moneda($caja_im[0]["cierremanual"]) . "\n" ));
                 $this->terminal->add_linea("Dnero final $" .  sprintf("%" . ($this->terminal->anchopapel - 11) . "s", $this->formato_moneda($caja_im[0]["d_fin"] - $this->facturas_credito($caja_im[0]["codagente"], $caja_im[0]["id"])) . "\n\n" ));
-                $this->terminal->add_linea("Gastos      $" .  sprintf("%" . ($this->terminal->anchopapel - 12) . "s", $this->formato_moneda($registrogasto->get_sum_idarqueo($caja_im[0]["id"])) . "\n" ));
+                
                 $this->terminal->add_linea_big("Por Artículo \n\n");
                 
                 $articulos = $this->familiasCierre($caja_im[0]["id"]);
