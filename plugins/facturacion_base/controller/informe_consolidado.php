@@ -18,7 +18,7 @@
  */
 
 use FacturaScripts\model\metodo_pago;
-
+require_once 'extras/xlsxwriter.class.php';
 require_once 'plugins/facturacion_base/extras/fbase_controller.php';
 
 class informe_consolidado extends fbase_controller
@@ -64,7 +64,7 @@ class informe_consolidado extends fbase_controller
     protected function private_core()
     {
         parent::private_core();
-
+        
         $this->agente = new agente();
         $this->almacenes = new almacen();
         $this->factura = new factura_cliente();
@@ -86,7 +86,10 @@ class informe_consolidado extends fbase_controller
         if (isset($_REQUEST['offset'])) {
             $this->offset = intval($_REQUEST['offset']);
         }
-
+        
+        if(isset($_GET['download'])){
+            $this->downloadReport();
+        }
 
         $this->getResultados();
     }
@@ -151,6 +154,107 @@ class informe_consolidado extends fbase_controller
         $this->resultados['gastos'] = $gastos;
         $this->resultados['gastos_total'] = $gastos_total[0]['total'];
 
+    }
+
+    function downloadReport() : void {
+        $sqlComision = "SELECT * FROM comision_empleados WHERE idmetodopago != '' ";
+        $sqlComision = "SELECT ultmod as date,'COMISIÓN' as module, t1.reg as code, t1.nombre_empleado as detail, (SELECT t0.nombre FROM metodospago t0 WHERE t0.id = t1.idmetodopago limit 1) as method,  t1.user_responsable as user, 'N/A' as cash, 'N/A' as product, 'PAGO COMISIÓN' as description, 'N/A' as observation, 0 as unitsel, 0 as totalup, 0 as ivaup, 'undc' as unitshop, t1.total as totale,  0 as ivae FROM comision_empleados t1 WHERE t1.idmetodopago != '' ";
+        $sqlFactcompra = "SELECT CONCAT(t1.fecha,' ',t1.hora) as date,'COMPRA' as module, t1.codigo as code, (SELECT t0.razonsocial FROM proveedores t0 WHERE t0.codproveedor = t1.codproveedor limit 1) as detail, (SELECT t0.nombre FROM metodospago t0 WHERE t0.id = t1.idmetodopago limit 1) as method,  (SELECT t0.nick FROM fs_users t0 WHERE t0.codagente = t1.codagente  limit 1) as user, 'N/A' as cash, t2.referencia as product, t2.descripcion as description, t1.observaciones as observation, 'undve' as unitsel, 0 as totalup, 0 as ivaup, 'undc' as unitshop, t1.total as totale,  t1.totaliva as ivae  FROM lineasfacturasprov t2 INNER JOIN facturasprov t1 ON t1.idfactura = t2.idfactura WHERE t1.idmetodopago != '' ";
+        $sqlGastos = "SELECT CONCAT(t1.fecha,' ',t1.hora) as date,'GASTO' as module, t1.codigo as code, (SELECT t0.razonsocial FROM proveedores t0 WHERE t0.codproveedor = t1.codproveedor limit 1) as detail, (SELECT t0.nombre FROM metodospago t0 WHERE t0.id = t1.idmetodopago limit 1) as method,  (SELECT t0.nick FROM fs_users t0 WHERE t0.codagente = t1.codagente  limit 1) as user, t1.idarqueo as cash, t2.referencia as product, t2.descripcion as description, t1.observaciones as observation, 'undve' as unitsel, 0 as totalup, 0 as ivaup, 'undc' as unitshop, t1.total as totale,  t1.totaliva as ivae FROM lineasgastos t2 INNER JOIN registro_gastos t1 ON t1.idfactura = t2.idfactura WHERE t1.idmetodopago != '' ";
+        $sqlFactcli = "SELECT CONCAT(t1.fecha,' ',t1.hora) as date,'VENTA' as module, t1.codigo as code, t1.nombrecliente as detail, (SELECT t0.nombre FROM metodospago t0 WHERE t0.id = t1.idmetodopago limit 1) as method,  (SELECT t0.nick FROM fs_users t0 WHERE t0.codagente = t1.codagente  limit 1) as user, t1.id_arqueo as cash, t2.referencia as product, CONCAT(t2.descripcion,' - ',t2.proveedor_lav) as description, t1.observaciones as observation, 'undve' as unitsel, t1.total as totalup, t1.totaliva as ivaup, 'undc' as unitshop, 0 as totale,  0 as ivae FROM lineasfacturascli t2 INNER JOIN facturascli t1 ON t1.idfactura = t2.idfactura WHERE t1.idmetodopago != '' ";
+
+        if(isset($_REQUEST['metodo_pago']) && $_REQUEST['metodo_pago'] != '' ){
+            $this->idmetodopago = $_REQUEST['metodo_pago'];
+            $sqlComision .= " AND idmetodopago = '".$_REQUEST['metodo_pago']."' ";
+            $sqlFactcompra .= " AND idmetodopago = '".$_REQUEST['metodo_pago']."' ";
+            $sqlGastos .= " AND idmetodopago = '".$_REQUEST['metodo_pago']."' ";
+            $sqlFactcli .= " AND idmetodopago = '".$_REQUEST['metodo_pago']."' ";
+        }
+        if(isset($_REQUEST['desde']))
+            $this->desde = $_REQUEST['desde'];
+        
+        $sqlComision .= " AND ultmod >= '".$this->desde." 00:00:01' ";
+        $sqlFactcompra .= " AND fecha >= '".$this->desde." 00:00:01' ";
+        $sqlGastos .= " AND fecha >= '".$this->desde." 00:00:01' ";
+        $sqlFactcli .= " AND fecha >= '".$this->desde." 00:00:01' ";
+        
+        if(isset($_REQUEST['hasta']))
+            $this->hasta = $_REQUEST['hasta'];  
+
+        $sqlComision .= " AND ultmod <= '".$this->hasta." 23:59:59' ";
+        $sqlFactcompra .= " AND fecha <= '".$this->hasta." 23:59:59' ";
+        $sqlGastos .= " AND fecha <= '".$this->hasta." 23:59:59' ";
+        $sqlFactcli .= " AND fecha <= '".$this->hasta." 23:59:59' ";
+        
+        //$factcompra_total = $this->db->select($sqlFactcompra);
+        $factcompra = $this->db->select($sqlFactcompra);
+        $comisiones_total = $this->db->select($sqlComision);
+        $comisiones = $this->db->select($sqlComision);
+        //$factcli_total = $this->db->select($sqlFactcli);
+        $factcli = $this->db->select($sqlFactcli);
+        $gastos_total = $this->db->select($sqlGastos);
+        $gastos = $this->db->select($sqlGastos);
+
+        $results = array_merge($factcompra, $comisiones, $factcli, $gastos);
+        $this->generar_xls($results);
+    }
+
+    protected function generar_xls($results)
+    {
+        $this->template = FALSE;
+        header("Content-Disposition: attachment; filename=\"informe_consolidado_" . time() . ".xls\"");
+        header("Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+        header('Content-Transfer-Encoding: binary');
+        header('Cache-Control: must-revalidate');
+        header('Pragma: public');
+
+        $header = array(
+            'FECHA' => 'string',
+            'MODULO' => 'string',
+            'CODIGO' => 'string',
+            'CLIENTE/PROVEEDOR/LAVADOR' => 'string',
+            'METODO PAGO' => 'string',
+            'CAJERO/USER' => 'string',
+            'ID ARQUEO' => 'string',
+            'PRODUCTO/GASTO' =>  'string',
+            'DESCRIPCION' =>  'string',
+            'OBSERVACIONES' => 'string',
+            'UND VEND' => '#,##0.00;[RED]-#,##0.00',
+            'TOTAL INGRESO' => '#,##0.00;[RED]-#,##0.00',
+            'IVA INGRESO' => '#,##0.00;[RED]-#,##0.00',
+            'UND COMP' => '#,##0.00;[RED]-#,##0.00',
+            'TOTAL EGRESO' => '#,##0.00;[RED]-#,##0.00',
+            'IVA EGRESO' => '#,##0.00;[RED]-#,##0.00',
+        );
+
+        $writter = new XLSXWriter();
+        $writter->setAuthor('FacturaScripts');
+        $writter->writeSheetHeader("Consolidado", $header);
+
+        foreach ($results as $doc) {
+            $linea = array(
+                'FECHA' => $doc['date'],
+                'MODULO' => $doc['module'],
+                'CODIGO' => $doc['code'],
+                'CLIENTE/PROVEEDOR/LAVADOR' => $doc['detail'],
+                'METODO PAGO' => $doc['method'],
+                'CAJERO/USER' => $doc['user'],
+                'ID ARQUEO' => $doc['cash'],
+                'PRODUCTO/GASTO' =>  $doc['product'],
+                'DESCRIPCION' =>  $doc['description'],
+                'OBSERVACIONES' => $doc['observation'],
+                'UND VEND' => $doc['unitsel'],
+                'TOTAL INGRESO' => $doc['totalup'],
+                'IVA INGRESO' => $doc['ivaup'],
+                'UND COMP' => $doc['unitshop'],
+                'TOTAL EGRESO' => $doc['totale'],
+                'IVA EGRESO' => $doc['ivae'],
+            );
+
+            $writter->writeSheetRow("Consolidado", $linea);
+        }
+
+        $writter->writeToStdOut();
     }
 
     public function url($busqueda = FALSE)

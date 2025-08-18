@@ -196,6 +196,11 @@
                <input type="date" name="hasta" value="{$fsc->hasta}" class="form-control " placeholder="Hasta" autocomplete="off" onchange="this.form.submit()"/>
             </div>
          </div>
+         <div class="col-sm-2">
+            <div class="form-group">
+               <a href="{$fsc->url()}&download=true&desde={$fsc->desde}&hasta={$fsc->hasta}" class="btn btn-primary">Descargar consolidado</a>
+            </div>
+         </div>
          
       </div>
    </div>
