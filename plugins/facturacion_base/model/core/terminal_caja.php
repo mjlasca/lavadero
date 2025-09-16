@@ -322,6 +322,7 @@ class terminal_caja extends \fs_model
             $this->var2str($this->sin_comandos) . ");";
 
         if ($this->db->exec($sql)) {
+            var_dump($sql);
             $this->id = $this->db->lastval();
             return TRUE;
         }
