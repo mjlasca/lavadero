@@ -189,7 +189,7 @@
          </div>
          <div class="col-sm-2">
             <div class="form-group">
-               <select name="metodo_pago" id="metodo_pago" class="form-control" onChange="metodoPagoSelected();" required>
+               <select name="metodo_pago" id="metodo_pago" class="form-control" onChange="metodoPagoSelected();">
                      <option value="">--Seleccione método de pago {$fsc->idmetodopago}--</option>
                      {loop="$fsc->metodo_pago->all()"}
                         {if="$value->id == $fsc->idmetodopago"}
