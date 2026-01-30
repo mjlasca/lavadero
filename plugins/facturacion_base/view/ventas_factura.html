@@ -1,5 +1,26 @@
 {include="header"}
+<style>
+   .list-group {
+      display: flex;
+      margin-left: 30px;
+   }
 
+   .list-group li {
+      background-color: aquamarine;
+      padding: 10px;
+      list-style: none;
+      margin-left: 5px;
+      cursor: pointer;
+   }
+
+   .list-group li .list-jefes {
+      background-color: rgb(255, 205, 232);
+   }
+
+   .list-group li .list-lavadores {
+      background-color: rgb(255, 211, 67);
+   }
+</style>
 {if="$fsc->factura"}
 <script type="text/javascript" src="{$fsc->get_js_location('ac_email_cliente.js')}"></script>
 <script type="text/javascript" src="{$fsc->get_js_location('provincias.js')}"></script>
@@ -7,11 +28,10 @@
 <!--{$lineas=$fsc->factura->get_lineas()}-->
 <script type="text/javascript">
    {if="$fsc->cliente"}
-   all_direcciones = {function="json_encode($fsc->cliente->get_direcciones())"};
+   all_direcciones = {function= "json_encode($fsc->cliente->get_direcciones())"};
    {/if}
-   
-   function enviar_email(url)
-   {
+
+   function enviar_email(url) {
       document.f_enviar_email.action = url;
       document.f_enviar_email.submit();
    }
@@ -21,11 +41,11 @@
          $("#modal_imprimir").modal('show');
       });
       var boton_pagar = "{$fsc->bandera_pagar}";
-      
-      if(boton_pagar == "TRUE"){
-          location.href="index.php?page=facturas_lav";
+
+      if (boton_pagar == "TRUE") {
+         location.href = "index.php?page=facturas_lav";
       }
-      
+
       $("#b_enviar").click(function (event) {
          event.preventDefault();
          $("#modal_enviar").modal('show');
@@ -49,7 +69,7 @@
 </script>
 
 <form action="{$fsc->factura->url()}" method="post" class="form">
-   <input type="hidden" name="idfactura" value="{$fsc->factura->idfactura}"/>
+   <input type="hidden" name="idfactura" value="{$fsc->factura->idfactura}" />
    <div class="container-fluid">
       <div class="row">
          <div class="col-xs-8">
@@ -71,8 +91,9 @@
                </a>
                {if="$fsc->factura->idasiento"}
                <div class="btn-group">
-               <input type="hidden" value="{$fsc->agente->codagente}" id="usuarioSistema" name="usuarioSistema">
-                  <button class="btn btn-sm btn-default dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true">
+                  <input type="hidden" value="{$fsc->agente->codagente}" id="usuarioSistema" name="usuarioSistema">
+                  <button class="btn btn-sm btn-default dropdown-toggle" type="button" data-toggle="dropdown"
+                     aria-haspopup="true">
                      <span class="glyphicon glyphicon-eye-open"></span>
                      <span class="hidden-xs">&nbsp;Asientos</span>
                   </button>
@@ -84,25 +105,26 @@
                   </ul>
                </div>
                {else}
-               <a id="asientoAuto" class="btn btn-sm btn-default" href="{$fsc->url()}&gen_asiento=TRUE&petid={$fsc->random_string()}">
+               <a id="asientoAuto" class="btn btn-sm btn-default"
+                  href="{$fsc->url()}&gen_asiento=TRUE&petid={$fsc->random_string()}">
                   <span class="glyphicon glyphicon-paperclip"></span>
                   <span class="hidden-xs">&nbsp;Generar asiento</span>
                </a>
                {/if}
             </div>
-            
+
             {if="$fsc->mostrar_boton_pagada"}
             <div class="btn-group">
                {if="$fsc->factura->pagada"}
-                     <a class="btn btn-sm btn-primary"  href="{$fsc->url()}&pagada=FALSE" >
-                        <span class="glyphicon glyphicon-remove"></span> &nbsp; No pagar
-                     </a>   
+               <a class="btn btn-sm btn-primary" href="{$fsc->url()}&pagada=FALSE">
+                  <span class="glyphicon glyphicon-remove"></span> &nbsp; No pagar
+               </a>
                {else}
-                     <a class="btn btn-sm btn-warning"  href="{$fsc->url()}&pagada=TRUE" >
-                        <span class="glyphicon glyphicon-ok"></span> &nbsp; Pagar
-                     </a>        
+               <a class="btn btn-sm btn-warning" href="{$fsc->url()}&pagada=TRUE">
+                  <span class="glyphicon glyphicon-ok"></span> &nbsp; Pagar
+               </a>
                {/if}
-               
+
                <!-- value="{$fsc->url()}&pagada=TRUE" 
                <button type="button" class="btn btn-sm btn-warning dropdown-toggle" data-toggle="dropdown">
                   <span class="glyphicon glyphicon-remove"></span> &nbsp; <b id="pagano">Sin pagar</b> <span class="caret"></span>
@@ -127,27 +149,29 @@
                   </li>
                </ul>-->
             </div>
+
             {elseif="$fsc->factura->pagada"}
             <a class="btn btn-sm btn-info" href="#">
                <span class="glyphicon glyphicon-ok"></span>
                <span class="hidden-xs">&nbsp;Pagada</span>
             </a>
             {/if}
-            
+
             <div class="btn-group">
-            {loop="$fsc->extensions"}
+               {loop="$fsc->extensions"}
                {if="$value->type=='button'"}
-               <a href="index.php?page={$value->from}&id={$fsc->factura->idfactura}{$value->params}" class="btn btn-sm btn-default">{$value->text}</a>
+               <a href="index.php?page={$value->from}&id={$fsc->factura->idfactura}{$value->params}"
+                  class="btn btn-sm btn-default">{$value->text}</a>
                {elseif="$value->type=='modal'"}
                <!--{$txt=base64_encode($value->text)}-->
                <!--{$url='index.php?page='.$value->from.'&id='.$fsc->factura->idfactura.$value->params}-->
                <a href="#" class="btn btn-sm btn-default" onclick="fs_modal('{$txt}','{$url}')">{$value->text}</a>
                {elseif="$value->type=='btn_javascript'"}
                <button class="btn btn-sm btn-default" type="button" onclick="{$value->params}">
-                   <span class="glyphicon glyphicon-exclamation-sign"></span>&nbsp; {$value->text}
+                  <span class="glyphicon glyphicon-exclamation-sign"></span>&nbsp; {$value->text}
                </button>
                {/if}
-            {/loop}
+               {/loop}
             </div>
          </div>
          <div class="col-xs-4 text-right">
@@ -170,33 +194,35 @@
       </div>
       <div class="row">
          <div class="col-sm-12">
-            <br/>
+            <br />
             <ol class="breadcrumb" style="margin-bottom: 5px;">
                <li><a href="{$fsc->ppage->url()}">Ventas</a></li>
                <li><a href="{$fsc->ppage->url()}" class="text-capitalize">{#FS_FACTURAS#}</a></li>
                <li><a href="#" title="almacén: {$fsc->factura->codalmacen}">{$fsc->factura->codalmacen}</a></li>
                <li title="{#FS_SERIE#}: {$fsc->factura->codserie}">
                   {loop="$fsc->serie->all()"}
-                     {if="$value->codserie==$fsc->factura->codserie"}
-                     <a href="{$fsc->ppage->url()}&codserie={$value->codserie}" class="text-capitalize">{$value->descripcion}</a>
-                     {/if}
+                  {if="$value->codserie==$fsc->factura->codserie"}
+                  <a href="{$fsc->ppage->url()}&codserie={$value->codserie}"
+                     class="text-capitalize">{$value->descripcion}</a>
+                  {/if}
                   {/loop}
                </li>
                <li title="cliente: {$fsc->factura->codcliente}">
                   {if="$fsc->cliente"}
-                     <a href="{$fsc->cliente->url()}">{$fsc->factura->nombrecliente}</a>
+                  <a href="{$fsc->cliente->url()}">{$fsc->factura->nombrecliente}</a>
                   {else}
-                     ???
+                  ???
                   {/if}
                </li>
                {if="$fsc->cliente"}
-                  {if="$fsc->cliente->nombre!=$fsc->factura->nombrecliente"}
-                  <li>
-                     <a href="#" onclick="bootbox.alert({message: 'Cliente conocido como: {$fsc->cliente->nombre}',title: '<b>Atención</b>'});">
-                        <span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span>
-                     </a>
-                  </li>
-                  {/if}
+               {if="$fsc->cliente->nombre!=$fsc->factura->nombrecliente"}
+               <li>
+                  <a href="#"
+                     onclick="bootbox.alert({message: 'Cliente conocido como: {$fsc->cliente->nombre}',title: '<b>Atención</b>'});">
+                     <span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span>
+                  </a>
+               </li>
+               {/if}
                {/if}
                <li class="active"><b>{$fsc->factura->codigo}</b></li>
             </ol>
@@ -226,46 +252,48 @@
          <div class="col-sm-2">
             <div class="form-group">
                <span class='text-capitalize'>{#FS_NUMERO2#}:</span>
-               <input class="form-control" type="text" name="numero2" disabled=""  value="{$fsc->factura->numero2}"/>
+               <input class="form-control" type="text" name="numero2" disabled="" value="{$fsc->factura->numero2}" />
             </div>
          </div>
          <div class="col-sm-2">
             <div class="form-group">
                <a href="{$fsc->serie->url()}" class="text-capitalize">{#FS_SERIE#}</a>:
                <select name="serie" class="form-control" disabled="">
-               {loop="$fsc->serie->all()"}
+                  {loop="$fsc->serie->all()"}
                   {if="$value->codserie==$fsc->factura->codserie"}
                   <option value="{$value->codserie}" selected="">{$value->descripcion}</option>
                   {else}
                   <option value="{$value->codserie}">{$value->descripcion}</option>
                   {/if}
-               {/loop}
+                  {/loop}
                </select>
             </div>
          </div>
          <div class="col-sm-2">
             <div class="form-group">
                Fecha:
-               <input class="form-control datepicker" type="text" disabled="" name="fecha" value="{$fsc->factura->fecha}" autocomplete="off"/>
+               <input class="form-control datepicker" type="text" disabled="" name="fecha"
+                  value="{$fsc->factura->fecha}" autocomplete="off" />
             </div>
          </div>
          <div class="col-sm-2">
             <div class="form-group">
                Hora:
-               <input class="form-control" type="text" name="hora" disabled="" value="{$fsc->factura->hora}" autocomplete="off"/>
+               <input class="form-control" type="text" name="hora" disabled="" value="{$fsc->factura->hora}"
+                  autocomplete="off" />
             </div>
          </div>
          <div class="col-sm-2">
             <div class="form-group">
                <a href="{$fsc->forma_pago->url()}">Forma de pago</a>:
                <select name="forma_pago" disabled="" class="form-control" onchange="this.form.submit()">
-               {loop="$fsc->forma_pago->all()"}
+                  {loop="$fsc->forma_pago->all()"}
                   {if="$fsc->factura->codpago==$value->codpago"}
                   <option value="{$value->codpago}" selected="">{$value->descripcion}</option>
                   {else}
                   <option value="{$value->codpago}">{$value->descripcion}</option>
                   {/if}
-               {/loop}
+                  {/loop}
                </select>
             </div>
          </div>
@@ -273,15 +301,17 @@
             <div class='form-group{if="$fsc->factura->vencida()"} has-warning{/if}'>
                Vencimiento:
                {if="$fsc->factura->pagada || !$fsc->mostrar_boton_pagada"}
-               <input type="text" name="vencimiento" disabled="" value="{$fsc->factura->vencimiento}" class="form-control datepicker" readonly=""/>
+               <input type="text" name="vencimiento" disabled="" value="{$fsc->factura->vencimiento}"
+                  class="form-control datepicker" readonly="" />
                {else}
-               <input type="text" name="vencimiento" disabled="" value="{$fsc->factura->vencimiento}" class="form-control datepicker" autocomplete="off"/>
+               <input type="text" name="vencimiento" disabled="" value="{$fsc->factura->vencimiento}"
+                  class="form-control datepicker" autocomplete="off" />
                {/if}
             </div>
          </div>
       </div>
    </div>
-   
+
    <!--{$lineas=$fsc->factura->get_lineas()}-->
    <div role="tabpanel">
       <ul class="nav nav-tabs" role="tablist">
@@ -305,16 +335,17 @@
             </a>
          </li>
          {loop="$fsc->extensions"}
-            {if="$value->type=='tab'"}
-            <li role="presentation">
-               <a href="#ext_{$value->name}" aria-controls="ext_{$value->name}" role="tab" data-toggle="tab">{$value->text}</a>
-            </li>
-            {/if}
+         {if="$value->type=='tab'"}
+         <li role="presentation">
+            <a href="#ext_{$value->name}" aria-controls="ext_{$value->name}" role="tab"
+               data-toggle="tab">{$value->text}</a>
+         </li>
+         {/if}
          {/loop}
       </ul>
       <div class="tab-content">
          <div role="tabpanel" class="tab-pane active" id="lineas_f">
-             {include="block/ventas_factura_lineas"}
+            {include="block/ventas_factura_lineas"}
          </div>
          <div role="tabpanel" class="tab-pane" id="detalles">
             <div class="container-fluid" style="margin-top: 10px;">
@@ -322,26 +353,28 @@
                   <div class="col-sm-3">
                      <div class="form-group">
                         Nombre del cliente:
-                        <input class="form-control" type="text" name="nombrecliente" value="{$fsc->factura->nombrecliente}" autocomplete="off"/>
+                        <input class="form-control" type="text" name="nombrecliente"
+                           value="{$fsc->factura->nombrecliente}" autocomplete="off" />
                      </div>
                   </div>
                   <div class="col-sm-2">
                      <div class="form-group">
                         {#FS_CIFNIF#}:
-                        <input class="form-control" type="text" name="cifnif" value="{$fsc->factura->cifnif}" maxlength="30" autocomplete="off"/>
+                        <input class="form-control" type="text" name="cifnif" value="{$fsc->factura->cifnif}"
+                           maxlength="30" autocomplete="off" />
                      </div>
                   </div>
                   <div class="col-sm-2">
                      <div class="form-group">
                         <a href="{$fsc->almacen->url()}">Almacén</a>:
                         <select name="almacen" class="form-control" disabled="">
-                        {loop="$fsc->almacen->all()"}
+                           {loop="$fsc->almacen->all()"}
                            {if="$value->codalmacen==$fsc->factura->codalmacen"}
                            <option value="{$value->codalmacen}" selected="">{$value->nombre}</option>
                            {else}
                            <option value="{$value->codalmacen}">{$value->nombre}</option>
                            {/if}
-                        {/loop}
+                           {/loop}
                         </select>
                      </div>
                   </div>
@@ -349,20 +382,21 @@
                      <div class="form-group">
                         <a href="{$fsc->divisa->url()}">Divisa</a>:
                         <select name="divisa" class="form-control" disabled="">
-                        {loop="$fsc->divisa->all()"}
+                           {loop="$fsc->divisa->all()"}
                            {if="$value->coddivisa==$fsc->factura->coddivisa"}
                            <option value="{$value->coddivisa}" selected="">{$value->descripcion}</option>
                            {else}
                            <option value="{$value->coddivisa}">{$value->descripcion}</option>
                            {/if}
-                        {/loop}
+                           {/loop}
                         </select>
                      </div>
                   </div>
                   <div class="col-sm-3">
                      <div class="form-group">
                         Tasa de conversión (1€ = X)
-                        <input type="text" name="tasaconv" value="{$fsc->factura->tasaconv}" class="form-control" readonly=""/>
+                        <input type="text" name="tasaconv" value="{$fsc->factura->tasaconv}" class="form-control"
+                           readonly="" />
                      </div>
                   </div>
                </div>
@@ -383,17 +417,17 @@
                               <span class="glyphicon glyphicon-th-list" aria-hidden="true"></span>
                            </span>
                            <select name="coddir" class="form-control" onchange="usar_direccion();">
-                           {if="$fsc->cliente"}
+                              {if="$fsc->cliente"}
                               {loop="$fsc->cliente->get_direcciones()"}
-                                 {if="$value->id==$fsc->factura->coddir"}
-                                 <option value="{$value->id}" selected="">{$value->descripcion}</option>
-                                 {elseif="$value->direccion==$fsc->factura->direccion"}
-                                 <option value="{$value->id}" selected="">{$value->descripcion}</option>
-                                 {else}
-                                 <option value="{$value->id}">{$value->descripcion}</option>
-                                 {/if}
+                              {if="$value->id==$fsc->factura->coddir"}
+                              <option value="{$value->id}" selected="">{$value->descripcion}</option>
+                              {elseif="$value->direccion==$fsc->factura->direccion"}
+                              <option value="{$value->id}" selected="">{$value->descripcion}</option>
+                              {else}
+                              <option value="{$value->id}">{$value->descripcion}</option>
+                              {/if}
                               {/loop}
-                           {/if}
+                              {/if}
                            </select>
                         </div>
                      </div>
@@ -402,44 +436,48 @@
                      <div class="form-group">
                         <a href="{$fsc->pais->url()}">País</a>:
                         <select class="form-control" name="codpais">
-                        {loop="$fsc->pais->all()"}
+                           {loop="$fsc->pais->all()"}
                            {if="$value->codpais==$fsc->factura->codpais"}
                            <option value="{$value->codpais}" selected="">{$value->nombre}</option>
                            {else}
                            <option value="{$value->codpais}">{$value->nombre}</option>
                            {/if}
-                        {/loop}
+                           {/loop}
                         </select>
                      </div>
                   </div>
                   <div class="col-sm-3">
                      <div class="form-group">
                         <span class="text-capitalize">{#FS_PROVINCIA#}</span>:
-                        <input id="ac_provincia" class="form-control" type="text" name="provincia" value="{$fsc->factura->provincia}"/>
+                        <input id="ac_provincia" class="form-control" type="text" name="provincia"
+                           value="{$fsc->factura->provincia}" />
                      </div>
                   </div>
                   <div class="col-sm-3">
                      <div class="form-group">
                         Ciudad:
-                        <input class="form-control" type="text" name="ciudad" value="{$fsc->factura->ciudad}"/>
+                        <input class="form-control" type="text" name="ciudad" value="{$fsc->factura->ciudad}" />
                      </div>
                   </div>
                   <div class="col-sm-3">
                      <div class="form-group">
                         Código Postal:
-                        <input class="form-control" type="text" name="codpostal" value="{$fsc->factura->codpostal}" maxlength="10" autocomplete="off"/>
+                        <input class="form-control" type="text" name="codpostal" value="{$fsc->factura->codpostal}"
+                           maxlength="10" autocomplete="off" />
                      </div>
                   </div>
                   <div class="col-sm-6">
                      <div class="form-group">
                         Dirección:
-                        <input class="form-control" type="text" name="direccion" value="{$fsc->factura->direccion}" autocomplete="off"/>
+                        <input class="form-control" type="text" name="direccion" value="{$fsc->factura->direccion}"
+                           autocomplete="off" />
                      </div>
                   </div>
                   <div class="col-sm-3">
                      <div class="form-group">
                         <span class="text-capitalize">{#FS_APARTADO#}</span>:
-                        <input class="form-control" type="text" name="apartado" value="{$fsc->factura->apartado}" maxlength="10" autocomplete="off"/>
+                        <input class="form-control" type="text" name="apartado" value="{$fsc->factura->apartado}"
+                           maxlength="10" autocomplete="off" />
                      </div>
                   </div>
                   <div class="col-sm-12">
@@ -474,7 +512,8 @@
                            <tr class="clickableRow" href="{$value->url()}">
                               <td class="text-right">
                                  {if="$value->principal"}
-                                 <span class="glyphicon glyphicon-flag" aria-hidden="true" title="Cuenta principal"></span>
+                                 <span class="glyphicon glyphicon-flag" aria-hidden="true"
+                                    title="Cuenta principal"></span>
                                  {/if}
                               </td>
                               <td>
@@ -514,11 +553,11 @@
                            <option value="">Ninguno</option>
                            <option value="">---</option>
                            {loop="$fsc->agentes"}
-                              {if="$value->codagente==$fsc->factura->codagente"}
-                              <option value="{$value->codagente}" selected="">{$value->get_fullname()}</option>
-                              {else}
-                              <option value="{$value->codagente}">{$value->get_fullname()}</option>
-                              {/if}
+                           {if="$value->codagente==$fsc->factura->codagente"}
+                           <option value="{$value->codagente}" selected="">{$value->get_fullname()}</option>
+                           {else}
+                           <option value="{$value->codagente}">{$value->get_fullname()}</option>
+                           {/if}
                            {/loop}
                         </select>
                      </div>
@@ -526,7 +565,8 @@
                   <div class="col-sm-3">
                      <div class="form-group">
                         <div class="input-group">
-                           <input type="number" name="porcomision" value="{$fsc->factura->porcomision}" class="form-control"/>
+                           <input type="number" name="porcomision" value="{$fsc->factura->porcomision}"
+                              class="form-control" />
                            <span class="input-group-addon">% comisión</span>
                         </div>
                      </div>
@@ -556,10 +596,13 @@
                               <td>{$value->codimpuesto}</td>
                               <td class="text-right">{$fsc->show_precio($value->neto, $fsc->factura->coddivisa)}</td>
                               <td class="text-right">{$fsc->show_numero($value->iva, 2)} %</td>
-                              <td class="text-right">{$fsc->show_precio($value->totaliva, $fsc->factura->coddivisa)}</td>
+                              <td class="text-right">{$fsc->show_precio($value->totaliva, $fsc->factura->coddivisa)}
+                              </td>
                               <td class="text-right">{$fsc->show_numero($value->recargo, 2)} %</td>
-                              <td class="text-right">{$fsc->show_precio($value->totalrecargo, $fsc->factura->coddivisa)}</td>
-                              <td class="text-right">{$fsc->show_precio($value->totallinea, $fsc->factura->coddivisa)}</td>
+                              <td class="text-right">{$fsc->show_precio($value->totalrecargo, $fsc->factura->coddivisa)}
+                              </td>
+                              <td class="text-right">{$fsc->show_precio($value->totallinea, $fsc->factura->coddivisa)}
+                              </td>
                            </tr>
                            {/loop}
                         </table>
@@ -574,13 +617,15 @@
                   <div class="col-sm-3">
                      <div class="form-group">
                         Nombre:
-                        <input type="text" name="envio_nombre" value="{$fsc->factura->envio_nombre}" class="form-control" autocomplete="off"/>
+                        <input type="text" name="envio_nombre" value="{$fsc->factura->envio_nombre}"
+                           class="form-control" autocomplete="off" />
                      </div>
                   </div>
                   <div class="col-sm-3">
                      <div class="form-group">
                         Apellidos:
-                        <input type="text" name="envio_apellidos" value="{$fsc->factura->envio_apellidos}" class="form-control" autocomplete="off"/>
+                        <input type="text" name="envio_apellidos" value="{$fsc->factura->envio_apellidos}"
+                           class="form-control" autocomplete="off" />
                      </div>
                   </div>
                   <div class="col-sm-2">
@@ -590,11 +635,11 @@
                            <option value="">Ninguna</option>
                            <option value="">------</option>
                            {loop="$fsc->agencia->all()"}
-                              {if="$fsc->factura->envio_codtrans==$value->codtrans"}
-                              <option value="{$value->codtrans}" selected="">{$value->nombre}</option>
-                              {else}
-                              <option value="{$value->codtrans}">{$value->nombre}</option>
-                              {/if}
+                           {if="$fsc->factura->envio_codtrans==$value->codtrans"}
+                           <option value="{$value->codtrans}" selected="">{$value->nombre}</option>
+                           {else}
+                           <option value="{$value->codtrans}">{$value->nombre}</option>
+                           {/if}
                            {/loop}
                         </select>
                      </div>
@@ -602,7 +647,8 @@
                   <div class="col-sm-4">
                      <div class="form-group">
                         Código de seguimiento:
-                        <input type="text" name="envio_codigo" value="{$fsc->factura->envio_codigo}" class="form-control" autocomplete="off"/>
+                        <input type="text" name="envio_codigo" value="{$fsc->factura->envio_codigo}"
+                           class="form-control" autocomplete="off" />
                      </div>
                   </div>
                </div>
@@ -618,13 +664,13 @@
                               <option value="">Ninguna</option>
                               <option value="">------</option>
                               {if="$fsc->cliente"}
-                                 {loop="$fsc->cliente->get_direcciones()"}
-                                    {if="$value->direccion==$fsc->factura->envio_direccion"}
-                                    <option value="{$value->id}" selected="">{$value->descripcion}</option>
-                                    {else}
-                                    <option value="{$value->id}">{$value->descripcion}</option>
-                                    {/if}
-                                 {/loop}
+                              {loop="$fsc->cliente->get_direcciones()"}
+                              {if="$value->direccion==$fsc->factura->envio_direccion"}
+                              <option value="{$value->id}" selected="">{$value->descripcion}</option>
+                              {else}
+                              <option value="{$value->id}">{$value->descripcion}</option>
+                              {/if}
+                              {/loop}
                               {/if}
                            </select>
                         </div>
@@ -634,65 +680,96 @@
                      <div class="form-group">
                         <a href="{$fsc->pais->url()}">País</a>:
                         <select class="form-control" name="envio_codpais">
-                        {loop="$fsc->pais->all()"}
+                           {loop="$fsc->pais->all()"}
                            {if="$value->codpais==$fsc->factura->envio_codpais"}
                            <option value="{$value->codpais}" selected="">{$value->nombre}</option>
                            {else}
                            <option value="{$value->codpais}">{$value->nombre}</option>
                            {/if}
-                        {/loop}
+                           {/loop}
                         </select>
                      </div>
                   </div>
                   <div class="col-sm-3">
                      <div class="form-group">
                         <span class="text-capitalize">{#FS_PROVINCIA#}</span>:
-                        <input type="text" name="envio_provincia" value="{$fsc->factura->envio_provincia}" id="ac_provincia2" class="form-control" autocomplete="off"/>
+                        <input type="text" name="envio_provincia" value="{$fsc->factura->envio_provincia}"
+                           id="ac_provincia2" class="form-control" autocomplete="off" />
                      </div>
                   </div>
                   <div class="col-sm-3">
                      <div class="form-group">
                         Ciudad:
-                        <input type="text" name="envio_ciudad" value="{$fsc->factura->envio_ciudad}" class="form-control" autocomplete="off"/>
+                        <input type="text" name="envio_ciudad" value="{$fsc->factura->envio_ciudad}"
+                           class="form-control" autocomplete="off" />
                      </div>
                   </div>
                   <div class="col-sm-3">
                      <div class="form-group">
                         Código Postal:
-                        <input type="text" name="envio_codpostal" value="{$fsc->factura->envio_codpostal}" class="form-control" autocomplete="off"/>
+                        <input type="text" name="envio_codpostal" value="{$fsc->factura->envio_codpostal}"
+                           class="form-control" autocomplete="off" />
                      </div>
                   </div>
                   <div class="col-sm-6">
                      <div class="form-group">
                         Dirección:
-                        <input type="text" name="envio_direccion" value="{$fsc->factura->envio_direccion}" class="form-control" autocomplete="off"/>
+                        <input type="text" name="envio_direccion" value="{$fsc->factura->envio_direccion}"
+                           class="form-control" autocomplete="off" />
                      </div>
                   </div>
                   <div class="col-sm-3">
                      <div class="form-group">
                         <span class="text-capitalize">{#FS_APARTADO#}</span>:
-                        <input class="form-control" type="text" name="envio_apartado" value="{$fsc->factura->envio_apartado}"/>
+                        <input class="form-control" type="text" name="envio_apartado"
+                           value="{$fsc->factura->envio_apartado}" />
                      </div>
                   </div>
                </div>
             </div>
          </div>
+         {if="$fsc->valuesPerson"}
+         <div class="row">
+            <ul class="list-group">
+               {loop="$fsc->valuesPerson['aspiradores']"}
+               <li class="list-liq">Aspiradores<br>{$value['total']} / <span>{$value['val_liquidacion']}</span></li>
+               {/loop}
+               {loop="$fsc->valuesPerson['jefes']"}
+               <li class="list-liq">Jefes<br>{$value['total']} / <span>{$value['val_liquidacion']}</span></li>
+               {/loop}
+               {loop="$fsc->valuesPerson['lavadores']"}
+               <li class="list-liq">Lavadores<br>{$value['total']} / <span>{$value['val_liquidacion']}</span></li>
+               {/loop}
+            </ul>
+         </div>
+         {/if}
          {loop="$fsc->extensions"}
-            {if="$value->type=='tab'"}
-            <div role="tabpanel" class="tab-pane" id="ext_{$value->name}">
-               <iframe src="index.php?page={$value->from}{$value->params}&id={$fsc->factura->idfactura}" width="100%" height="2000" frameborder="0"></iframe>
-            </div>
-            {/if}
+         {if="$value->type=='tab'"}
+         <div role="tabpanel" class="tab-pane" id="ext_{$value->name}">
+            <iframe src="index.php?page={$value->from}{$value->params}&id={$fsc->factura->idfactura}" width="100%"
+               height="2000" frameborder="0"></iframe>
+         </div>
+         {/if}
          {/loop}
       </div>
    </div>
 </form>
-
+<script>
+   const liDetails = document.querySelectorAll('.list-liq');
+   liDetails.forEach(element => {
+      console.log(element);
+      element.addEventListener('click', function(event) {
+         const valdat = event.target.querySelector('span');
+         console.log(navigator.clipboard.writeText(valdat.textContent));
+         navigator.clipboard.writeText(valdat.textContent);
+      });
+   });
+</script>
 {include="block/ventas_factura_modals"}
 
 {else}
 <div class="text-center">
-   <img src="{#FS_PATH#}view/img/fuuu_face.png" alt="fuuuuu"/>
+   <img src="{#FS_PATH#}view/img/fuuu_face.png" alt="fuuuuu" />
 </div>
 {/if}
 

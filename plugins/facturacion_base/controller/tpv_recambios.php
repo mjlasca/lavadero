@@ -46,6 +46,7 @@ class tpv_recambios extends fbase_controller
     public $ultimas_compras;
     public $ultimas_ventas;
     public $metodo_pago;
+    public $valuesPerson;
     
     public $current_invoice;
     
@@ -78,6 +79,7 @@ class tpv_recambios extends fbase_controller
         $this->factura_editar = -1;
         $fact_ = new factura_cliente();
         $this->current_invoice = FALSE;
+        $this->valuesPerson = FALSE;
         
         if (isset($_REQUEST['factura_editar'])) {
             $this->factura_editar = $_REQUEST['factura_editar'];
@@ -806,6 +808,7 @@ class tpv_recambios extends fbase_controller
 						
 
                         $this->new_message("<a href='" . $factura->url() . "'>Factura</a> guardada correctamente.");
+                        $this->get_values_person($factura->idfactura);
                         if ($_POST['regalo'] == 'TRUE') {
                             $this->imprimir_ticket_regalo($factura);
                         } else {
@@ -843,6 +846,38 @@ class tpv_recambios extends fbase_controller
         }
     }
   
+    public function get_values_person($idfactura){
+        $sql = "SELECT SUM(t3.pvptotal) as total,SUM(t3.val_liquidacion) as val_liquidacion"
+                    . " FROM aspiradores_lav t1 "
+                    . " INNER JOIN  facturascli t2 "
+                    . " INNER JOIN lineasfacturascli t3 "
+                    . " ON  t2.idfactura=t3.idfactura  AND t2.anulada = 0 AND t2.cod_persona=t1.id_persona AND t3.referencia = '6' "
+                    . " WHERE t3.idfactura = {$idfactura}";
+
+        
+        $aspi = $this->db->select($sql);
+        $this->valuesPerson['aspiradores'] = $aspi ?? [];
+
+        $sql = "SELECT SUM(t3.pvptotal) as total, SUM(t3.val_liquidacion_jefes) as val_liquidacion"
+                    . " FROM  jefes_patio t1 "
+                    . " INNER JOIN  facturascli t2 "
+                    . " INNER JOIN lineasfacturascli t3 "
+                    . " INNER JOIN articulos t4 "
+                    . " ON  t2.idfactura=t3.idfactura  AND t2.anulada = 0 AND t2.cod_persona=t1.id_persona AND t4.referencia=t3.referencia AND  t3.val_liquidacion_jefes>0  "
+                    . " WHERE t2.idfactura = {$idfactura}";
+
+        $jefes = $this->db->select($sql);
+        $this->valuesPerson['jefes'] = $jefes ?? [];
+
+        $sql = "SELECT SUM(t1.pvptotal) as total, SUM(t1.val_liquidacion) as val_liquidacion "
+                    . " FROM lineasfacturascli t1 INNER JOIN facturascli t2 "
+                    . " ON t1.idfactura=t2.idfactura AND t2.anulada = 0 AND "
+                    . " t1.proveedor_lav != '' "
+                    . " WHERE t2.idfactura = {$idfactura}";
+        
+        $lavadores = $this->db->select($sql);
+        $this->valuesPerson['lavadores'] = $lavadores ?? [];
+    }
             
 
     private function abrir_caja()
