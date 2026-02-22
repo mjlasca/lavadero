@@ -16,14 +16,14 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-require_once 'plugins/facturacion_base/model/core/metodo_pago.php';
+require_once 'plugins/facturacion_base/model/core/factura_metodo_pago.php';
 
 /**
  * Description of linea_transferencia_stock
  *
  * @author Carlos García Gómez <neorazorx@gmail.com>
  */
-class metodo_pago extends FacturaScripts\model\metodo_pago
+class factura_metodo_pago extends FacturaScripts\model\factura_metodo_pago
 {
 
 }

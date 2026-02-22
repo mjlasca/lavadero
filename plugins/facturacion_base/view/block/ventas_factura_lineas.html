@@ -133,11 +133,22 @@
 <div class="container-fluid">
     <div class="row">
         <div class="col-sm-12">
-            {if="!in_array('editar_facturas', $GLOBALS['plugins'])"}
-            <p class="help-block text-right">
-                Puedes editar las líneas de las facturas usando el plugin
-                <a href="https://www.facturascripts.com/plugin/editar_facturas" target="_blank">editar facturas</a>.
-            </p>
+            {if="$fsc->methods"}
+            <h4>Métodos de pago</h4>
+            <table style="width: 300px;margin-bottom: 20px;">
+                <tbody>
+                    <tr>
+                        <th>Detalle</th>
+                        <th style="text-align: right;">Monto</th>
+                    </tr>
+                    {loop="$fsc->methods"}
+                    <tr>
+                        <td>{$value->descripcion}</td>
+                        <td style="text-align: right;">{$fsc->show_precio($value->total, $fsc->factura->coddivisa)}</td>
+                    </tr>
+                    {/loop}
+                </tbody>
+            </table>
             {/if}
             <div class="form-group">
                 Observaciones:

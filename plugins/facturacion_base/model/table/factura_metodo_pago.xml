@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Document   : factura_metodo_pago.xml
+    Author     : Mario Lasluisa Castaño
+    Description:
+        Estructura de la tabla factura_metodo_pago.
+-->
+<tabla>
+    <columna>
+        <nombre>id</nombre>
+        <tipo>serial</tipo>
+        <nulo>NO</nulo>
+        <defecto>nextval('factura_metodo_pago_id_seq'::regclass)</defecto>
+    </columna>
+    <columna>
+        <nombre>idfactura</nombre>
+        <tipo>integer</tipo>
+        <nulo>NO</nulo>
+    </columna>
+    <columna>
+        <nombre>idmetodopago</nombre>
+        <tipo>integer</tipo>
+        <nulo>NO</nulo>
+    </columna>
+    <columna>
+        <nombre>total</nombre>
+        <tipo>numeric(12,2)</tipo>
+        <nulo>NO</nulo>
+    </columna>
+    <restriccion>
+        <nombre>factura_metodo_pago_pkey</nombre>
+        <consulta>PRIMARY KEY (id)</consulta>
+    </restriccion>
+    <restriccion>
+        <nombre>ca_factura_metodo_pago_idfactura</nombre>
+        <consulta>FOREIGN KEY (idfactura)
+            REFERENCES facturascli (idfactura)
+            ON DELETE CASCADE ON UPDATE CASCADE</consulta>
+    </restriccion>
+    <restriccion>
+        <nombre>ca_factura_metodo_pago_idmetodopago</nombre>
+        <consulta>FOREIGN KEY (idmetodopago)
+            REFERENCES metodospago (id)
+            ON DELETE CASCADE ON UPDATE CASCADE</consulta>
+    </restriccion>
+</tabla>

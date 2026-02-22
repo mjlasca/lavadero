@@ -1236,14 +1236,55 @@ function show_pvp_iva(pvp, codimpuesto)
 }
 
 function metodoPagoSelected(){
-    const metodo =  document.querySelector('#metodo_pago');
+    const metodos =  document.querySelectorAll('.method-fields');
     const modal_save = document.querySelector('#modal_guardar');
+    const total_fac = document.querySelector('#tpv_total');
     const foot = modal_save.querySelector('.modal-footer');
-    if(metodo.value != "")
+    let flag = true;
+    let sumInput = 0;
+    metodos.forEach(me => {
+        const select = me.querySelector('select');
+        const input = me.querySelector('input');
+        if(select.value == "" || input.value == "")
+            flag = false;
+        if(input.value != "" && select.value != ""){
+            sumInput += parseFloat(input.value);
+        }
+    });
+
+    if(flag && sumInput == total_fac.value)
         foot.classList.remove('hidden_modal');
     else
         foot.classList.add('hidden_modal');
-    
+}
+
+
+function addMethod(){
+    const container_payments = document.querySelector('.container-payments');
+    if(container_payments){
+        createMethod();
+    }
+    metodoPagoSelected();
+}
+
+function createMethod(){
+    const container_payments = document.querySelector('.container-payments');
+    const buttonDelete = document.createElement('button');
+    buttonDelete.classList = "method-delete";
+    buttonDelete.type = "button";
+    buttonDelete.innerHTML = "-";
+    buttonDelete.addEventListener('click', (event) => deleteMethod(event));
+    const original = document.querySelector('.method-0');
+    const clon = original.cloneNode(true);
+    clon.querySelector('input').value = "";
+    clon.appendChild(buttonDelete);
+    container_payments.appendChild(clon);
+}
+
+function deleteMethod(event){
+    const container = event.target.closest('.method-0');
+    container.remove();
+    metodoPagoSelected();
 }
 
 function botonfactura(){

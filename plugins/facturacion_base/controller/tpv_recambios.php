@@ -47,12 +47,12 @@ class tpv_recambios extends fbase_controller
     public $ultimas_ventas;
     public $metodo_pago;
     public $valuesPerson;
-    
+
     public $current_invoice;
-    
+
     public $aviso_ne;
-    
-    
+
+
     public $factura_editar;
 
     public function __construct()
@@ -63,7 +63,7 @@ class tpv_recambios extends fbase_controller
     protected function private_core()
     {
         parent::private_core();
-        
+
         //$this->cambiar_();
         $this->jefeopro = "Proveedor de servicio";
         $this->share_extensions();
@@ -80,29 +80,29 @@ class tpv_recambios extends fbase_controller
         $fact_ = new factura_cliente();
         $this->current_invoice = FALSE;
         $this->valuesPerson = FALSE;
-        
+
         if (isset($_REQUEST['factura_editar'])) {
             $this->factura_editar = $_REQUEST['factura_editar'];
             $this->current_invoice = $fact_->get($this->factura_editar);
         }
-        
+
         if (isset($_REQUEST['editando_lineas'])) {
             $this->factura_editar = $_REQUEST['editando_lineas'];
             $this->lineas_factura_editar();
         }
-        
-        if ( isset($_GET['ticketfact']) ) {
+
+        if (isset($_GET['ticketfact'])) {
             $this->reimprimir_ticket();
         }
-        
-        
+
+
         if (isset($_REQUEST['buscar_cliente'])) {
             $this->fbase_buscar_cliente($_REQUEST['buscar_cliente']);
         } else if (isset($_REQUEST['datoscliente'])) {
             $this->datos_cliente();
         } else if (isset($_REQUEST['placa'])) {
             $this->datos_cliente_placa();
-        }else if (isset($_REQUEST['combo_seleccionado'])) {
+        } else if (isset($_REQUEST['combo_seleccionado'])) {
             $this->datos_combo($_REQUEST['combo_seleccionado']);
         } else if (isset($_REQUEST['crear_cliente'])) {
             $this->crear_cliente($_REQUEST['crear_cliente']);
@@ -128,7 +128,7 @@ class tpv_recambios extends fbase_controller
                 $this->caja = FALSE;
                 $this->terminal = FALSE;
                 $caja = new caja();
-                
+
                 $terminal0 = new terminal_caja();
                 foreach ($caja->all_by_agente($this->agente->codagente) as $cj) {
                     if ($cj->abierta()) {
@@ -137,10 +137,10 @@ class tpv_recambios extends fbase_controller
                         break;
                     }
                 }
-                
+
 
                 if (!$this->caja) {
-                    
+
                     if (isset($_POST['terminal'])) {
                         $this->terminal = $terminal0->get($_POST['terminal']);
                         if (!$this->terminal) {
@@ -151,8 +151,8 @@ class tpv_recambios extends fbase_controller
                             $this->caja->codagente = $this->agente->codagente;
                             $this->caja->dinero_inicial = floatval($_POST['d_inicial']);
                             $this->caja->dinero_fin = floatval($_POST['d_inicial']);
-                            
-                            
+
+
                             if ($this->caja->save()) {
                                 $this->new_message("Caja iniciada con " . $this->show_precio($this->caja->dinero_inicial));
                                 /*
@@ -164,7 +164,7 @@ class tpv_recambios extends fbase_controller
                                 $consulta_registro = $this->db->select($sql);*/
                                 //$sql = "UPDATE cajas SET totalRealCaja = '".$consulta_registro[0]["reg"]."' WHERE id = '".$this->caja->id."'";
                                 //$this->db->exec($sql);
-                                
+
                             } else {
                                 $this->new_error_msg("¡Imposible guardar los datos de caja!");
                             }
@@ -183,7 +183,7 @@ class tpv_recambios extends fbase_controller
                 }
 
                 if ($this->caja) {
-                    
+
                     if (isset($_POST['cliente'])) {
                         $this->cliente_s = $this->cliente->get($_POST['cliente']);
                     } else if ($this->terminal) {
@@ -200,14 +200,14 @@ class tpv_recambios extends fbase_controller
                     if (isset($_GET['abrir_caja'])) {
                         $this->abrir_caja();
                     } else if (isset($_GET['cerrar_caja'])) {
-                        
-                        $sql = "SELECT * FROM facturascli WHERE id_arqueo='".$this->caja->id."' AND pagada<1  AND codpago='CONT'";
-                        
-                        if($this->db->select($sql))
-                            $this->new_error_msg ("No se puede cerrar el arqueo si no ha pagado todas las facturas contado");
+
+                        $sql = "SELECT * FROM facturascli WHERE id_arqueo='" . $this->caja->id . "' AND pagada<1  AND codpago='CONT'";
+
+                        if ($this->db->select($sql))
+                            $this->new_error_msg("No se puede cerrar el arqueo si no ha pagado todas las facturas contado");
                         else
                             $this->cerrar_caja();
-                        
+
                     } else if (isset($_POST['cliente'])) {
                         if (intval($_POST['numlineas']) > 0) {
                             $this->nueva_factura_cliente();
@@ -224,29 +224,30 @@ class tpv_recambios extends fbase_controller
                a tu usuario, y por tanto no puedes hacer tickets.');
             }
 
-            
-            
-            if(isset($_REQUEST["familia_mostrar"])){
+
+
+            if (isset($_REQUEST["familia_mostrar"])) {
                 $this->mostrar_cinta_articulos($_REQUEST["familia_mostrar"]);
             }
-            
-            
-            
-            
-            
-            
 
-            
+
+
+
+
+
+
+
         }
-        
-        
-        
-        
-        
+
+
+
+
+
     }
 
-    
-    public function today1(){
+
+    public function today1()
+    {
         return date('Y-m-d');
     }
 
@@ -297,26 +298,26 @@ class tpv_recambios extends fbase_controller
         header('Content-Type: application/json');
         echo json_encode($this->cliente->get_placa($_REQUEST['placa']));
     }
-    
-    
+
+
     private function lineas_factura_editar()
     {
         /// desactivamos la plantilla HTML
         $this->template = FALSE;
 
-         $sql = "SELECT t1.referencia, t1.codcombinacion, t1.iva, t1.recargo, t1.irpf, t1.descripcion, t1.cantidad, t1.pvpunitario, t1.proveedor_lav, t2.proveedor_servicio, t2.nombrecliente, t2.fecha "
-                 . "FROM lineasfacturascli t1 INNER JOIN facturascli t2 ON t2.pagada = 0 AND t1.idfactura = '".$this->factura_editar."'  AND t1.idfactura = t2.idfactura ORDER BY t1.idlinea DESC";
-        
+        $sql = "SELECT t1.referencia, t1.codcombinacion, t1.iva, t1.recargo, t1.irpf, t1.descripcion, t1.cantidad, t1.pvpunitario, t1.proveedor_lav, t2.proveedor_servicio, t2.nombrecliente, t2.fecha "
+            . "FROM lineasfacturascli t1 INNER JOIN facturascli t2 ON t2.pagada = 0 AND t1.idfactura = '" . $this->factura_editar . "'  AND t1.idfactura = t2.idfactura ORDER BY t1.idlinea DESC";
+
         $lineas_fact = $this->db->select($sql);
-        
+
         //fechatemporal = json[0].fecha .substr(8, 2) +"-"+ json[0].fecha .substr(5, 2) +"-"+ json[0].fecha .substr(0, 4);
-        
-        
+
+
         header('Content-Type: application/json');
         echo json_encode($lineas_fact);
     }
-    
-    
+
+
     private function clientes_db()
     {
         /// desactivamos la plantilla HTML
@@ -326,71 +327,71 @@ class tpv_recambios extends fbase_controller
         header('Content-Type: application/json');
         echo json_encode($ten);
     }
-	
-	
+
+
     private function datos_combo($dato)
     {
         /// desactivamos la plantilla HTML
 
         $this->template = FALSE;
-		$sql = "SELECT t3.referencia, t3.descripcion, t3.pvp, t3.codimpuesto, t3.servicio,t3.preciocombo, t3.necesita_articulo  FROM combos_lav t1 INNER JOIN conjunto_combos t2 INNER JOIN articulos t3 ON  t3.referencia=t2.articulo AND t1.idcombo = '".$dato."' AND t1.codigo_estado=1 AND t1.idcombo=t2.idcombo AND t2.codigo_estado=1 ";
-		$resultadito = $this->db->select($sql);
-		
+        $sql = "SELECT t3.referencia, t3.descripcion, t3.pvp, t3.codimpuesto, t3.servicio,t3.preciocombo, t3.necesita_articulo  FROM combos_lav t1 INNER JOIN conjunto_combos t2 INNER JOIN articulos t3 ON  t3.referencia=t2.articulo AND t1.idcombo = '" . $dato . "' AND t1.codigo_estado=1 AND t1.idcombo=t2.idcombo AND t2.codigo_estado=1 ";
+        $resultadito = $this->db->select($sql);
+
         header('Content-Type: application/json');
         echo json_encode($resultadito);
     }
-    
+
     private function crear_cliente($dato)
     {
         /// desactivamos la plantilla HTML
         $this->template = FALSE;
         $resultadito = false;
-        
+
         $cliente_nuevo = new cliente();
-        
-        
+
+
         $cliente_nuevo->coddivisa = "COP";
         $cliente_nuevo->codpago = "CONT";
         $cliente_nuevo->fechaalta = date("Y-m-d");
         $cliente_nuevo->nombre = $dato;
-        if(isset($_REQUEST['cod']))
+        if (isset($_REQUEST['cod']))
             $cliente_nuevo->codcliente = $_REQUEST['cod'];
-        if(isset($_REQUEST['razonsocial']) && $_REQUEST['razonsocial'] != "")
+        if (isset($_REQUEST['razonsocial']) && $_REQUEST['razonsocial'] != "")
             $cliente_nuevo->razonsocial = $_REQUEST['razonsocial'];
-        if(isset($_REQUEST['nombre2']))
+        if (isset($_REQUEST['nombre2']))
             $cliente_nuevo->nombre2 = $_REQUEST['nombre2'];
-        if(isset($_REQUEST['telefono1']))
+        if (isset($_REQUEST['telefono1']))
             $cliente_nuevo->telefono1 = $_REQUEST['telefono1'];
-        if(isset($_REQUEST['email']))
+        if (isset($_REQUEST['email']))
             $cliente_nuevo->email = $_REQUEST['email'];
-        if(isset($_REQUEST['cifnif']))
+        if (isset($_REQUEST['cifnif']))
             $cliente_nuevo->cifnif = $_REQUEST['cifnif'];
-        if(isset($_REQUEST['tipo_cifnif']))
+        if (isset($_REQUEST['tipo_cifnif']))
             $cliente_nuevo->tipoidfiscal = $_REQUEST['tipo_cifnif'];
         $cliente_nuevo->regimeniva = "General";
         $cliente_nuevo->personafisica = 1;
-        
-        if($cliente_nuevo->save()){
+
+        if ($cliente_nuevo->save()) {
             $resultadito["exito"] = true;
             $resultadito["cod"] = $cliente_nuevo->get_by_cifnif($cliente_nuevo->cifnif);
         }
-        
-		//$resultadito["hola"] = $sql;
+
+        //$resultadito["hola"] = $sql;
         header('Content-Type: application/json');
         echo json_encode($resultadito);
     }
-    
-    
+
+
     private function mostrar_cinta_articulos($familia)
     {
         /// desactivamos la plantilla HTML
         $this->template = FALSE;
-        
-        if($familia == "0")
+
+        if ($familia == "0")
             $sql = "SELECT *, SUM(t1.cantidad) as suma FROM lineasfacturascli t1 INNER JOIN articulos t2  ON  t2.cod_estado = 1 AND   t1.referencia = t2.referencia  GROUP BY t2.referencia  ";
         else
-            $sql = "SELECT * FROM lineasfacturascli t1 INNER JOIN articulos t2  ON  t2.cod_estado = 1 AND  t2.codfamilia = '".$familia."' ";
-        
+            $sql = "SELECT * FROM lineasfacturascli t1 INNER JOIN articulos t2  ON  t2.cod_estado = 1 AND  t2.codfamilia = '" . $familia . "' ";
+
         $consulta = $this->db->select_limit($sql, 30);
 
         header('Content-Type: application/json');
@@ -477,28 +478,29 @@ class tpv_recambios extends fbase_controller
     }
     //ESTA FUNCIÓN SE USÓ PARA MODIFICAR LAS LIQUIDACIONES PORQUE COMO SE INGRESABAN CON UNA FECHA
     //ATÍPICA NO SE ESTABA COGIENDO REALMENTE EL DÍA CORRECTO DE LA SEMANA. LA IDEA ES USAR EL ALGORITMO UNA SOLA VEZ
-    private function cambiar_(){
-        
-       $sql = "SELECT * FROM lineasfacturascli t1 INNER JOIN facturascli t2 ON t1.idfactura = t2.idfactura AND YEAR(fecha) = '2019' "; 
-       $res = $this->db->select($sql);
-       $val_liq = 0;
-       if($res){
-           for($i=0 ; $i < count($res) ; $i++){
-                
-               //echo "</br></br></br> ".$res[$i]["pvptotal"]. ", ".$res[$i]["referencia"]."1,". $res[$i]["idfactura"]."</br> ".$this->liquidacion_servicios($res[$i]["pvptotal"], $res[$i]["referencia"], 1, $res[$i]["idfactura"]);
-               $val_liq = $this->liquidacion_servicios($res[$i]["pvptotal"], $res[$i]["referencia"], 1, $res[$i]["idfactura"]);
-               if($val_liq == 0){
+    private function cambiar_()
+    {
+
+        $sql = "SELECT * FROM lineasfacturascli t1 INNER JOIN facturascli t2 ON t1.idfactura = t2.idfactura AND YEAR(fecha) = '2019' ";
+        $res = $this->db->select($sql);
+        $val_liq = 0;
+        if ($res) {
+            for ($i = 0; $i < count($res); $i++) {
+
+                //echo "</br></br></br> ".$res[$i]["pvptotal"]. ", ".$res[$i]["referencia"]."1,". $res[$i]["idfactura"]."</br> ".$this->liquidacion_servicios($res[$i]["pvptotal"], $res[$i]["referencia"], 1, $res[$i]["idfactura"]);
+                $val_liq = $this->liquidacion_servicios($res[$i]["pvptotal"], $res[$i]["referencia"], 1, $res[$i]["idfactura"]);
+                if ($val_liq == 0) {
                     $val_liq = $this->liquidacion_servicios($res[$i]["pvptotal"], $res[$i]["referencia"], 2, $res[$i]["idfactura"]);
-               }
-               
-               $sql = "UPDATE lineasfacturascli SET val_liquidacion='".$val_liq."' WHERE  idlinea ='".$res[$i]["idlinea"]."' ";
-               $this->db->exec($sql);
-           }
-       }
-       
-       
-        
-        
+                }
+
+                $sql = "UPDATE lineasfacturascli SET val_liquidacion='" . $val_liq . "' WHERE  idlinea ='" . $res[$i]["idlinea"] . "' ";
+                $this->db->exec($sql);
+            }
+        }
+
+
+
+
     }
 
     private function get_precios_articulo()
@@ -596,6 +598,11 @@ class tpv_recambios extends fbase_controller
             $continuar = FALSE;
         }
 
+        if (!isset($_POST['metodo_pago']) && count($_POST['metodo_pago']) < 1) {
+            $this->new_error_msg('Metodo de pago no encontrado.');
+            $continuar = FALSE;
+        }
+
         $factura = new factura_cliente();
 
         if ($this->duplicated_petition($_POST['petition_id'])) {
@@ -606,27 +613,28 @@ class tpv_recambios extends fbase_controller
         }
 
         if ($continuar) {
-			
-			$ssql = "";
-			$factura->idmetodopago = $_POST['metodo_pago'] ?? NULL;
+
+            $ssql = "";
+
+            $factura->idmetodopago = $_POST['metodo_pago'][0] ?? NULL;
             $factura->codejercicio = $ejercicio->codejercicio;
             $factura->codserie = $serie->codserie;
-            
-            
+
+
             //CONDICIÓN PARA NO CAMBIAR LA FECHA DE LA FACTURA
             /*if($this->user->admin)
                 $factura->fecha = $_POST['fecha'];    
             else
                 $factura->set_fecha_hora($_POST['fecha'], $factura->hora);*/
-            
-            $factura->fecha = $_POST['fecha'];    
+
+            $factura->fecha = $_POST['fecha'];
             $factura->codalmacen = $_POST['almacen'];
             $factura->codpago = $forma_pago->codpago;
             $factura->coddivisa = $divisa->coddivisa;
             $factura->tasaconv = $divisa->tasaconv;
-			
-			
-			
+
+
+
             if ($_POST['tasaconv'] != '') {
                 $factura->tasaconv = floatval($_POST['tasaconv']);
             }
@@ -649,7 +657,7 @@ class tpv_recambios extends fbase_controller
             $factura->codpais = $this->empresa->codpais;
             $factura->codpostal = $this->empresa->codpostal;
             $factura->provincia = $this->empresa->provincia;
-			
+
 
             foreach ($this->cliente_s->get_direcciones() as $d) {
                 if ($d->domfacturacion) {
@@ -668,41 +676,47 @@ class tpv_recambios extends fbase_controller
             if (!fs_generar_numero2($factura)) {
                 $factura->numero2 = $_POST['numero2'] ?? null;
             }
-            
+
             //En ésta línea se hace una condición para que la factura sea editada y no cree una nueva
             //Se actualiza con el idfactura de factura_editar
-            if($this->factura_editar != -1){
+            if ($this->factura_editar != -1) {
                 $factura->idfactura = $this->factura_editar;
                 $edita_factura = $factura->search_id($factura->idfactura);
-                $factura->codigo =  $edita_factura[0]["codigo"];
-                $factura->numero =  $edita_factura[0]["numero"];
+                $factura->codigo = $edita_factura[0]["codigo"];
+                $factura->numero = $edita_factura[0]["numero"];
                 $this->caja->dinero_fin = $this->caja->dinero_fin - $edita_factura[0]["total"];
             }
-            
-            
+
+
             $regularizacion = new regularizacion_iva();
-            
+
             if ($regularizacion->get_fecha_inside($factura->fecha)) {
                 $this->new_error_msg("El " . FS_IVA . " de ese periodo ya ha sido regularizado."
                     . " No se pueden añadir más facturas en esa fecha.");
-                
+
             } else if ($factura->save()) {
-                 
-            
+
+                $method_ = new factura_metodo_pago();
+                for ($i = 0; $i < count($_POST['metodo_pago']); $i++) {
+                    $method_->idfactura = $factura->idfactura;
+                    $method_->idmetodopago = $_POST['metodo_pago'][$i];
+                    $method_->total = $_POST['metodo_pago_value'][$i];
+                    $method_->save();
+                }
                 //$cons_usuario = $this->db->select("SELECT reg FROM personas_lav WHERE usario_asociado='".$this->user->nick."' AND codigo_estado = 1 ");
                 $cons_usuario = $this->bandera_lav;
                 $provAgregar = "0";
-                
+
                 $linea_ = new linea_factura_cliente();
-                if($this->factura_editar != -1){
+                if ($this->factura_editar != -1) {
                     $factura->idfactura = $this->factura_editar;
                     $linea_->delete_lineas($factura->idfactura);
                     $linea_iva = new linea_iva_factura_cliente;
                     $linea_iva->delete_fact($factura->idfactura);
-                    $this->factura_editar    = -1;
+                    $this->factura_editar = -1;
                 }
-                
-                
+
+
                 $trazabilidad = FALSE;
                 $n = floatval($_POST['numlineas']);
                 for ($i = 1; $i <= $n; $i++) {
@@ -714,8 +728,8 @@ class tpv_recambios extends fbase_controller
                             $linea->referencia = $articulo->referencia;
                             $linea->descripcion = $_POST['desc_' . $i];
                             $linea->proveedor_lav = $_POST['prov_' . $i];
-                            
-                                
+
+
 
                             if (!$serie->siniva || $this->cliente_s->regimeniva != 'Exento') {
                                 $linea->codimpuesto = $articulo->codimpuesto;
@@ -729,28 +743,27 @@ class tpv_recambios extends fbase_controller
                             $linea->dtopor = floatval($_POST['dto_' . $i]);
                             $linea->pvpsindto = $linea->pvpunitario * $linea->cantidad;
                             $linea->pvptotal = $linea->cantidad * $linea->pvpunitario * (100 - $linea->dtopor) / 100;
-                            
-                            
+
+
                             $linea->val_liquidacion_jefes = $this->liquidacion_jefes($linea->pvptotal / $linea->cantidad, $linea->referencia, 2, $linea->idfactura);
-                            
-                            if(!empty($_POST['prov_' . $i]))
-                            {
-                                    $provAgregar = $_POST['prov_' . $i];
-                                    $linea->val_liquidacion = $this->liquidacion_servicios($linea->pvptotal / $linea->cantidad, $linea->referencia, 1, $linea->idfactura);
-                                    if($linea->val_liquidacion == 0)
-                                        $linea->val_liquidacion = $this->liquidacion_servicios($linea->pvptotal / $linea->cantidad, $linea->referencia, 2, $linea->idfactura);
-                                    
+
+                            if (!empty($_POST['prov_' . $i])) {
+                                $provAgregar = $_POST['prov_' . $i];
+                                $linea->val_liquidacion = $this->liquidacion_servicios($linea->pvptotal / $linea->cantidad, $linea->referencia, 1, $linea->idfactura);
+                                if ($linea->val_liquidacion == 0)
+                                    $linea->val_liquidacion = $this->liquidacion_servicios($linea->pvptotal / $linea->cantidad, $linea->referencia, 2, $linea->idfactura);
+
                             }
-                            
-                            
-                            
+
+
+
                             /*
                              * Se multiplica por la cantidad los valores de liquidación.
                              */
                             $linea->val_liquidacion = $linea->cantidad * $linea->val_liquidacion;
                             $linea->val_liquidacion_instalados = $linea->cantidad * $linea->val_liquidacion_instalados;
                             $linea->val_liquidacion_jefes = $linea->cantidad * $linea->val_liquidacion_jefes;
-                            
+
                             if ($articulo) {
                                 if ($articulo->trazabilidad) {
                                     $trazabilidad = TRUE;
@@ -778,8 +791,8 @@ class tpv_recambios extends fbase_controller
                         }
                     }
                 }
-				
-				
+
+
 
                 if ($continuar) {
                     /// obtenemos los subtotales por impuesto
@@ -799,13 +812,13 @@ class tpv_recambios extends fbase_controller
                         $factura->delete();
                     } else if ($factura->save()) {
                         $this->generar_asiento($factura);
-						
-						
+
+
 
                         /// Función de ejecución de tareas post guardado correcto de la factura
                         fs_documento_post_save($factura);
-						
-						
+
+
 
                         $this->new_message("<a href='" . $factura->url() . "'>Factura</a> guardada correctamente.");
                         $this->get_values_person($factura->idfactura);
@@ -814,13 +827,13 @@ class tpv_recambios extends fbase_controller
                         } else {
                             $this->imprimir_ticket($factura, floatval($_POST['num_tickets']));
                         }
-						
-                        $ssql = "UPDATE facturascli SET proveedor_servicio='".$provAgregar."', cod_persona='".$cons_usuario[0]["reg"]."' WHERE idfactura='".$factura->idfactura."'";
+
+                        $ssql = "UPDATE facturascli SET proveedor_servicio='" . $provAgregar . "', cod_persona='" . $cons_usuario[0]["reg"] . "' WHERE idfactura='" . $factura->idfactura . "'";
                         //SE GUARDA EL PROVEEDOR DE SERVICIO DE LA TABLA FACTURASCLI
                         $this->db->exec($ssql);
 
                         /// actualizamos la caja
-                        
+
                         $this->caja->dinero_fin += $factura->total;
                         $this->caja->tickets += 1;
                         $this->caja->ip = $_SERVER['REMOTE_ADDR'];
@@ -845,67 +858,69 @@ class tpv_recambios extends fbase_controller
             }
         }
     }
-  
-    public function get_values_person($idfactura){
-        $sql = "SELECT SUM(t3.pvptotal) as total,SUM(t3.val_liquidacion) as val_liquidacion"
-                    . " FROM aspiradores_lav t1 "
-                    . " INNER JOIN  facturascli t2 "
-                    . " INNER JOIN lineasfacturascli t3 "
-                    . " ON  t2.idfactura=t3.idfactura  AND t2.anulada = 0 AND t2.cod_persona=t1.id_persona AND t3.referencia = '6' "
-                    . " WHERE t3.idfactura = {$idfactura}";
 
-        
+    public function get_values_person($idfactura)
+    {
+        $sql = "SELECT SUM(t3.pvptotal) as total,SUM(t3.val_liquidacion) as val_liquidacion"
+            . " FROM aspiradores_lav t1 "
+            . " INNER JOIN  facturascli t2 "
+            . " INNER JOIN lineasfacturascli t3 "
+            . " ON  t2.idfactura=t3.idfactura  AND t2.anulada = 0 AND t2.cod_persona=t1.id_persona AND t3.referencia = '6' "
+            . " WHERE t3.idfactura = {$idfactura}";
+
+
         $aspi = $this->db->select($sql);
         $this->valuesPerson['aspiradores'] = $aspi ?? [];
 
         $sql = "SELECT SUM(t3.pvptotal) as total, SUM(t3.val_liquidacion_jefes) as val_liquidacion"
-                    . " FROM  jefes_patio t1 "
-                    . " INNER JOIN  facturascli t2 "
-                    . " INNER JOIN lineasfacturascli t3 "
-                    . " INNER JOIN articulos t4 "
-                    . " ON  t2.idfactura=t3.idfactura  AND t2.anulada = 0 AND t2.cod_persona=t1.id_persona AND t4.referencia=t3.referencia AND  t3.val_liquidacion_jefes>0  "
-                    . " WHERE t2.idfactura = {$idfactura}";
+            . " FROM  jefes_patio t1 "
+            . " INNER JOIN  facturascli t2 "
+            . " INNER JOIN lineasfacturascli t3 "
+            . " INNER JOIN articulos t4 "
+            . " ON  t2.idfactura=t3.idfactura  AND t2.anulada = 0 AND t2.cod_persona=t1.id_persona AND t4.referencia=t3.referencia AND  t3.val_liquidacion_jefes>0  "
+            . " WHERE t2.idfactura = {$idfactura}";
 
         $jefes = $this->db->select($sql);
         $this->valuesPerson['jefes'] = $jefes ?? [];
 
         $sql = "SELECT SUM(t1.pvptotal) as total, SUM(t1.val_liquidacion) as val_liquidacion "
-                    . " FROM lineasfacturascli t1 INNER JOIN facturascli t2 "
-                    . " ON t1.idfactura=t2.idfactura AND t2.anulada = 0 AND "
-                    . " t1.proveedor_lav != '' "
-                    . " WHERE t2.idfactura = {$idfactura}";
-        
+            . " FROM lineasfacturascli t1 INNER JOIN facturascli t2 "
+            . " ON t1.idfactura=t2.idfactura AND t2.anulada = 0 AND "
+            . " t1.proveedor_lav != '' "
+            . " WHERE t2.idfactura = {$idfactura}";
+
         $lavadores = $this->db->select($sql);
         $this->valuesPerson['lavadores'] = $lavadores ?? [];
     }
-            
+
 
     private function abrir_caja()
     {
         if ($this->terminal) {
             $this->terminal->abrir_cajon();
             $this->terminal->save();
-            
+
         } else {
             $this->new_error_msg('Terminal no encontrado.');
         }
     }
 
-    function getMetodosPagoVal($idarqueo) : array {
+    function getMetodosPagoVal($idarqueo): array
+    {
         $result = [];
         $metodopago = new metodo_pago();
-        
+
         return $metodopago->getTotalCash($idarqueo) ?? [];
     }
-    
-    
+
+
     private function cerrar_caja()
     {
-        
+
         $this->caja->fecha_fin = Date('d-m-Y H:i:s');
-        if(isset($_REQUEST["dinero_caja"]))
+        if (isset($_REQUEST["dinero_caja"]))
             $this->caja->cierremanual = $_REQUEST["dinero_caja"];
-        
+
         if ($this->caja->save()) {
             $this->getMetodosPagoVal($this->caja->id);
             if ($this->terminal) {
@@ -913,47 +928,47 @@ class tpv_recambios extends fbase_controller
                 $this->terminal->anchopapel = 28;
                 $this->terminal->add_linea_big("\nCIERRE DE CAJA:\n\n");
                 $this->terminal->add_linea("Gestor: " . $this->user->codagente . " \n " . $this->agente->get_fullname() . "\n");
-                $this->terminal->add_linea("Caja: " . $this->caja->fs_id ."  ID Arqueo: ".$this->caja->id." \n");
-                $this->terminal->add_linea("Fecha Arqueo: \n" . date("Y-m-d H:i:s"). "\n");
+                $this->terminal->add_linea("Caja: " . $this->caja->fs_id . "  ID Arqueo: " . $this->caja->id . " \n");
+                $this->terminal->add_linea("Fecha Arqueo: \n" . date("Y-m-d H:i:s") . "\n");
                 $this->terminal->add_linea("Fecha ini: \n" . $this->caja->fecha_inicial . "\n");
                 $this->terminal->add_linea("Fecha fin: \n" . $this->caja->show_fecha_fin() . "\n");
                 $this->terminal->add_linea("Diferencia: $ " . $this->formato_moneda($this->caja->diferencia()) . "\n");
                 $this->terminal->add_linea("Tickets: " . $this->caja->tickets . "\n\n");
                 $this->terminal->add_linea_big("Arqueo caja: \n\n");
-                
+
                 $this->terminal->add_linea_big("Métodos de pago: \n");
                 foreach ($this->getMetodosPagoVal($this->caja->id) as $meth) {
-                    $this->terminal->add_linea($meth['nombre']."      $" .  sprintf("%" . ($this->terminal->anchopapel - 12) . "s", $this->formato_moneda($meth['total']) . "\n" ));
+                    $this->terminal->add_linea($meth['nombre'] . "      $" . sprintf("%" . ($this->terminal->anchopapel - 12) . "s", $this->formato_moneda($meth['total']) . "\n"));
                 }
                 $registrogasto = new registro_gasto();
-                $this->terminal->add_linea("\nGastos      $" .  sprintf("%" . ($this->terminal->anchopapel - 12) . "s", $this->formato_moneda($registrogasto->get_sum_idarqueo($this->caja->id)) . "\n" ));
+                $this->terminal->add_linea("\nGastos      $" . sprintf("%" . ($this->terminal->anchopapel - 12) . "s", $this->formato_moneda($registrogasto->get_sum_idarqueo($this->caja->id)) . "\n"));
                 $this->terminal->add_linea_big("\n\n");
 
-                $this->terminal->add_linea("Dinero inic $" . sprintf("%" . ($this->terminal->anchopapel - 12) . "s",$this->formato_moneda($this->caja->dinero_inicial) . "\n"));
-                $this->terminal->add_linea("Fact. Ctado $". sprintf("%" . ($this->terminal->anchopapel - 12) . "s", $this->formato_moneda($this->facturas_contado($this->user->codagente, $this->caja->id)). "\n") );
-                $this->terminal->add_linea("Fact. Cdito $". sprintf("%" . ($this->terminal->anchopapel - 12) . "s", $this->formato_moneda($this->facturas_credito($this->user->codagente, $this->caja->id)). "\n") );
-                $this->terminal->add_linea("Dnero Manua $" .  sprintf("%" . ($this->terminal->anchopapel - 12) . "s", $this->formato_moneda($this->caja->cierremanual) . "\n" ));
-                $this->terminal->add_linea("Dnero final $" .  sprintf("%" . ($this->terminal->anchopapel - 11) . "s", $this->formato_moneda($this->caja->dinero_fin - $this->facturas_credito($this->user->codagente, $this->caja->id) ) . "\n\n" ));
-                
+                $this->terminal->add_linea("Dinero inic $" . sprintf("%" . ($this->terminal->anchopapel - 12) . "s", $this->formato_moneda($this->caja->dinero_inicial) . "\n"));
+                $this->terminal->add_linea("Fact. Ctado $" . sprintf("%" . ($this->terminal->anchopapel - 12) . "s", $this->formato_moneda($this->facturas_contado($this->user->codagente, $this->caja->id)) . "\n"));
+                $this->terminal->add_linea("Fact. Cdito $" . sprintf("%" . ($this->terminal->anchopapel - 12) . "s", $this->formato_moneda($this->facturas_credito($this->user->codagente, $this->caja->id)) . "\n"));
+                $this->terminal->add_linea("Dnero Manua $" . sprintf("%" . ($this->terminal->anchopapel - 12) . "s", $this->formato_moneda($this->caja->cierremanual) . "\n"));
+                $this->terminal->add_linea("Dnero final $" . sprintf("%" . ($this->terminal->anchopapel - 11) . "s", $this->formato_moneda($this->caja->dinero_fin - $this->facturas_credito($this->user->codagente, $this->caja->id)) . "\n\n"));
+
                 /*$this->terminal->add_linea("Dinero inicial:  " .$espacio. $this->formato_moneda($this->caja->dinero_inicial) . "\n");
                 $this->terminal->add_linea("Facturas Contado: ".$this->formato_moneda($this->facturas_contado($this->user->codagente, $this->caja->id)). "\n");
                 $this->terminal->add_linea("Facturas Crédito: ".$this->formato_moneda($this->facturas_credito($this->user->codagente, $this->caja->id)). "\n");
                 $this->terminal->add_linea("Dinero Manual:   " .$espacio. $this->formato_moneda($this->caja->cierremanual) . "\n");
                 $this->terminal->add_linea("Dinero final:    " .$espacio. $this->formato_moneda($this->caja->dinero_fin) . "\n\n");*/
-                
+
                 $this->terminal->add_linea_big("Por Artículo \n\n");
 
                 $articulos = $this->familiasCierre($this->caja->id);
                 $sumaArticulos = 0;
-                
-                if($articulos){
-                    foreach($articulos as $art){
+
+                if ($articulos) {
+                    foreach ($articulos as $art) {
                         $refe = $art["referencia"];
-                        while(strlen($refe)<=11){
+                        while (strlen($refe) <= 11) {
                             $refe .= " ";
                         }
                         $refe .= "$";
-                        $this->terminal->add_linea($refe .sprintf("%" . ($this->terminal->anchopapel - 12) . "s", "(".$art["cantidad"].")".$this->formato_moneda($art["sumita"]) . "\n"));  
+                        $this->terminal->add_linea($refe . sprintf("%" . ($this->terminal->anchopapel - 12) . "s", "(" . $art["cantidad"] . ")" . $this->formato_moneda($art["sumita"]) . "\n"));
                         $sumaArticulos += $art["sumita"];
                     }
 
@@ -964,29 +979,29 @@ class tpv_recambios extends fbase_controller
                 $this->terminal->add_linea_big("Por Lavador \n\n");
 
                 $total_proveedores = 0;
-                if($this->desgloce_lavador($this->user->codagente, $this->caja->id)){
+                if ($this->desgloce_lavador($this->user->codagente, $this->caja->id)) {
                     $consulta = $this->desgloce_lavador($this->user->codagente, $this->caja->id);
-                    for($i=0 ; $i < count($consulta) ; $i++){
+                    for ($i = 0; $i < count($consulta); $i++) {
                         //if($consulta[$i]["proveedor_servicio"] == "0")
-                            //$this->terminal->add_linea("ARTICULOS:  $" .sprintf("%" . ($this->terminal->anchopapel - 12) . "s", $this->formato_moneda($consulta[$i]["total"]) . "\n"));                            
-                        if($consulta[$i]["proveedor_servicio"] != "0"){
-                         $proveedor_temp = substr($consulta[$i]["proveedor_servicio"], 0, 11);
-                            
-                            if(strlen($consulta[$i]["proveedor_servicio"]) > 11){
+                        //$this->terminal->add_linea("ARTICULOS:  $" .sprintf("%" . ($this->terminal->anchopapel - 12) . "s", $this->formato_moneda($consulta[$i]["total"]) . "\n"));                            
+                        if ($consulta[$i]["proveedor_servicio"] != "0") {
+                            $proveedor_temp = substr($consulta[$i]["proveedor_servicio"], 0, 11);
+
+                            if (strlen($consulta[$i]["proveedor_servicio"]) > 11) {
                                 $proveedor_temp .= ".$";
-                            }else{
-                                while(strlen($proveedor_temp)<=11){
+                            } else {
+                                while (strlen($proveedor_temp) <= 11) {
                                     $proveedor_temp .= " ";
                                 }
                                 $proveedor_temp .= "$";
-                                
+
                             }
-                            $this->terminal->add_linea($proveedor_temp. sprintf("%" . ($this->terminal->anchopapel - 12) . "s", $this->formato_moneda($consulta[$i]["total"]) . "\n"));   
+                            $this->terminal->add_linea($proveedor_temp . sprintf("%" . ($this->terminal->anchopapel - 12) . "s", $this->formato_moneda($consulta[$i]["total"]) . "\n"));
                             $total_proveedores += $consulta[$i]["total"];
                         }
-                        
+
                     }
-                    $this->terminal->add_linea("\nTOTAL:      $" . sprintf("%" . ($this->terminal->anchopapel - 11) . "s", $this->formato_moneda( $total_proveedores ) . "\n\n"));
+                    $this->terminal->add_linea("\nTOTAL:      $" . sprintf("%" . ($this->terminal->anchopapel - 11) . "s", $this->formato_moneda($total_proveedores) . "\n\n"));
                 }
                 $this->terminal->add_linea("Observaciones:\n\n\n\n");
                 $this->terminal->add_linea("Firma:\n\n\n\n\n\n\n\n\n\n");
@@ -1006,69 +1021,74 @@ class tpv_recambios extends fbase_controller
     }
 
 
-    public function familiasCierre($idarqueo){
-        
-        $sql = "SELECT t1.referencia, SUM(t1.pvptotal  * (1+ (t1.iva/100))) as sumita, SUM(t1.cantidad) as cantidad  FROM lineasfacturascli t1 INNER JOIN facturascli t2 ON t2.anulada = 0 AND t2.id_arqueo = '".$idarqueo."' AND t1.idfactura = t2.idfactura AND ( t1.proveedor_lav IS NULL OR  t1.proveedor_lav = '' OR  t1.proveedor_lav = '0' )    GROUP BY t1.referencia";
+    public function familiasCierre($idarqueo)
+    {
+
+        $sql = "SELECT t1.referencia, SUM(t1.pvptotal  * (1+ (t1.iva/100))) as sumita, SUM(t1.cantidad) as cantidad  FROM lineasfacturascli t1 INNER JOIN facturascli t2 ON t2.anulada = 0 AND t2.id_arqueo = '" . $idarqueo . "' AND t1.idfactura = t2.idfactura AND ( t1.proveedor_lav IS NULL OR  t1.proveedor_lav = '' OR  t1.proveedor_lav = '0' )    GROUP BY t1.referencia";
 
         return $this->db->select($sql);
 
     }
 
-    
-    
-    public function formato_moneda($number){
-            $text = number_format($number, 2); 
-            return  $text;
-        
+
+
+    public function formato_moneda($number)
+    {
+        $text = number_format($number, 2);
+        return $text;
+
     }
-    
-  
+
+
 
     /*
      * Se consulta las facturas para saber cuánto ha generado por lavador o por 
-      * artículos, es decir, cuando la factura no tiene ningún lavador asignado
+     * artículos, es decir, cuando la factura no tiene ningún lavador asignado
      */
-    private function desgloce_lavador($empleado, $id_arqueo){
-        
-        $sql = "SELECT SUM(t2.pvptotal * (1+ (t2.iva/100))) as total, t2.proveedor_lav as proveedor_servicio FROM facturascli t1 INNER JOIN lineasfacturascli t2 WHERE   t2.proveedor_lav != '' AND t1.idfactura = t2.idfactura AND  t1.codagente = '".$empleado."' AND t1.id_arqueo='".$id_arqueo."' AND t1.anulada='0' GROUP BY t2.proveedor_lav";
+    private function desgloce_lavador($empleado, $id_arqueo)
+    {
+
+        $sql = "SELECT SUM(t2.pvptotal * (1+ (t2.iva/100))) as total, t2.proveedor_lav as proveedor_servicio FROM facturascli t1 INNER JOIN lineasfacturascli t2 WHERE   t2.proveedor_lav != '' AND t1.idfactura = t2.idfactura AND  t1.codagente = '" . $empleado . "' AND t1.id_arqueo='" . $id_arqueo . "' AND t1.anulada='0' GROUP BY t2.proveedor_lav";
         $consulta = $this->db->select($sql);
         return $consulta;
     }
-    
-    
+
+
     /*
      * Se consulta las facturas crédito que se hicieron en el arqueo con id $id
      * y el empleado
      */
-    private function facturas_credito($empleado, $id_arqueo){
-        
-        $sql = "SELECT SUM(total) as total FROM facturascli WHERE pagada=0 AND  codagente = '".$empleado."' AND id_arqueo='".$id_arqueo."'   AND anulada='0' " ;
-        
+    private function facturas_credito($empleado, $id_arqueo)
+    {
+
+        $sql = "SELECT SUM(total) as total FROM facturascli WHERE pagada=0 AND  codagente = '" . $empleado . "' AND id_arqueo='" . $id_arqueo . "'   AND anulada='0' ";
+
         $consulta = $this->db->select($sql);
-        
-        if($consulta)
+
+        if ($consulta)
             return $consulta[0]["total"];
         else
             return 0;
-        
+
     }
-    
-    
+
+
     /*
      * Se consulta las facturas contado que se hicieron en el arqueo con id $id
      * y el empleado
      */
-    private function facturas_contado($empleado, $id_arqueo){
-        
-        $sql = "SELECT SUM(total) as total FROM facturascli WHERE pagada=1 AND  codagente = '".$empleado."' AND id_arqueo='".$id_arqueo."' AND anulada='0' ";
-        
+    private function facturas_contado($empleado, $id_arqueo)
+    {
+
+        $sql = "SELECT SUM(total) as total FROM facturascli WHERE pagada=1 AND  codagente = '" . $empleado . "' AND id_arqueo='" . $id_arqueo . "' AND anulada='0' ";
+
         $consulta = $this->db->select($sql);
-        
-        if($consulta)
+
+        if ($consulta)
             return $consulta[0]["total"];
         else
             return 0;
-        
+
     }
 
     private function reimprimir_ticket()

@@ -37,12 +37,12 @@ class contabilidad_metodos_pago extends fbase_controller
     protected function private_core()
     {
         parent::private_core();
-
+        $relations = new factura_metodo_pago();
         $this->metodo_pago = new metodo_pago();
 
-        if(isset($_POST['disabled'])){
+        if (isset($_POST['disabled'])) {
             $this->editar_metodo_pago(0);
-        }else if (isset($_POST['id']) || isset($_POST['nombre'])) {
+        } else if (isset($_POST['id']) || isset($_POST['nombre'])) {
             $this->editar_metodo_pago();
         }
 
@@ -52,25 +52,25 @@ class contabilidad_metodos_pago extends fbase_controller
     {
         /// crear/modificar forma de pago
         $metodopago = new metodo_pago();
-        if($codestado == 0)
+        if ($codestado == 0)
             $metodopago->id = $_POST['disabled'];
         $metodopago->codestado = $codestado;
-       if(isset($_POST['id'])){
+        if (isset($_POST['id'])) {
             $metodopago->id = $_POST['id'];
             $metodopago->nombre = $_POST['nombre'];
             $metodopago->descripcion = $_POST['descripcion'];
             $metodopago->user_mod = $this->user->nick;
             $metodopago->ultmod = date("Y-m-d h:i:s");
-       }else if(isset($_POST['nombre'])){
+        } else if (isset($_POST['nombre'])) {
             $metodopago->nombre = $_POST['nombre'];
             $metodopago->descripcion = $_POST['descripcion'];
             $metodopago->user_mod = $this->user->nick;
             $metodopago->ultmod = date("Y-m-d h:i:s");
-       }
+        }
 
-       if($metodopago->save())
+        if ($metodopago->save())
             $this->new_message('Se ha guardado el método de pago correctamente');
-       else
+        else
             $this->new_error_msg('No se ha podido guardar el método de pago');
     }
 

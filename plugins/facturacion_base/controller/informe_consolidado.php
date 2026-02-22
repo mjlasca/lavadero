@@ -64,7 +64,7 @@ class informe_consolidado extends fbase_controller
     protected function private_core()
     {
         parent::private_core();
-        
+
         $this->agente = new agente();
         $this->almacenes = new almacen();
         $this->factura = new factura_cliente();
@@ -80,67 +80,68 @@ class informe_consolidado extends fbase_controller
             $this->arrPay[$pay->id] = $pay->nombre;
         }
         $this->mostrar = 'buscar';
-        
+
 
         $this->offset = 0;
         if (isset($_REQUEST['offset'])) {
             $this->offset = intval($_REQUEST['offset']);
         }
-        
-        if(isset($_GET['download'])){
+
+        if (isset($_GET['download'])) {
             $this->downloadReport();
         }
 
         $this->getResultados();
     }
-   
+
     /**
      * Función para agregar los registros y mostrarlos en la tabla
      * @return Array 
      */
-    public function getResultados(){
+    public function getResultados()
+    {
         $this->resultados = [];
-        
+
         $sqlComision = "SELECT  IF(idmetodopago is NULL,'0',idmetodopago) as idmetodopago, SUM(total) as total FROM comision_empleados WHERE total > 0 ";
         $sqlFactcompra = "SELECT  IF(idmetodopago is NULL,'0',idmetodopago) as idmetodopago, SUM(total) as total FROM facturasprov WHERE pagada=1 AND anulada = 0 AND total > 0 ";
         $sqlGastos = "SELECT  IF(idmetodopago is NULL,'0',idmetodopago) as idmetodopago, SUM(total) as total FROM registro_gastos WHERE  anulada = 0 AND total > 0 ";
-        $sqlFactcli = "SELECT  IF(idmetodopago is NULL,'0',idmetodopago) as idmetodopago, SUM(total) as total FROM facturascli WHERE pagada=1 AND anulada = 0 AND total > 0 ";
+        $sqlFactcli = "SELECT  IF(t1.idmetodopago is NULL,'0',t1.idmetodopago) as idmetodopago, SUM(t1.total) as total FROM facturascli t0 LEFT JOIN factura_metodo_pago t1 ON t0.idfactura = t1.idfactura WHERE pagada=1 AND anulada = 0 AND t1.total > 0 ";
 
-        if(isset($_REQUEST['metodo_pago']) && $_REQUEST['metodo_pago'] != '' ){
+        if (isset($_REQUEST['metodo_pago']) && $_REQUEST['metodo_pago'] != '') {
             $this->idmetodopago = $_REQUEST['metodo_pago'];
-            $sqlComision .= " AND idmetodopago = '".$_REQUEST['metodo_pago']."' ";
-            $sqlFactcompra .= " AND idmetodopago = '".$_REQUEST['metodo_pago']."' ";
-            $sqlGastos .= " AND idmetodopago = '".$_REQUEST['metodo_pago']."' ";
-            $sqlFactcli .= " AND idmetodopago = '".$_REQUEST['metodo_pago']."' ";
+            $sqlComision .= " AND idmetodopago = '" . $_REQUEST['metodo_pago'] . "' ";
+            $sqlFactcompra .= " AND idmetodopago = '" . $_REQUEST['metodo_pago'] . "' ";
+            $sqlGastos .= " AND idmetodopago = '" . $_REQUEST['metodo_pago'] . "' ";
+            $sqlFactcli .= " AND t1.idmetodopago = '" . $_REQUEST['metodo_pago'] . "' ";
         }
-        if(isset($_REQUEST['desde']))
+        if (isset($_REQUEST['desde']))
             $this->desde = $_REQUEST['desde'];
-        
-        $sqlComision .= " AND fecha_final >= '".$this->desde."' ";
-        $sqlFactcompra .= " AND fecha >= '".$this->desde."'";
-        $sqlGastos .= " AND fecha >= '".$this->desde."'";
-        $sqlFactcli .= " AND fecha >= '".$this->desde."'";
-        
-        if(isset($_REQUEST['hasta']))
-            $this->hasta = $_REQUEST['hasta'];  
 
-        $sqlComision .= " AND fecha_final <= '".$this->hasta."' ";
-        $sqlFactcompra .= " AND fecha <= '".$this->hasta."'";
-        $sqlGastos .= " AND fecha <= '".$this->hasta."'";
-        $sqlFactcli .= " AND fecha <= '".$this->hasta."'";
-        
+        $sqlComision .= " AND fecha_final >= '" . $this->desde . "' ";
+        $sqlFactcompra .= " AND fecha >= '" . $this->desde . "'";
+        $sqlGastos .= " AND fecha >= '" . $this->desde . "'";
+        $sqlFactcli .= " AND t0.fecha >= '" . $this->desde . "'";
+
+        if (isset($_REQUEST['hasta']))
+            $this->hasta = $_REQUEST['hasta'];
+
+        $sqlComision .= " AND fecha_final <= '" . $this->hasta . "' ";
+        $sqlFactcompra .= " AND fecha <= '" . $this->hasta . "'";
+        $sqlGastos .= " AND fecha <= '" . $this->hasta . "'";
+        $sqlFactcli .= " AND t0.fecha <= '" . $this->hasta . "'";
+
 
         $factcompra_total = $this->db->select($sqlFactcompra);
-        $factcompra = $this->db->select($sqlFactcompra." group by idmetodopago ");
+        $factcompra = $this->db->select($sqlFactcompra . " group by idmetodopago ");
 
         $comisiones_total = $this->db->select($sqlComision);
-        $comisiones = $this->db->select($sqlComision." group by idmetodopago ");
+        $comisiones = $this->db->select($sqlComision . " group by idmetodopago ");
 
         $factcli_total = $this->db->select($sqlFactcli);
-        $factcli = $this->db->select($sqlFactcli." group by idmetodopago ");
+        $factcli = $this->db->select($sqlFactcli . " group by t1.idmetodopago ");
 
         $gastos_total = $this->db->select($sqlGastos);
-        $gastos = $this->db->select($sqlGastos." group by idmetodopago ");
+        $gastos = $this->db->select($sqlGastos . " group by idmetodopago ");
 
         $this->resultados['comisiones'] = $comisiones;
         $this->resultados['comisiones_total'] = $comisiones_total[0]['total'];
@@ -156,36 +157,43 @@ class informe_consolidado extends fbase_controller
 
     }
 
-    function downloadReport() : void {
+    function downloadReport(): void
+    {
         $sqlComision = "SELECT * FROM comision_empleados WHERE total > 0 ";
         $sqlComision = "SELECT fecha_final as date,'COMISIÓN' as module, t1.reg as code, t1.nombre_empleado as detail, (SELECT t0.nombre FROM metodospago t0 WHERE t0.id = t1.idmetodopago limit 1) as method,  t1.user_responsable as user, 'N/A' as cash, 'N/A' as product, 'PAGO COMISIÓN' as description, 'N/A' as observation, 0 as unitsel, 0 as totalup, 0 as ivaup, 'undc' as unitshop, t1.total as totale,  0 as ivae FROM comision_empleados t1  WHERE total > 0 ";
         $sqlFactcompra = "SELECT CONCAT(t1.fecha,' ',t1.hora) as date,'COMPRA' as module, t1.codigo as code, (SELECT t0.razonsocial FROM proveedores t0 WHERE t0.codproveedor = t1.codproveedor limit 1) as detail, (SELECT t0.nombre FROM metodospago t0 WHERE t0.id = t1.idmetodopago limit 1) as method,  (SELECT t0.nick FROM fs_users t0 WHERE t0.codagente = t1.codagente  limit 1) as user, 'N/A' as cash, t2.referencia as product, t2.descripcion as description, t1.observaciones as observation, 0 as unitsel, 0 as totalup, 0 as ivaup, t2.cantidad as unitshop, t2.pvptotal as totale,  t2.iva as ivae  FROM lineasfacturasprov t2 INNER JOIN facturasprov t1 ON t1.idfactura = t2.idfactura  WHERE pagada=1 AND anulada = 0 AND  total > 0 ";
         $sqlGastos = "SELECT CONCAT(t1.fecha,' ',t1.hora) as date,'GASTO' as module, t1.codigo as code, (SELECT t0.razonsocial FROM proveedores t0 WHERE t0.codproveedor = t1.codproveedor limit 1) as detail, (SELECT t0.nombre FROM metodospago t0 WHERE t0.id = t1.idmetodopago limit 1) as method,  (SELECT t0.nick FROM fs_users t0 WHERE t0.codagente = t1.codagente  limit 1) as user, t1.idarqueo as cash, t2.referencia as product, t2.descripcion as description, t1.observaciones as observation, 'undve' as unitsel, 0 as totalup, 0 as ivaup, t2.cantidad as unitshop, t2.pvptotal as totale,  t2.iva as ivae FROM lineasgastos t2 INNER JOIN registro_gastos t1 ON t1.idfactura = t2.idfactura  WHERE  anulada = 0 AND  total > 0 ";
-        $sqlFactcli = "SELECT CONCAT(t1.fecha,' ',t1.hora) as date,'VENTA' as module, t1.codigo as code, t1.nombrecliente as detail, (SELECT t0.nombre FROM metodospago t0 WHERE t0.id = t1.idmetodopago limit 1) as method,  (SELECT t0.nick FROM fs_users t0 WHERE t0.codagente = t1.codagente  limit 1) as user, t1.id_arqueo as cash, t2.referencia as product, CONCAT(t2.descripcion,' - ',t2.proveedor_lav) as description, t1.observaciones as observation, t2.cantidad as unitsel, t2.pvptotal as totalup, t2.iva as ivaup, 0 as unitshop, 0 as totale,  0 as ivae FROM lineasfacturascli t2 INNER JOIN facturascli t1 ON t1.idfactura = t2.idfactura  WHERE  pagada=1 AND anulada = 0 AND total > 0 ";
+        $sqlFactcli = "SELECT CONCAT(t1.fecha,' ',t1.hora) as date,'VENTA' as module, t1.codigo as code, t1.nombrecliente as detail, (
+        SELECT GROUP_CONCAT(mp.nombre SEPARATOR ' + ')
+        FROM factura_metodo_pago fmp
+        INNER JOIN metodospago mp 
+            ON mp.id = fmp.idmetodopago
+        WHERE fmp.idfactura = t1.idfactura
+    ) AS method,  (SELECT t0.nick FROM fs_users t0 WHERE t0.codagente = t1.codagente  limit 1) as user, t1.id_arqueo as cash, t2.referencia as product, CONCAT(t2.descripcion,' - ',t2.proveedor_lav) as description, t1.observaciones as observation, t2.cantidad as unitsel, t2.pvptotal as totalup, t2.iva as ivaup, 0 as unitshop, 0 as totale,  0 as ivae FROM lineasfacturascli t2 INNER JOIN facturascli t1 ON t1.idfactura = t2.idfactura  WHERE  t1.pagada=1 AND t1.anulada = 0 AND t1.total > 0 ";
 
-        if(isset($_REQUEST['metodo_pago']) && $_REQUEST['metodo_pago'] != '' ){
+        if (isset($_REQUEST['metodo_pago']) && $_REQUEST['metodo_pago'] != '') {
             $this->idmetodopago = $_REQUEST['metodo_pago'];
-            $sqlComision .= " AND idmetodopago = '".$_REQUEST['metodo_pago']."' ";
-            $sqlFactcompra .= " AND idmetodopago = '".$_REQUEST['metodo_pago']."' ";
-            $sqlGastos .= " AND idmetodopago = '".$_REQUEST['metodo_pago']."' ";
-            $sqlFactcli .= " AND idmetodopago = '".$_REQUEST['metodo_pago']."' ";
+            $sqlComision .= " AND idmetodopago = '" . $_REQUEST['metodo_pago'] . "' ";
+            $sqlFactcompra .= " AND idmetodopago = '" . $_REQUEST['metodo_pago'] . "' ";
+            $sqlGastos .= " AND idmetodopago = '" . $_REQUEST['metodo_pago'] . "' ";
+            $sqlFactcli .= " AND idmetodopago = '" . $_REQUEST['metodo_pago'] . "' ";
         }
-        if(isset($_REQUEST['desde']))
+        if (isset($_REQUEST['desde']))
             $this->desde = $_REQUEST['desde'];
-        
-        $sqlComision .= " AND fecha_final >= '".$this->desde."' ";
-        $sqlFactcompra .= " AND fecha >= '".$this->desde."'";
-        $sqlGastos .= " AND fecha >= '".$this->desde."'";
-        $sqlFactcli .= " AND fecha >= '".$this->desde."'";
-        
-        if(isset($_REQUEST['hasta']))
-            $this->hasta = $_REQUEST['hasta'];  
 
-        $sqlComision .= " AND fecha_final <= '".$this->hasta."' ";
-        $sqlFactcompra .= " AND fecha <= '".$this->hasta."'";
-        $sqlGastos .= " AND fecha <= '".$this->hasta."'";
-        $sqlFactcli .= " AND fecha <= '".$this->hasta."'";
-        
+        $sqlComision .= " AND fecha_final >= '" . $this->desde . "' ";
+        $sqlFactcompra .= " AND fecha >= '" . $this->desde . "'";
+        $sqlGastos .= " AND fecha >= '" . $this->desde . "'";
+        $sqlFactcli .= " AND fecha >= '" . $this->desde . "'";
+
+        if (isset($_REQUEST['hasta']))
+            $this->hasta = $_REQUEST['hasta'];
+
+        $sqlComision .= " AND fecha_final <= '" . $this->hasta . "' ";
+        $sqlFactcompra .= " AND fecha <= '" . $this->hasta . "'";
+        $sqlGastos .= " AND fecha <= '" . $this->hasta . "'";
+        $sqlFactcli .= " AND fecha <= '" . $this->hasta . "'";
+
         //$factcompra_total = $this->db->select($sqlFactcompra);
         $factcompra = $this->db->select($sqlFactcompra);
         $comisiones_total = $this->db->select($sqlComision);
@@ -216,8 +224,8 @@ class informe_consolidado extends fbase_controller
             'METODO PAGO' => 'string',
             'CAJERO/USER' => 'string',
             'ID ARQUEO' => 'string',
-            'PRODUCTO/GASTO' =>  'string',
-            'DESCRIPCION' =>  'string',
+            'PRODUCTO/GASTO' => 'string',
+            'DESCRIPCION' => 'string',
             'OBSERVACIONES' => 'string',
             'UND VEND' => '#,##0.00;[RED]-#,##0.00',
             'TOTAL INGRESO' => '#,##0.00;[RED]-#,##0.00',
@@ -240,8 +248,8 @@ class informe_consolidado extends fbase_controller
                 'METODO PAGO' => $doc['method'],
                 'CAJERO/USER' => $doc['user'],
                 'ID ARQUEO' => $doc['cash'],
-                'PRODUCTO/GASTO' =>  $doc['product'],
-                'DESCRIPCION' =>  $doc['description'],
+                'PRODUCTO/GASTO' => $doc['product'],
+                'DESCRIPCION' => $doc['description'],
                 'OBSERVACIONES' => $doc['observation'],
                 'UND VEND' => $doc['unitsel'],
                 'TOTAL INGRESO' => $doc['totalup'],
@@ -335,9 +343,9 @@ class informe_consolidado extends fbase_controller
             $sql .= $where . "codcliente = " . $this->agente->var2str($this->cliente->codcliente);
             $where = ' AND ';
         }
-        
+
         if ($this->idarqueo) {
-            $sql .= $where . "id_arqueo = '" .$this->idarqueo."'" ;
+            $sql .= $where . "id_arqueo = '" . $this->idarqueo . "'";
             $where = ' AND ';
         }
 
@@ -345,7 +353,7 @@ class informe_consolidado extends fbase_controller
             $sql .= $where . "codagente = " . $this->agente->var2str($this->codagente);
             $where = ' AND ';
         }
-     
+
 
         if ($this->codalmacen != '') {
             $sql .= $where . "codalmacen = " . $this->agente->var2str($this->codalmacen);
@@ -361,7 +369,7 @@ class informe_consolidado extends fbase_controller
             $sql .= $where . "codpago = " . $this->agente->var2str($this->codpago);
             $where = ' AND ';
         }
-        
+
         if ($this->codserie != '') {
             $sql .= $where . "codserie = " . $this->agente->var2str($this->codserie);
             $where = ' AND ';
