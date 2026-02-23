@@ -1,0 +1,66 @@
+<?php
+/*
+ * This file is part of facturacion_base
+ * Copyright (C) 2014-2017    Carlos Garcia Gomez  neorazorx@gmail.com
+ * Copyright (C) 2014         GISBEL JOSE          gpg841@gmail.com
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+use FacturaScripts\model\company;
+
+require_once 'plugins/facturacion_base/extras/fbase_controller.php';
+
+class fact_companies extends fbase_controller
+{
+
+    public $companies;
+
+    public function __construct()
+    {
+        parent::__construct(__CLASS__, 'Empresas facturación', 'ventas');
+    }
+
+    protected function private_core()
+    {
+        parent::private_core();
+        $this->companies = new company();
+
+        if (isset($_POST['cif'])) {
+            $this->save();
+        }
+    }
+
+    public function save()
+    {
+        $company = new company();
+        if (isset($_POST['id'])) {
+            $company->id = $_POST['id'];
+        }
+        $company->cif = $_POST['cif'];
+        $company->prefijo = $_POST['prefijo'];
+        if (empty($company->id) && $company->getCifPref() != FALSE) {
+            $this->new_error_msg('El CIF y/o el prefijo ya existe');
+            return FALSE;
+        }
+        $company->nombre = $_POST['nombre'];
+        $company->useredit = $this->user->nick;
+        $company->ultmod = date('Y-m-d H:i:s');
+        $company->save();
+
+
+
+    }
+
+}

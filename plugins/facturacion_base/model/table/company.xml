@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Document   : company.xml
+    Author     : Mario Lasluisa Castaño
+    Description:
+        Estructura de la tabla company.
+-->
+<tabla>
+    <columna>
+        <nombre>id</nombre>
+        <tipo>serial</tipo>
+        <nulo>NO</nulo>
+        <defecto>nextval('company_id_seq'::regclass)</defecto>
+    </columna>
+    <columna>
+        <nombre>nombre</nombre>
+        <tipo>varchar(255)</tipo>
+        <nulo>NO</nulo>
+    </columna>
+    <columna>
+        <nombre>cif</nombre>
+        <tipo>varchar(20)</tipo>
+        <nulo>NO</nulo>
+    </columna>
+    <columna>
+        <nombre>prefijo</nombre>
+        <tipo>varchar(10)</tipo>
+        <nulo>NO</nulo>
+    </columna>
+    <columna>
+        <nombre>ultmod</nombre>
+        <tipo>timestamp</tipo>
+        <nulo>NO</nulo>
+    </columna>
+    <columna>
+        <nombre>useredit</nombre>
+        <tipo>varchar(150)</tipo>
+        <nulo>NO</nulo>
+    </columna>
+    <columna>
+        <nombre>codestado</nombre>
+        <tipo>int(1)</tipo>
+        <nulo>NO</nulo>
+        <defecto>1</defecto>
+    </columna>
+    <restriccion>
+        <nombre>company_pkey</nombre>
+        <consulta>PRIMARY KEY (id)</consulta>
+    </restriccion>
+</tabla>
