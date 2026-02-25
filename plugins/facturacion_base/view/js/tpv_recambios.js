@@ -1243,7 +1243,7 @@ function metodoPagoSelected(){
     let flag = true;
     let sumInput = 0;
     metodos.forEach(me => {
-        const select = me.querySelector('select');
+        const select = me.querySelector('.metodos');
         const input = me.querySelector('input');
         if(select.value == "" || input.value == "")
             flag = false;
@@ -1251,12 +1251,25 @@ function metodoPagoSelected(){
             sumInput += parseFloat(input.value);
         }
     });
-
-    if(flag && sumInput == total_fac.value)
+    const selectMe0 = document.querySelector('.metodos');
+    if(selectMe0){
+        selectMe0.addEventListener('change', (event) =>{
+            const selectComp = document.querySelector('.companies');
+            [...selectComp.options].forEach(option => {
+                if (option.dataset.mp === event.target.value) {
+                    option.selected = true;
+                }
+            });
+        });
+    }
+    const selectComp = document.querySelector('.companies');
+    if(selectComp.value != '' && flag && sumInput != 0 && sumInput == total_fac.value)
         foot.classList.remove('hidden_modal');
     else
         foot.classList.add('hidden_modal');
 }
+
+
 
 
 function addMethod(){

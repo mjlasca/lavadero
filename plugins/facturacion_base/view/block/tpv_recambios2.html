@@ -109,8 +109,9 @@
    });
 </script>
 {if="$fsc->valuesPerson"}
-<div class="row">
-   <ul class="list-group">
+<div style="display: flex;">
+   <div>
+      <ul class="list-group">
       {loop="$fsc->valuesPerson['aspiradores']"}
       <li class="list-liq">Aspiradores<br>{$value['total']} / <span>{$value['val_liquidacion']}</span></li>
       {/loop}
@@ -121,6 +122,10 @@
       <li class="list-liq">Lavadores<br>{$value['total']} / <span>{$value['val_liquidacion']}</span></li>
       {/loop}
    </ul>
+   </div>
+   <div>
+      <a style="height: 55px; margin-left: 10px;" href="{$fsc->url()}&download_file=true" class="btn btn-primary" target="_blank"><span class="glyphicon glyphicon-download"></span></a>
+   </div>
 </div>
 {/if}
 <form id="f_tpv" name="f_tpv" action="{$fsc->url()}" method="post" class="form">
@@ -433,7 +438,7 @@
                            <a href="{$fsc->metodo_pago->url()}">Método de pago</a>:
                            <div class="form-group method-0">
                               <div class="method-fields">
-                                 <select name="metodo_pago[]" class="form-control metodo-pago__select"
+                                 <select name="metodo_pago[]" class="form-control metodos metodo-pago__select"
                                     onChange="metodoPagoSelected();">
                                     <option value="">--Seleccione método de pago--</option>
                                     {loop="$fsc->metodo_pago->all()"}
@@ -445,12 +450,24 @@
                                     {/loop}
                                  </select>
                                  <input type="number" name="metodo_pago_value[]" onChange="metodoPagoSelected();" placeholder="Monto $" class="form-control">
+                                 
                               </div>
                            </div>
+                           
                         </div>
                         <div>
                            <button class="btn" onclick="addMethod()" type="button">Agregar método de pago</button>
                         </div>
+                        <div class="form-group">
+                           <a href="{$fsc->company->url()}">Empresa factura</a>:
+                           <select name="idempresa" class="form-control companies metodo-pago__select" onChange="metodoPagoSelected();">
+                                    <option value="">--Seleccione empresa--</option>
+                                    {loop="$fsc->company->all()"}
+                                          <option value="{$value->id}" data-mp="{$value->idmetodopago}">{$value->prefijo}:{$value->nombre}</option>
+                                    {/loop}
+                                 </select>
+                        </div>
+                        
                         <div class="form-group">
                            <a href="{$fsc->forma_pago->url()}">Forma de pago</a>:
                            <!--<p>{$fsc->cliente->codpago}</p>-->

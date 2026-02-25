@@ -46,6 +46,7 @@ class factura_cliente extends \fs_model
      * @var integer 
      */
     public $idimprenta;
+    public $idempresa;
 
     public function __construct($data = FALSE)
     {
@@ -64,7 +65,7 @@ class factura_cliente extends \fs_model
             if (!is_null($data['vencimiento'])) {
                 $this->vencimiento = Date('d-m-Y', \strtotime($data['vencimiento']));
             }
-
+            $this->idempresa = $this->intval($data['idempresa']);
             $this->idimprenta = $this->intval($data['idimprenta']);
         } else {
             $this->clear_trait($this->default_items);
@@ -77,6 +78,7 @@ class factura_cliente extends \fs_model
             $this->anulada = FALSE;
             $this->vencimiento = Date('d-m-Y', \strtotime('+1 day'));
             $this->idimprenta = NULL;
+            $this->idempresa = NULL;
         }
     }
 
@@ -94,7 +96,7 @@ class factura_cliente extends \fs_model
             return FALSE;
         }
 
-        return ( \strtotime($this->vencimiento) < \strtotime(Date('d-m-Y')) );
+        return (\strtotime($this->vencimiento) < \strtotime(Date('d-m-Y')));
     }
 
     /**
@@ -298,7 +300,7 @@ class factura_cliente extends \fs_model
         $sql .= " ORDER BY numero ASC;";
 
         $data = $this->db->select($sql);
-        
+
         if ($data) {
             foreach ($data as $d) {
                 if (intval($d['numero']) < $num) {
@@ -370,7 +372,7 @@ class factura_cliente extends \fs_model
                 if ($asiento->tipodocumento != 'Factura de cliente' || $asiento->documento != $this->codigo) {
                     $this->new_error_msg("Esta factura apunta a un <a href='" . $this->asiento_url() . "'>asiento incorrecto</a>.");
                     $status = FALSE;
-                } else if ($this->coddivisa == $this->default_items->coddivisa() && ( abs($asiento->importe) - abs($this->total + $this->totalirpf) >= .02)) {
+                } else if ($this->coddivisa == $this->default_items->coddivisa() && (abs($asiento->importe) - abs($this->total + $this->totalirpf) >= .02)) {
                     $this->new_error_msg("El importe del asiento es distinto al de la factura.");
                     $status = FALSE;
                 } else {
@@ -427,7 +429,7 @@ class factura_cliente extends \fs_model
     {
         if ($this->test()) {
             $this->clean_cache();
-            
+
             if ($this->exists()) {
                 $sql = "UPDATE " . $this->table_name . " SET idasiento = " . $this->var2str($this->idasiento) .
                     ", idasientop = " . $this->var2str($this->idasientop) .
@@ -488,10 +490,11 @@ class factura_cliente extends \fs_model
                     ", numdocs = " . $this->var2str($this->numdocs) .
                     ", id_arqueo = " . $this->var2str($this->id_arqueo) .
                     ", idmetodopago = " . $this->var2str($this->idmetodopago) .
+                    ", idempresa = " . $this->var2str($this->idempresa) .
                     "  WHERE idfactura = " . $this->var2str($this->idfactura) . ";";
-                
-                
-                
+
+
+
                 return $this->db->exec($sql);
             }
 
@@ -502,7 +505,7 @@ class factura_cliente extends \fs_model
                codagente,netosindto,neto,dtopor1,dtopor2,dtopor3,dtopor4,dtopor5,totaliva,total,totaleuros,
                irpf,totalirpf,porcomision,tasaconv,totalrecargo,pagada,anulada,observaciones,hora,numero2,
                vencimiento,femail,codtrans,codigoenv,nombreenv,apellidosenv,apartadoenv,direccionenv,
-               codpostalenv,ciudadenv,provinciaenv,codpaisenv,idimprenta,numdocs,id_arqueo,idmetodopago) VALUES ("
+               codpostalenv,ciudadenv,provinciaenv,codpaisenv,idimprenta,numdocs,id_arqueo,idmetodopago,idempresa) VALUES ("
                 . $this->var2str($this->idasiento) .
                 "," . $this->var2str($this->idasientop) .
                 "," . $this->var2str($this->idfacturarect) .
@@ -561,8 +564,9 @@ class factura_cliente extends \fs_model
                 "," . $this->var2str($this->idimprenta) .
                 "," . $this->var2str($this->numdocs) .
                 "," . $this->var2str($this->id_arqueo) .
-                "," . $this->var2str($this->idmetodopago) . ");";
-            
+                "," . $this->var2str($this->idmetodopago) .
+                "," . $this->var2str($this->idempresa) . ");";
+
             if ($this->db->exec($sql)) {
                 $this->idfactura = $this->db->lastval();
                 return TRUE;
@@ -779,14 +783,15 @@ class factura_cliente extends \fs_model
 
         return $this->all_from($sql, $offset);
     }
-    
-    
+
+
     /*
      * Consulta por idfactura
      */
-    public function search_id($id){
-        $sql = "SELECT * FROM " . $this->table_name . " WHERE idfactura = '".$id."' ";
-        
+    public function search_id($id)
+    {
+        $sql = "SELECT * FROM " . $this->table_name . " WHERE idfactura = '" . $id . "' ";
+
         return $this->db->select($sql);
     }
 

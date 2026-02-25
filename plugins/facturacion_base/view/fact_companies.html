@@ -51,6 +51,7 @@
             <th  class="text-left">Identificación</th>
             <th  class="text-left">Nombre</th>
             <th class="text-left">Prefijo</th>
+            <th class="text-left">Método pago por defecto</th>
             <th width="150" class="text-left">Modificado por</th>
             <th width="150" class="text-left">Fecha modificación</th>
             <th class="text-right" width="120">Acciones</th>
@@ -63,14 +64,34 @@
             <td> <input class="form-control" type="text" name="cif" id="" value="{$value->cif}"> </td>
             <td> <input class="form-control" type="text" name="nombre" id="" value="{$value->nombre}"> </td>
             <td> <input class="form-control" type="text" name="prefijo" id="" value="{$value->prefijo}"> </td>
-            <td> <input class="form-control" type="text" name="useredit" id="" value="{$value->useredit}"> </td>
+            <td>
+               <select name="idmetodopago" class="form-control metodo-pago__select">
+                  <option value="">--Seleccione método de pago--</option>
+                  {loop="$fsc->metodo_pago->all()"}
+                     {if="$value2->id == $value1->idmetodopago"}
+                        <option value="{$value2->id}" selected>{$value2->nombre}</option>
+                     {else}
+                        <option value="{$value2->id}">{$value2->nombre}</option>
+                     {/if}
+                  {/loop}
+               </select>
+            </td>
+            <td> <input class="form-control" type="text" name="useredit" readonly id="" value="{$value->useredit}"> </td>
             <td><input class="form-control" disabled type="text" name="ultmod" id="" value="{$value->ultmod}"></td>
+            
                <div class="btn-group">
                   <td>
+                  
                   {if="$fsc->allow_delete"}
-                     <a href="{$fsc->url()}?disabled={$value->id}" class="btn btn-sm btn-warning" title="Deshabilitar" >
+                     {if="$value->codestado == 1"}
+                     <a href="{$fsc->url()}&disabled={$value->id}" class="btn btn-sm btn-warning" title="Deshabilitar" >
                         <span class="glyphicon glyphicon-lock"></span>
                      </a>
+                     {else}
+                     <a href="{$fsc->url()}&enabled={$value->id}" class="btn btn-sm btn-success" title="Habilitar" >
+                        <span class="glyphicon glyphicon-lock"></span>
+                     </a>
+                     {/if}
                   {/if}
                   <button class="btn btn-sm btn-primary" type="submit" onclick="this.disabled=true;this.form.submit();" title="Guardar">
                      <span class="glyphicon glyphicon-floppy-disk"></span>
@@ -92,6 +113,14 @@
             </td>
             <td >
                 <input class="form-control" type="text" name="prefijo" autocomplete="off" placeholder="Prefijo"  maxlength="50"  required=""/>
+            </td>
+            <td>
+               <select name="idmetodopago" class="form-control metodo-pago__select">
+                                    <option value="">--Seleccione método de pago--</option>
+                                    {loop="$fsc->metodo_pago->all()"}
+                                          <option value="{$value->id}">{$value->nombre}</option>
+                                    {/loop}
+                                 </select>
             </td>
             
             <td colspan="3" class="text-right">

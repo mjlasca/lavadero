@@ -43,8 +43,19 @@
         <nulo>NO</nulo>
         <defecto>1</defecto>
     </columna>
+    <columna>
+        <nombre>idmetodopago</nombre>
+        <tipo>integer</tipo>
+        <nulo>YES</nulo>
+    </columna>
     <restriccion>
         <nombre>company_pkey</nombre>
         <consulta>PRIMARY KEY (id)</consulta>
+    </restriccion>
+    <restriccion>
+        <nombre>ca_company_idmetodopago</nombre>
+        <consulta>FOREIGN KEY (idmetodopago)
+            REFERENCES metodospago (id)
+            ON DELETE CASCADE ON UPDATE CASCADE</consulta>
     </restriccion>
 </tabla>

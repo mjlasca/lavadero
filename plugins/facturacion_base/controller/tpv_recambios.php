@@ -21,6 +21,7 @@ use FacturaScripts\model\factura_cliente;
 use FacturaScripts\model\metodo_pago;
 
 require_once 'plugins/facturacion_base/extras/fbase_controller.php';
+require_once 'extras/xlsxwriter.class.php';
 
 class tpv_recambios extends fbase_controller
 {
@@ -54,6 +55,7 @@ class tpv_recambios extends fbase_controller
 
 
     public $factura_editar;
+    public $company;
 
     public function __construct()
     {
@@ -67,6 +69,7 @@ class tpv_recambios extends fbase_controller
         //$this->cambiar_();
         $this->jefeopro = "Proveedor de servicio";
         $this->share_extensions();
+        $this->company = new company();
 
         $this->articulo = new articulo();
         $this->cliente = new cliente();
@@ -229,20 +232,11 @@ class tpv_recambios extends fbase_controller
             if (isset($_REQUEST["familia_mostrar"])) {
                 $this->mostrar_cinta_articulos($_REQUEST["familia_mostrar"]);
             }
-
-
-
-
-
-
-
-
         }
 
-
-
-
-
+        if (isset($_GET['download_file'])) {
+            $this->file_fact_xls([1, 2]);
+        }
     }
 
 
@@ -657,7 +651,7 @@ class tpv_recambios extends fbase_controller
             $factura->codpais = $this->empresa->codpais;
             $factura->codpostal = $this->empresa->codpostal;
             $factura->provincia = $this->empresa->provincia;
-
+            $factura->idempresa = $_POST['idempresa'] ?? NULL;
 
             foreach ($this->cliente_s->get_direcciones() as $d) {
                 if ($d->domfacturacion) {
@@ -703,6 +697,7 @@ class tpv_recambios extends fbase_controller
                     $method_->total = $_POST['metodo_pago_value'][$i];
                     $method_->save();
                 }
+
                 //$cons_usuario = $this->db->select("SELECT reg FROM personas_lav WHERE usario_asociado='".$this->user->nick."' AND codigo_estado = 1 ");
                 $cons_usuario = $this->bandera_lav;
                 $provAgregar = "0";
@@ -822,6 +817,7 @@ class tpv_recambios extends fbase_controller
 
                         $this->new_message("<a href='" . $factura->url() . "'>Factura</a> guardada correctamente.");
                         $this->get_values_person($factura->idfactura);
+
                         if ($_POST['regalo'] == 'TRUE') {
                             $this->imprimir_ticket_regalo($factura);
                         } else {
@@ -857,6 +853,163 @@ class tpv_recambios extends fbase_controller
                 $this->new_error_msg("¡Imposible guardar la factura!");
             }
         }
+    }
+
+    protected function file_fact_xls($results)
+    {
+        $this->template = FALSE;
+        header("Content-Disposition: attachment; filename=\"Fatura001-wordlOffice_" . time() . ".xls\"");
+        header("Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+        header('Content-Transfer-Encoding: binary');
+        header('Cache-Control: must-revalidate');
+        header('Pragma: public');
+
+        $header = array(
+            'Encab: Empresa' => 'string',
+            'Encab: Tipo Documento' => 'string',
+            'Encab: Prefijo' => 'string',
+            'Encab: Documento Número' => 'string',
+            'Encab: Fecha' => 'string',
+            'Encab: Tercero Interno' => 'string',
+            'Encab: Tercero Externo' => 'string',
+            'Encab: Nota' => 'string',
+            'Encab: FormaPago' => 'string',
+            'Encab: Fecha Entrega' => 'string',
+            'Encab: Prefijo Documento Externo' => 'string',
+            'Encab: Número_Documento_Externo' => 'string',
+            'Encab: Verificado' => 'string',
+            'Encab: Anulado' => 'string',
+            'Encab: Personalizado 1' => 'string',
+            'Encab: Personalizado 2' => 'string',
+            'Encab: Personalizado 3' => 'string',
+            'Encab: Personalizado 4' => 'string',
+            'Encab: Personalizado 5' => 'string',
+            'Encab: Personalizado 6' => 'string',
+            'Encab: Personalizado 7' => 'string',
+            'Encab: Personalizado 8' => 'string',
+            'Encab: Personalizado 9' => 'string',
+            'Encab: Personalizado 10' => 'string',
+            'Encab: Personalizado 11' => 'string',
+            'Encab: Personalizado 12' => 'string',
+            'Encab: Personalizado 13' => 'string',
+            'Encab: Personalizado 14' => 'string',
+            'Encab: Personalizado 15' => 'string',
+            'Encab: Sucursal' => 'string',
+            'Encab: Clasificación' => 'string',
+            'Detalle: Producto' => 'string',
+            'Detalle: Bodega' => 'string',
+            'Detalle: UnidadDeMedida' => 'string',
+            'Detalle: Cantidad' => 'string',
+            'Detalle: IVA' => 'string',
+            'Detalle: Valor Unitario' => 'string',
+            'Detalle: Descuento' => 'string',
+            'Detalle: Vencimiento' => 'string',
+            'Detalle: Nota' => 'string',
+            'Detalle: Centro costos' => 'string',
+            'Detalle: Personalizado1' => 'string',
+            'Detalle: Personalizado2' => 'string',
+            'Detalle: Personalizado3' => 'string',
+            'Detalle: Personalizado4' => 'string',
+            'Detalle: Personalizado5' => 'string',
+            'Detalle: Personalizado6' => 'string',
+            'Detalle: Personalizado7' => 'string',
+            'Detalle: Personalizado8' => 'string',
+            'Detalle: Personalizado9' => 'string',
+            'Detalle: Personalizado10' => 'string',
+            'Detalle: Personalizado11' => 'string',
+            'Detalle: Personalizado12' => 'string',
+            'Detalle: Personalizado13' => 'string',
+            'Detalle: Personalizado14' => 'string',
+            'Detalle: Personalizado15' => 'string',
+            'Detalle: Código Centro Costos' => 'string',
+            /*
+                        'FECHA' => 'string',
+                        'MODULO' => 'string',
+                        'CODIGO' => 'string',
+                        'CLIENTE/PROVEEDOR/LAVADOR' => 'string',
+                        'METODO PAGO' => 'string',
+                        'CAJERO/USER' => 'string',
+                        'ID ARQUEO' => 'string',
+                        'PRODUCTO/GASTO' => 'string',
+                        'DESCRIPCION' => 'string',
+                        'OBSERVACIONES' => 'string',
+                        'UND VEND' => '#,##0.00;[RED]-#,##0.00',
+                        'TOTAL INGRESO' => '#,##0.00;[RED]-#,##0.00',
+                        'IVA INGRESO' => '#,##0.00;[RED]-#,##0.00',
+                        'UND COMP' => '#,##0.00;[RED]-#,##0.00',
+                        'TOTAL EGRESO' => '#,##0.00;[RED]-#,##0.00',
+                        'IVA EGRESO' => '#,##0.00;[RED]-#,##0.00',*/
+        );
+
+        $writter = new XLSXWriter();
+        $writter->setAuthor('FacturaScripts');
+        $writter->writeSheetHeader("Fatura001-wordlOffice", $header);
+
+        foreach ($results as $doc) {
+            $linea = array(
+                'Encab: Empresa' => 'string',
+                'Encab: Tipo Documento' => 'string',
+                'Encab: Prefijo' => 'string',
+                'Encab: Documento Número' => 'string',
+                'Encab: Fecha' => 'string',
+                'Encab: Tercero Interno' => 'string',
+                'Encab: Tercero Externo' => 'string',
+                'Encab: Nota' => 'string',
+                'Encab: FormaPago' => 'string',
+                'Encab: Fecha Entrega' => 'string',
+                'Encab: Prefijo Documento Externo' => 'string',
+                'Encab: Número_Documento_Externo' => 'string',
+                'Encab: Verificado' => 'string',
+                'Encab: Anulado' => 'string',
+                'Encab: Personalizado 1' => 'string',
+                'Encab: Personalizado 2' => 'string',
+                'Encab: Personalizado 3' => 'string',
+                'Encab: Personalizado 4' => 'string',
+                'Encab: Personalizado 5' => 'string',
+                'Encab: Personalizado 6' => 'string',
+                'Encab: Personalizado 7' => 'string',
+                'Encab: Personalizado 8' => 'string',
+                'Encab: Personalizado 9' => 'string',
+                'Encab: Personalizado 10' => 'string',
+                'Encab: Personalizado 11' => 'string',
+                'Encab: Personalizado 12' => 'string',
+                'Encab: Personalizado 13' => 'string',
+                'Encab: Personalizado 14' => 'string',
+                'Encab: Personalizado 15' => 'string',
+                'Encab: Sucursal' => 'string',
+                'Encab: Clasificación' => 'string',
+                'Detalle: Producto' => 'string',
+                'Detalle: Bodega' => 'string',
+                'Detalle: UnidadDeMedida' => 'string',
+                'Detalle: Cantidad' => 'string',
+                'Detalle: IVA' => 'string',
+                'Detalle: Valor Unitario' => 'string',
+                'Detalle: Descuento' => 'string',
+                'Detalle: Vencimiento' => 'string',
+                'Detalle: Nota' => 'string',
+                'Detalle: Centro costos' => 'string',
+                'Detalle: Personalizado1' => 'string',
+                'Detalle: Personalizado2' => 'string',
+                'Detalle: Personalizado3' => 'string',
+                'Detalle: Personalizado4' => 'string',
+                'Detalle: Personalizado5' => 'string',
+                'Detalle: Personalizado6' => 'string',
+                'Detalle: Personalizado7' => 'string',
+                'Detalle: Personalizado8' => 'string',
+                'Detalle: Personalizado9' => 'string',
+                'Detalle: Personalizado10' => 'string',
+                'Detalle: Personalizado11' => 'string',
+                'Detalle: Personalizado12' => 'string',
+                'Detalle: Personalizado13' => 'string',
+                'Detalle: Personalizado14' => 'string',
+                'Detalle: Personalizado15' => 'string',
+                'Detalle: Código Centro Costos' => 'string',
+            );
+
+            $writter->writeSheetRow("Fatura001-wordlOffice", $linea);
+        }
+
+        $writter->writeToStdOut();
     }
 
     public function get_values_person($idfactura)

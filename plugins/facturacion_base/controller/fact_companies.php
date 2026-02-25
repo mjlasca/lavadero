@@ -26,6 +26,7 @@ class fact_companies extends fbase_controller
 {
 
     public $companies;
+    public $metodo_pago;
 
     public function __construct()
     {
@@ -36,9 +37,18 @@ class fact_companies extends fbase_controller
     {
         parent::private_core();
         $this->companies = new company();
+        $this->metodo_pago = new metodo_pago();
 
         if (isset($_POST['cif'])) {
             $this->save();
+        }
+
+        if (isset($_GET['disabled'])) {
+            $this->disable($_GET['disabled'], 0);
+        }
+
+        if (isset($_GET['enabled'])) {
+            $this->disable($_GET['enabled'], 1);
         }
     }
 
@@ -57,10 +67,18 @@ class fact_companies extends fbase_controller
         $company->nombre = $_POST['nombre'];
         $company->useredit = $this->user->nick;
         $company->ultmod = date('Y-m-d H:i:s');
+        if (isset($_POST['idmetodopago'])) {
+            $company->idmetodopago = $_POST['idmetodopago'];
+        }
         $company->save();
-
-
-
     }
 
+    public function disable($id, $state)
+    {
+        $company = new company();
+        $company = $company->get($id);
+        $company->id = $id;
+        $company->disabled = $state;
+        $company->save();
+    }
 }

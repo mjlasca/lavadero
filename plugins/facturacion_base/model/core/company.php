@@ -37,6 +37,7 @@ class company extends \fs_model
     public $ultmod;
     public $useredit;
     public $codestado;
+    public $idmetodopago;
 
     public function __construct($data = FALSE)
     {
@@ -49,6 +50,7 @@ class company extends \fs_model
             $this->ultmod = $data['ultmod'];
             $this->useredit = $data['useredit'];
             $this->codestado = $data['codestado'];
+            $this->idmetodopago = $data['idmetodopago'];
         } else {
             $this->id = NULL;
             $this->nombre = NULL;
@@ -57,6 +59,7 @@ class company extends \fs_model
             $this->ultmod = NULL;
             $this->useredit = NULL;
             $this->codestado = 1;
+            $this->idmetodopago = NULL;
         }
     }
 
@@ -72,7 +75,7 @@ class company extends \fs_model
      */
     public function url()
     {
-        return 'index.php?page=company';
+        return 'index.php?page=fact_companies';
     }
 
     /**
@@ -130,15 +133,17 @@ class company extends \fs_model
                 ", ultmod = " . $this->var2str($this->ultmod) .
                 ", useredit = " . $this->var2str($this->useredit) .
                 ", codestado = " . $this->var2str($this->codestado) .
+                ", idmetodopago = " . $this->var2str($this->idmetodopago) .
                 "  WHERE id = " . $this->var2str($this->id) . ";";
         } else {
-            $sql = "INSERT INTO " . $this->table_name . " (nombre,cif,prefijo,ultmod,useredit,codestado) VALUES 
+            $sql = "INSERT INTO " . $this->table_name . " (nombre,cif,prefijo,ultmod,useredit,codestado,idmetodopago) VALUES 
                   (" . $this->var2str($this->nombre) .
                 "," . $this->var2str($this->cif) .
                 "," . $this->var2str($this->prefijo) .
                 "," . $this->var2str($this->ultmod) .
                 "," . $this->var2str($this->useredit) .
-                "," . $this->var2str($this->codestado) . ");";
+                "," . $this->var2str($this->codestado) .
+                "," . $this->var2str($this->idmetodopago) . ");";
         }
         return $this->db->exec($sql);
     }
