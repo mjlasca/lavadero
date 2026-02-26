@@ -70,6 +70,11 @@ class fact_companies extends fbase_controller
         if (isset($_POST['idmetodopago'])) {
             $company->idmetodopago = $_POST['idmetodopago'];
         }
+        if (isset($_POST['noiva'])) {
+            $company->noiva = 1;
+        } else {
+            $company->noiva = 0;
+        }
         $company->save();
     }
 

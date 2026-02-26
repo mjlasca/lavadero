@@ -23,7 +23,7 @@ namespace FacturaScripts\model;
  *
  * @author Carlos García Gómez <neorazorx@gmail.com>
  */
-class company extends \fs_model
+class company_consecutive extends \fs_model
 {
 
     /**
@@ -31,38 +31,23 @@ class company extends \fs_model
      * @var int
      */
     public $id;
-    public $nombre;
-    public $cif;
-    public $prefijo;
-    public $ultmod;
-    public $useredit;
-    public $codestado;
-    public $idmetodopago;
-    public $noiva;
+    public $idfactura;
+    public $idcompany;
+    public $consecutive;
 
     public function __construct($data = FALSE)
     {
-        parent::__construct('company');
+        parent::__construct('company_consecutive');
         if ($data) {
             $this->id = $data['id'];
-            $this->nombre = $data['nombre'];
-            $this->cif = $data['cif'];
-            $this->prefijo = $data['prefijo'];
-            $this->ultmod = $data['ultmod'];
-            $this->useredit = $data['useredit'];
-            $this->codestado = $data['codestado'];
-            $this->idmetodopago = $data['idmetodopago'];
-            $this->noiva = $data['noiva'];
+            $this->idfactura = $data['idfactura'];
+            $this->idcompany = $data['idcompany'];
+            $this->consecutive = $data['consecutive'];
         } else {
             $this->id = NULL;
-            $this->nombre = NULL;
-            $this->cif = NULL;
-            $this->prefijo = NULL;
-            $this->ultmod = NULL;
-            $this->useredit = NULL;
-            $this->codestado = 1;
-            $this->idmetodopago = NULL;
-            $this->noiva = FALSE;
+            $this->idfactura = NULL;
+            $this->idcompany = NULL;
+            $this->consecutive = NULL;
         }
     }
 
@@ -78,19 +63,19 @@ class company extends \fs_model
      */
     public function url()
     {
-        return 'index.php?page=fact_companies';
+        return 'index.php?page=company_consecutive';
     }
 
     /**
      * Devuelve la forma de pago 
      * @param int $id
-     * @return \FacturaScripts\model\company|boolean
+     * @return \FacturaScripts\model\company_consecutive|boolean
      */
     public function get($id)
     {
         $pago = $this->db->select("SELECT * FROM " . $this->table_name . " WHERE id = " . $this->var2str($id) . ";");
         if ($pago) {
-            return new \company($pago[0]);
+            return new \company_consecutive($pago[0]);
         }
         return FALSE;
     }
@@ -98,15 +83,43 @@ class company extends \fs_model
     /**
      * Devuelve la forma de pago 
      * @param int $id
-     * @return \FacturaScripts\model\company|boolean
+     * @return \FacturaScripts\model\company_consecutive|boolean
      */
-    public function getCifPref()
+    public function get_by_idfactura($idfactura)
     {
-        $pago = $this->db->select("SELECT * FROM " . $this->table_name . " WHERE cif = " . $this->var2str($this->cif) . " || prefijo = " . $this->var2str($this->prefijo) . ";");
+        $pago = $this->db->select("SELECT * FROM " . $this->table_name . " WHERE idfactura = " . $this->var2str($idfactura) . ";");
         if ($pago) {
-            return new \company($pago[0]);
+            return new \company_consecutive($pago[0]);
         }
         return FALSE;
+    }
+
+    /**
+     * Devuelve la forma de pago 
+     * @param int $id
+     * @return \FacturaScripts\model\company_consecutive|boolean
+     */
+    public function get_by_idcompany($idcompany)
+    {
+        $pago = $this->db->select("SELECT * FROM " . $this->table_name . " WHERE idcompany = " . $this->var2str($idcompany) . ";");
+        if ($pago) {
+            return new \company_consecutive($pago[0]);
+        }
+        return FALSE;
+    }
+
+    /**
+     * Devuelve la forma de pago 
+     * @param int $id
+     * @return \FacturaScripts\model\company_consecutive|boolean
+     */
+    public function get_by_idcompany_last($idcompany)
+    {
+        $pago = $this->db->select("SELECT consecutive FROM " . $this->table_name . " WHERE idcompany = " . $this->var2str($idcompany) . " ORDER BY consecutive DESC LIMIT 1;");
+        if ($pago) {
+            return $pago[0]['consecutive'];
+        }
+        return 0;
     }
 
     /**
@@ -130,25 +143,15 @@ class company extends \fs_model
     {
         $this->clean_cache();
         if ($this->exists()) {
-            $sql = "UPDATE " . $this->table_name . " SET nombre = " . $this->var2str($this->nombre) .
-                ", cif = " . $this->var2str($this->cif) .
-                ", prefijo = " . $this->var2str($this->prefijo) .
-                ", ultmod = " . $this->var2str($this->ultmod) .
-                ", useredit = " . $this->var2str($this->useredit) .
-                ", codestado = " . $this->var2str($this->codestado) .
-                ", idmetodopago = " . $this->var2str($this->idmetodopago) .
-                ", noiva = " . $this->var2str($this->noiva) .
+            $sql = "UPDATE " . $this->table_name . " SET idfactura = " . $this->var2str($this->idfactura) .
+                ", idcompany = " . $this->var2str($this->idcompany) .
+                ", consecutive = " . $this->var2str($this->consecutive) .
                 "  WHERE id = " . $this->var2str($this->id) . ";";
         } else {
-            $sql = "INSERT INTO " . $this->table_name . " (nombre,cif,prefijo,ultmod,useredit,codestado,idmetodopago,noiva) VALUES 
-                  (" . $this->var2str($this->nombre) .
-                "," . $this->var2str($this->cif) .
-                "," . $this->var2str($this->prefijo) .
-                "," . $this->var2str($this->ultmod) .
-                "," . $this->var2str($this->useredit) .
-                "," . $this->var2str($this->codestado) .
-                "," . $this->var2str($this->idmetodopago) .
-                "," . $this->var2str($this->noiva) . ");";
+            $sql = "INSERT INTO " . $this->table_name . " (idfactura,idcompany,consecutive) VALUES 
+                  (" . $this->var2str($this->idfactura) .
+                "," . $this->var2str($this->idcompany) .
+                "," . $this->var2str($this->consecutive) . ");";
         }
         return $this->db->exec($sql);
     }
@@ -184,7 +187,7 @@ class company extends \fs_model
             $formas = $this->db->select("SELECT * FROM " . $this->table_name . ";");
             if ($formas) {
                 foreach ($formas as $f) {
-                    $listaformas[] = new \company($f);
+                    $listaformas[] = new \company_consecutive($f);
                 }
             }
 
