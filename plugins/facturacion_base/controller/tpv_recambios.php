@@ -1229,6 +1229,15 @@ class tpv_recambios extends fbase_controller
 
     }
 
+    public function decimal_number($number)
+    {
+        if (is_null($number)) {
+            return "0.00";
+        }
+
+        return round($number, 2);
+    }
+
 
 
     /*

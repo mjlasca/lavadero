@@ -61,7 +61,7 @@ class fact_companies extends fbase_controller
         $company->cif = $_POST['cif'];
         $company->prefijo = $_POST['prefijo'];
         if (empty($company->id) && $company->getCifPref() != FALSE) {
-            $this->new_error_msg('El CIF y/o el prefijo ya existe');
+            $this->new_error_msg('El id y/o el prefijo ya existe');
             return FALSE;
         }
         $company->nombre = $_POST['nombre'];
