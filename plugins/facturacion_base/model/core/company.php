@@ -163,7 +163,7 @@ class company extends \fs_model
      */
     private function clean_cache()
     {
-        $this->cache->delete('m_metodo_pago_all');
+        $this->cache->delete('m_company');
     }
 
     /**

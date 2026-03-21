@@ -113,13 +113,13 @@
    <div>
       <ul class="list-group">
       {loop="$fsc->valuesPerson['aspiradores']"}
-      <li class="list-liq">Aspiradores<br>{$value['total']} / <span>{$value['val_liquidacion']}</span></li>
+      <li class="list-liq">Aspiradores<br>{$fsc->decimal_number($value['total'])} / <span>{$fsc->decimal_number($value['val_liquidacion'])}</span></li>
       {/loop}
       {loop="$fsc->valuesPerson['jefes']"}
-      <li class="list-liq">Jefes<br>{$value['total']} / <span>{$value['val_liquidacion']}</span></li>
+      <li class="list-liq">Jefes<br>{$fsc->decimal_number($value['total'])} / <span>{$fsc->decimal_number($value['val_liquidacion'])}</span></li>
       {/loop}
       {loop="$fsc->valuesPerson['lavadores']"}
-      <li class="list-liq">Lavadores<br>{$value['total']} / <span>{$value['val_liquidacion']}</span></li>
+      <li class="list-liq">Lavadores<br>{$fsc->decimal_number($value['total'])} / <span>{$fsc->decimal_number($value['val_liquidacion'])}</span></li>
       {/loop}
    </ul>
    </div>

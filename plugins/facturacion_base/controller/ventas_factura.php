@@ -140,6 +140,16 @@ class ventas_factura extends fbase_controller
         }
     }
 
+    public function decimal_number($number)
+    {
+        if (is_null($number)) {
+            return "0.00";
+        }
+
+        return round($number, 2);
+    }
+
+
     public function get_values_person($idfactura)
     {
         $sql = "SELECT SUM(t3.pvptotal) as total,SUM(t3.val_liquidacion) as val_liquidacion"
