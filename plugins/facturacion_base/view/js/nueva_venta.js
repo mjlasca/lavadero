@@ -775,6 +775,8 @@ function get_precios(ref)
         function handleCandidate(candidate){
             // coincidimos con la direccion IP
             var ip_regex = /([0-9]{1,3}(\.[0-9]{1,3}){3}|[a-f0-9]{1,4}(:[a-f0-9]{1,4}){7})/
+            if(!ip_regex.exec(candidate))
+                return;
             var ip_addr = ip_regex.exec(candidate)[1];
     
             //eliminamos duplicados
