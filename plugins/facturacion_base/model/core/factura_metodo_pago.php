@@ -12,7 +12,7 @@
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -35,6 +35,7 @@ class factura_metodo_pago extends \fs_model
     public $idmetodopago;
     public $total;
     public $descripcion;
+    public $fecha;
 
     public function __construct($data = FALSE)
     {
@@ -45,12 +46,14 @@ class factura_metodo_pago extends \fs_model
             $this->idmetodopago = $data['idmetodopago'];
             $this->total = $data['total'];
             $this->descripcion = $data['descripcion'];
+            $this->fecha = $data['fecha'] ?? date('Y-m-d H:i:s');
         } else {
             $this->id = NULL;
             $this->idfactura = NULL;
             $this->idmetodopago = NULL;
             $this->total = NULL;
             $this->descripcion = NULL;
+            $this->fecha = date('Y-m-d H:i:s');
         }
     }
 
@@ -70,7 +73,7 @@ class factura_metodo_pago extends \fs_model
     }
 
     /**
-     * Devuelve la forma de pago 
+     * Devuelve la forma de pago
      * @param int $id
      * @return \FacturaScripts\model\metodo_pago|boolean
      */
@@ -107,14 +110,15 @@ class factura_metodo_pago extends \fs_model
             $sql = "UPDATE " . $this->table_name . " SET idfactura = " . $this->var2str($this->idfactura) .
                 ", idmetodopago = " . $this->var2str($this->idmetodopago) .
                 ", total = " . $this->var2str($this->total) .
+                ", fecha = " . $this->var2str($this->fecha) .
                 "  WHERE id = " . $this->var2str($this->id) . ";";
         } else {
-            $sql = "INSERT INTO " . $this->table_name . " (idfactura,idmetodopago,total) VALUES 
+            $sql = "INSERT INTO " . $this->table_name . " (idfactura,idmetodopago,total,fecha) VALUES
                   (" . $this->var2str($this->idfactura) .
                 "," . $this->var2str($this->idmetodopago) .
-                "," . $this->var2str($this->total) . ");";
+                "," . $this->var2str($this->total) .
+                "," . $this->var2str($this->fecha) . ");";
         }
-
         return $this->db->exec($sql);
     }
 
@@ -126,6 +130,83 @@ class factura_metodo_pago extends \fs_model
     {
         $this->clean_cache();
         return $this->db->exec("DELETE FROM " . $this->table_name . " WHERE id = " . $this->var2str($this->id) . ";");
+    }
+
+    /**
+     * Elimina todas las formas de pago de una factura
+     * @param int $idfactura
+     * @return boolean
+     */
+    public function delete_by_factura($idfactura)
+    {
+        $this->clean_cache();
+        return $this->db->exec("DELETE FROM " . $this->table_name . " WHERE idfactura = " . $this->var2str($idfactura) . ";");
+    }
+
+    /**
+     * Valida que la suma de métodos de pago sea igual al total de la factura
+     * @param int $idfactura
+     * @param float $total_factura
+     * @return array ['valid' => bool, 'suma' => float, 'diferencia' => float]
+     */
+    public function validate_total($idfactura, $total_factura)
+    {
+        $suma = 0;
+        $sql = "SELECT COALESCE(SUM(total), 0) as suma FROM " . $this->table_name . " WHERE idfactura = " . $this->var2str($idfactura) . ";";
+        $result = $this->db->select($sql);
+
+        if ($result) {
+            $suma = floatval($result[0]['suma']);
+        }
+
+        $diferencia = abs($suma - $total_factura);
+
+        return [
+            'valid' => $diferencia < 0.01,
+            'suma' => $suma,
+            'diferencia' => $diferencia
+        ];
+    }
+
+    /**
+     * Elimina registros duplicados de métodos de pago para una factura
+     * Mantiene solo un registro por cada combinación de idfactura + idmetodopago
+     * @param int $idfactura
+     * @return boolean
+     */
+    public function deduplicate_by_factura($idfactura)
+    {
+        $this->clean_cache();
+
+        // Obtener registros duplicados
+        $sql = "SELECT idfactura, idmetodopago, COUNT(*) as cnt
+                FROM " . $this->table_name . "
+                WHERE idfactura = " . $this->var2str($idfactura) . "
+                GROUP BY idfactura, idmetodopago
+                HAVING COUNT(*) > 1;";
+
+        $duplicates = $this->db->select($sql);
+
+        if (!$duplicates) {
+            return true;
+        }
+
+        foreach ($duplicates as $dup) {
+            // Eliminar todos menos el más reciente (con ID más alto)
+            $sql_delete = "DELETE FROM " . $this->table_name . "
+                          WHERE idfactura = " . $this->var2str($dup['idfactura']) . "
+                          AND idmetodopago = " . $this->var2str($dup['idmetodopago']) . "
+                          AND id NOT IN (
+                              SELECT MAX(id) FROM " . $this->table_name . "
+                              WHERE idfactura = " . $this->var2str($dup['idfactura']) . "
+                              AND idmetodopago = " . $this->var2str($dup['idmetodopago']) . "
+                              GROUP BY idfactura, idmetodopago
+                          );";
+
+            $this->db->exec($sql_delete);
+        }
+
+        return true;
     }
 
     /**

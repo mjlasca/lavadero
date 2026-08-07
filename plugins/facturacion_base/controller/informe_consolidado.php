@@ -12,7 +12,7 @@
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -96,7 +96,7 @@ class informe_consolidado extends fbase_controller
 
     /**
      * Función para agregar los registros y mostrarlos en la tabla
-     * @return Array 
+     * @return Array
      */
     public function getResultados()
     {
@@ -163,20 +163,14 @@ class informe_consolidado extends fbase_controller
         $sqlComision = "SELECT fecha_final as date,'COMISIÓN' as module, t1.reg as code, t1.nombre_empleado as detail, (SELECT t0.nombre FROM metodospago t0 WHERE t0.id = t1.idmetodopago limit 1) as method,  t1.user_responsable as user, 'N/A' as cash, 'N/A' as product, 'PAGO COMISIÓN' as description, 'N/A' as observation, 0 as unitsel, 0 as totalup, 0 as ivaup, 'undc' as unitshop, t1.total as totale,  0 as ivae FROM comision_empleados t1  WHERE total > 0 ";
         $sqlFactcompra = "SELECT CONCAT(t1.fecha,' ',t1.hora) as date,'COMPRA' as module, t1.codigo as code, (SELECT t0.razonsocial FROM proveedores t0 WHERE t0.codproveedor = t1.codproveedor limit 1) as detail, (SELECT t0.nombre FROM metodospago t0 WHERE t0.id = t1.idmetodopago limit 1) as method,  (SELECT t0.nick FROM fs_users t0 WHERE t0.codagente = t1.codagente  limit 1) as user, 'N/A' as cash, t2.referencia as product, t2.descripcion as description, t1.observaciones as observation, 0 as unitsel, 0 as totalup, 0 as ivaup, t2.cantidad as unitshop, t2.pvptotal as totale,  t2.iva as ivae  FROM lineasfacturasprov t2 INNER JOIN facturasprov t1 ON t1.idfactura = t2.idfactura  WHERE pagada=1 AND anulada = 0 AND  total > 0 ";
         $sqlGastos = "SELECT CONCAT(t1.fecha,' ',t1.hora) as date,'GASTO' as module, t1.codigo as code, (SELECT t0.razonsocial FROM proveedores t0 WHERE t0.codproveedor = t1.codproveedor limit 1) as detail, (SELECT t0.nombre FROM metodospago t0 WHERE t0.id = t1.idmetodopago limit 1) as method,  (SELECT t0.nick FROM fs_users t0 WHERE t0.codagente = t1.codagente  limit 1) as user, t1.idarqueo as cash, t2.referencia as product, t2.descripcion as description, t1.observaciones as observation, 'undve' as unitsel, 0 as totalup, 0 as ivaup, t2.cantidad as unitshop, t2.pvptotal as totale,  t2.iva as ivae FROM lineasgastos t2 INNER JOIN registro_gastos t1 ON t1.idfactura = t2.idfactura  WHERE  anulada = 0 AND  total > 0 ";
-        $sqlFactcli = "SELECT CONCAT(t1.fecha,' ',t1.hora) as date,'VENTA' as module, t1.codigo as code, t1.nombrecliente as detail, (
-        SELECT GROUP_CONCAT(mp.nombre SEPARATOR ' + ')
-        FROM factura_metodo_pago fmp
-        INNER JOIN metodospago mp 
-            ON mp.id = fmp.idmetodopago
-        WHERE fmp.idfactura = t1.idfactura
-    ) AS method,  (SELECT t0.nick FROM fs_users t0 WHERE t0.codagente = t1.codagente  limit 1) as user, t1.id_arqueo as cash, t2.referencia as product, CONCAT(t2.descripcion,' - ',t2.proveedor_lav) as description, t1.observaciones as observation, t2.cantidad as unitsel, t2.pvptotal as totalup, t2.iva as ivaup, 0 as unitshop, 0 as totale,  0 as ivae FROM lineasfacturascli t2 INNER JOIN facturascli t1 ON t1.idfactura = t2.idfactura  WHERE  t1.pagada=1 AND t1.anulada = 0 AND t1.total > 0 ";
+        $sqlFactcli = "SELECT CONCAT(t1.fecha,' ',t1.hora) AS date, 'VENTA' AS module, t1.codigo AS code, t1.nombrecliente AS detail, mp.nombre AS method, (SELECT t0.nick FROM fs_users t0 WHERE t0.codagente = t1.codagente LIMIT 1) AS user, t1.id_arqueo AS cash, t2.referencia AS product, CONCAT(t2.descripcion,' - ',t2.proveedor_lav) AS description, t1.observaciones AS observation, t2.cantidad AS unitsel, ROUND(t2.pvptotal * (fmp.total / t1.total), 2) AS totalup, ROUND(t2.iva * (fmp.total / t1.total), 2) AS ivaup, 0 AS unitshop, 0 AS totale, 0 AS ivae FROM lineasfacturascli t2 INNER JOIN facturascli t1 ON t1.idfactura = t2.idfactura INNER JOIN (SELECT idfactura, idmetodopago, total FROM factura_metodo_pago GROUP BY idfactura, idmetodopago) fmp ON fmp.idfactura = t1.idfactura INNER JOIN metodospago mp ON mp.id = fmp.idmetodopago WHERE t1.pagada = 1 AND t1.anulada = 0 AND t1.total > 0 ";
 
         if (isset($_REQUEST['metodo_pago']) && $_REQUEST['metodo_pago'] != '') {
             $this->idmetodopago = $_REQUEST['metodo_pago'];
             $sqlComision .= " AND idmetodopago = '" . $_REQUEST['metodo_pago'] . "' ";
             $sqlFactcompra .= " AND idmetodopago = '" . $_REQUEST['metodo_pago'] . "' ";
             $sqlGastos .= " AND idmetodopago = '" . $_REQUEST['metodo_pago'] . "' ";
-            $sqlFactcli .= " AND idmetodopago = '" . $_REQUEST['metodo_pago'] . "' ";
+            $sqlFactcli .= " AND fmp.idmetodopago = '" . $_REQUEST['metodo_pago'] . "' ";
         }
         if (isset($_REQUEST['desde']))
             $this->desde = $_REQUEST['desde'];
@@ -184,7 +178,7 @@ class informe_consolidado extends fbase_controller
         $sqlComision .= " AND fecha_final >= '" . $this->desde . "' ";
         $sqlFactcompra .= " AND fecha >= '" . $this->desde . "'";
         $sqlGastos .= " AND fecha >= '" . $this->desde . "'";
-        $sqlFactcli .= " AND fecha >= '" . $this->desde . "'";
+        $sqlFactcli .= " AND t1.fecha >= '" . $this->desde . "'";
 
         if (isset($_REQUEST['hasta']))
             $this->hasta = $_REQUEST['hasta'];
@@ -192,7 +186,7 @@ class informe_consolidado extends fbase_controller
         $sqlComision .= " AND fecha_final <= '" . $this->hasta . "' ";
         $sqlFactcompra .= " AND fecha <= '" . $this->hasta . "'";
         $sqlGastos .= " AND fecha <= '" . $this->hasta . "'";
-        $sqlFactcli .= " AND fecha <= '" . $this->hasta . "'";
+        $sqlFactcli .= " AND t1.fecha <= '" . $this->hasta . "'";
 
         //$factcompra_total = $this->db->select($sqlFactcompra);
         $factcompra = $this->db->select($sqlFactcompra);

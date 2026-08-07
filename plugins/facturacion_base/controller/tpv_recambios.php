@@ -12,7 +12,7 @@
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -50,6 +50,7 @@ class tpv_recambios extends fbase_controller
     public $valuesPerson;
 
     public $current_invoice;
+    public $current_methods;
 
     public $aviso_ne;
 
@@ -83,11 +84,18 @@ class tpv_recambios extends fbase_controller
         $this->factura_editar = -1;
         $fact_ = new factura_cliente();
         $this->current_invoice = FALSE;
+        $this->current_methods = [];
         $this->valuesPerson = FALSE;
 
         if (isset($_REQUEST['factura_editar'])) {
             $this->factura_editar = $_REQUEST['factura_editar'];
             $this->current_invoice = $fact_->get($this->factura_editar);
+
+            // Cargar métodos de pago de la factura
+            if ($this->current_invoice) {
+                $method_model = new factura_metodo_pago();
+                $this->current_methods = $method_model->all($this->factura_editar);
+            }
         }
 
         if (isset($_REQUEST['editando_lineas'])) {
@@ -163,7 +171,7 @@ class tpv_recambios extends fbase_controller
                                     *** FRAGMENTO PARA ASIGNAR EL REGISTRO DE USUARIO JEFES DE PATIO Y PROV SERVICIOS**
                                  *  se hace para poder identificar en la tabla cajas las facturas que se hicieron en ese turno, tengan la fecha que tengan
                                  *  ya que al tener un identificador REG que se encuentra en cada una de las facturas elaboradas
-                                 *                                  
+                                 *
                                 $sql = "select reg FROM personas_lav WHERE usario_asociado = '".$this->user->nick."' AND codigo_estado=1 " ;
                                 $consulta_registro = $this->db->select($sql);*/
                                 //$sql = "UPDATE cajas SET totalRealCaja = '".$consulta_registro[0]["reg"]."' WHERE id = '".$this->caja->id."'";
@@ -617,7 +625,7 @@ class tpv_recambios extends fbase_controller
 
             //CONDICIÓN PARA NO CAMBIAR LA FECHA DE LA FACTURA
             /*if($this->user->admin)
-                $factura->fecha = $_POST['fecha'];    
+                $factura->fecha = $_POST['fecha'];
             else
                 $factura->set_fecha_hora($_POST['fecha'], $factura->hora);*/
 
@@ -689,14 +697,28 @@ class tpv_recambios extends fbase_controller
                     . " No se pueden añadir más facturas en esa fecha.");
 
             } else if ($factura->save()) {
-
-                $method_ = new factura_metodo_pago();
-                for ($i = 0; $i < count($_POST['metodo_pago']); $i++) {
-                    $method_->idfactura = $factura->idfactura;
-                    $method_->idmetodopago = $_POST['metodo_pago'][$i];
-                    $method_->total = $_POST['metodo_pago_value'][$i];
-                    $method_->save();
+                // Eliminar métodos de pago anteriores si se está editando
+                if ($this->factura_editar != -1) {
+                    $method_delete = new factura_metodo_pago();
+                    $method_delete->delete_by_factura($factura->idfactura);
                 }
+                // Guardar métodos de pago (crear nuevo objeto en cada iteración)
+                for ($i = 0; $i < count($_POST['metodo_pago']); $i++) {
+                    if (!empty($_POST['metodo_pago'][$i]) && $_POST['metodo_pago'][$i] !== '') {
+                        $method_ = new factura_metodo_pago();
+                        $method_->idfactura = $factura->idfactura;
+                        $method_->idmetodopago = $_POST['metodo_pago'][$i];
+                        $method_->total = floatval($_POST['metodo_pago_value'][$i]);
+                        $method_->fecha = date('Y-m-d H:i:s');
+                        $method_->save();
+                    }
+                }
+
+                // Eliminar duplicados si existen
+                $method_dedup = new factura_metodo_pago();
+                $method_dedup->deduplicate_by_factura($factura->idfactura);
+
+
 
                 $consecutive = new company_consecutive();
                 $consecutive->idfactura = $factura->idfactura;
@@ -1173,7 +1195,7 @@ class tpv_recambios extends fbase_controller
                     $consulta = $this->desgloce_lavador($this->user->codagente, $this->caja->id);
                     for ($i = 0; $i < count($consulta); $i++) {
                         //if($consulta[$i]["proveedor_servicio"] == "0")
-                        //$this->terminal->add_linea("ARTICULOS:  $" .sprintf("%" . ($this->terminal->anchopapel - 12) . "s", $this->formato_moneda($consulta[$i]["total"]) . "\n"));                            
+                        //$this->terminal->add_linea("ARTICULOS:  $" .sprintf("%" . ($this->terminal->anchopapel - 12) . "s", $this->formato_moneda($consulta[$i]["total"]) . "\n"));
                         if ($consulta[$i]["proveedor_servicio"] != "0") {
                             $proveedor_temp = substr($consulta[$i]["proveedor_servicio"], 0, 11);
 
@@ -1241,7 +1263,7 @@ class tpv_recambios extends fbase_controller
 
 
     /*
-     * Se consulta las facturas para saber cuánto ha generado por lavador o por 
+     * Se consulta las facturas para saber cuánto ha generado por lavador o por
      * artículos, es decir, cuando la factura no tiene ningún lavador asignado
      */
     private function desgloce_lavador($empleado, $id_arqueo)

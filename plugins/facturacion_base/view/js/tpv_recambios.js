@@ -1300,6 +1300,14 @@ function deleteMethod(event){
     metodoPagoSelected();
 }
 
+function removeMethod(btn){
+    const container = btn.closest('.method-0');
+    if(container){
+        container.remove();
+        metodoPagoSelected();
+    }
+}
+
 function botonfactura(){
     const modal_save = document.querySelector('#modal_guardar');
     if(modal_save){
