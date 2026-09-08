@@ -11,7 +11,7 @@
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -65,10 +65,10 @@ function getClient(placa)
     if (tpv_url !== '') {
         $.getJSON(tpv_url, 'placa=' + placa, function (json) {
             let flag = false;
-            
+
             if(json){
                 if( json.nombre2 == "" || json.email == "" || json.telefono1 == ""){
-                    flag = true;       
+                    flag = true;
                 }
                 document.querySelector('input[name="nombrecliente"]').value = placa
                 document.querySelector('input[name="cifnif"]').value = json.cifnif;
@@ -108,7 +108,7 @@ function setdataclient(){
         razonsocial: data_client.querySelector('input[name="razonsocial"]').value,
     };
 
-    
+
     let errors = "";
     if(data.cifnif == "")
         errors += "La identificación es obligatoria<br>";
@@ -121,9 +121,9 @@ function setdataclient(){
     if(data.email == "")
         errors += "El email es obligatorio<br>";
     if(data.tipo_cifnif == "NIT" && data.razonsocial == "")
-        errors += "La razón social es obligatorio cuando es NIT<br>";    
+        errors += "La razón social es obligatorio cuando es NIT<br>";
     if(data.cifnif == placa)
-        errors += "Identificación incorrecta<br>";    
+        errors += "Identificación incorrecta<br>";
     if(data.email != "" && validarEmail(data.email) == false) {
         errors += "El email está mal escrito<br>"
     }
@@ -136,7 +136,7 @@ function setdataclient(){
     else{
         err.innerHTML = errors;
     }
-    
+
 
 }
 
@@ -154,7 +154,7 @@ function cliente_db()
                 clientes_db = json;
                //alert(JSON.stringify(clientes_db));
             }
-            
+
         });
     }
 }
@@ -407,7 +407,7 @@ function traer_combos(ref_combo)
     if (tpv_url !== '') {
         $.getJSON(tpv_url, 'combo_seleccionado=' + ref_combo, function (json) {
                 if(json.length>0){
-                    
+
 			for(i=0; i < json.length ; i++)
 			{
 					//buscar_articulosManual(json[i].articulo);
@@ -416,14 +416,14 @@ function traer_combos(ref_combo)
 			}
                         bot_add_combo = true;
                         $("#addCombo").show();
-                        
+
                 }
 
         });
     }
-    
-    
-    
+
+
+
 }
 
 
@@ -431,12 +431,12 @@ function traer_combos(ref_combo)
 
 function verificar_combo_lineas()
 {
-    
+
     result = false;
     cont = 0;
-    
+
     if(bot_add_combo){
-      
+
         for(i=1; i<= numlineas; i++){
             if ($("#linea_" + i).length > 0) {
                 if($("#desc_"+i).val().indexOf("_COMBO") != -1){
@@ -450,18 +450,18 @@ function verificar_combo_lineas()
     }
     else
         result = true;
-    
-    
-    
+
+
+
     return result;
 }
-        
+
 function add_articulo(ref, desc, pvp, dto, codimpuesto, cantidad, servi_lav, prec_combo, necesita_art, codcombinacion)
 {
-    
+
     ventana_personas_tpv = true;
 	per_temp = "";
-	
+
     //Se revisa si el artículo adicionado es un servicio
         if(servi_lav == 1){
 
@@ -475,31 +475,31 @@ function add_articulo(ref, desc, pvp, dto, codimpuesto, cantidad, servi_lav, pre
                             cont_arreglo_lineas_servicios++;
 
         }
-    
-    //con ésta línea se garantiza que si, es mayot a cero abra el cuadro de diálogo y 
+
+    //con ésta línea se garantiza que si, es mayot a cero abra el cuadro de diálogo y
     //rellene el campo que le corresponde
     necesita_articulo = necesita_art;
-    
+
         if(necesita_art > 0){
             $("#modal_personas").show();
             $("#espacio_add").hide();
             $("#bot_personas").hide();
         }
-    
-    
-    
-        
-    
-    
+
+
+
+
+
+
     //********************************
-    
+
     if (typeof codcombinacion == 'undefined') {
         codcombinacion = '';
     }
 
     numlineas += 1;
     $("#numlineas").val(numlineas);
-    
+
     desc = Base64.decode(desc);
     var iva = 0;
     var recargo = 0;
@@ -514,15 +514,15 @@ function add_articulo(ref, desc, pvp, dto, codimpuesto, cantidad, servi_lav, pre
             }
         }
     }
-    
-	
-	
+
+
+
     if(combo_activo){
         pvp = prec_combo;
 		desc = desc +" __COMBO";
     }
-    
-    
+
+
 
     $("#lineas_doc").prepend("<tr id=\"linea_" + numlineas + "\">\n\
          <td><input type=\"hidden\" name=\"referencia_" + numlineas + "\" value=\"" + ref + "\"/>\n\
@@ -557,12 +557,12 @@ function add_articulo(ref, desc, pvp, dto, codimpuesto, cantidad, servi_lav, pre
 
    /* setTimeout(function() {
         traerPesoBalanza((numlineas));
-         
+
       }, 500);
 */
     $("#referenciaManual").val("");
     $("#referenciaManual").select();
-	
+
 }
 
 function nueva_persona(linea){
@@ -580,19 +580,19 @@ function traerPesoBalanza(ref)
         })
         .done(function(data){
                 if(data.exito != null){
-                    
+
                     if(data.estad == 0){
-                        $("#cantidad_" + ref).val(1);    
+                        $("#cantidad_" + ref).val(1);
                     }
                     else{
-                        
+
                         $("#cantidad_" + ref).val(data.exito);
                     }
                 }
                 else{
 
                     if(data.estad == 0){
-                        $("#cantidad_" + ref).val(1);    
+                        $("#cantidad_" + ref).val(1);
                     }
                     else{
                         alert("No se ha podido leer el peso del producto, presione la tecla (Bloq Mayús)");
@@ -600,7 +600,7 @@ function traerPesoBalanza(ref)
                     }
                 }
 
-           
+
         });
 
         setTimeout(function() {
@@ -608,18 +608,18 @@ function traerPesoBalanza(ref)
 			$("#balanza").removeClass("btn-warning").addClass("btn-apagado");
             recalcular();
         }, 500);
-        
+
 }
 
 
 function permitirPeso(dat)
 {
-	
+
     $.ajax({
             url     : 'pesoBalanza.php',
             type    : 'POST',
             dataType: 'json',
-            data    : "ipUsuario=" + ipUsuario +"&peticion=" + "estado" +"&estado=" + dat 
+            data    : "ipUsuario=" + ipUsuario +"&peticion=" + "estado" +"&estado=" + dat
         })
         .done(function(data){
             if(data.estado)
@@ -672,10 +672,10 @@ function buscar_articulos()
 
                 $.each(json, function (key, val) {
                     conti++;
-                
+
                     contadorColumnas++;
-                    var tdtr = "</td>";  
-                    var tr_aux = "<td class='mostrador'>";  
+                    var tdtr = "</td>";
+                    var tr_aux = "<td class='mostrador'>";
 
                     //ésta es la condición que devuelve el contador en 1
                     if(contadorColumnas == 3){
@@ -697,7 +697,7 @@ function buscar_articulos()
                         descripcion_visible += ' <span class="label label-default" title="Familia: ' + val.codfamilia + '">'
                                 + val.codfamilia + '</span>';
                     }
-                    
+
                     if (val.codfabricante) {
                         descripcion_visible += ' <span class="label label-default" title="Fabricante: ' + val.codfabricante + '">'
                                 + val.codfabricante + '</span>';
@@ -706,7 +706,7 @@ function buscar_articulos()
                         descripcion_visible += ' &nbsp; <i class="fa fa-code-fork" aria-hidden="true" title="Trazabilidad activada"></i>';
                     }
                     */
-                                        
+
                     if ((val.bloqueado || (val.stockalm < 1 && !val.controlstock) )) {
                         tr_aux = "<td class=\"danger mostrador\">";
                     } else if (val.stockfis < val.stockmin) {
@@ -714,8 +714,8 @@ function buscar_articulos()
                     } else if (val.stockalm > 0) {
                         tr_aux = "<td class=\"success mostrador\">";
                     }
-					
-                    
+
+
 
                     if (val.sevende) {
                         var funcion = "add_articulo('" + val.referencia + "','" + descripcion + "','" + val.pvp + "','"
@@ -728,7 +728,7 @@ function buscar_articulos()
 						if(val.es_combo == 1){
 							funcion = "traer_combos('"+val.referencia+"')";
 						}
-                    
+
 
 
                         items.push(tr_aux + "<div id='desflotante'><a href=\"#\" onclick=\"get_precios('" + val.referencia + "')\" title=\"más detalles\">\n\
@@ -743,7 +743,7 @@ function buscar_articulos()
                         insertar = true;
                         fin_busqueda1 = true;
                     }
-                    
+
 
                 });
 
@@ -760,7 +760,7 @@ function buscar_articulos()
                   <th class=\"text-left\" >Artículo</th>\n\
                   <th class=\"text-left\" >Artículo</th>\n\
                   </tr></thead>" + items.join('') + "</table></div>");
-                    
+
                 }
         });
     }
@@ -859,14 +859,14 @@ function buscar_articulos()
 
 function mostrarArticulos(fam){
 
-    
+
     if (tpv_url !== '') {
-        
+
             fin_busqueda1 = false;
 
 
             $.getJSON(tpv_url, "familia_mostrar=" +fam, function (json) {
-                
+
                 var items = [];
                 var insertar = false;
                 //alert(JSON.stringify(json));
@@ -879,11 +879,11 @@ function mostrarArticulos(fam){
                 $.each(json, function (key, val) {
 
                     con++;
-                    
-                
+
+
                     contadorColumnas++;
-                    var tdtr = "</td>";  
-                    var tr_aux = '<td>';  
+                    var tdtr = "</td>";
+                    var tr_aux = '<td>';
 
                     //ésta es la condición que devuelve el contador en 1
                     if(contadorColumnas == 15){
@@ -906,7 +906,7 @@ function mostrarArticulos(fam){
                         descripcion_visible += ' <span class="label label-default" title="Familia: ' + val.codfamilia + '">'
                                 + val.codfamilia + '</span>';
                     }
-                    
+
                     if (val.codfabricante) {
                         descripcion_visible += ' <span class="label label-default" title="Fabricante: ' + val.codfabricante + '">'
                                 + val.codfabricante + '</span>';
@@ -915,9 +915,9 @@ function mostrarArticulos(fam){
                         descripcion_visible += ' &nbsp; <i class="fa fa-code-fork" aria-hidden="true" title="Trazabilidad activada"></i>';
                     }
                     */
-                   
-                   
-                                        
+
+
+
                     if ((val.bloqueado || (val.stockalm < 1 && !val.controlstock) )) {
                         tr_aux = "<td class=\"danger\">";
                     } else if (val.stockfis < val.stockmin) {
@@ -926,7 +926,7 @@ function mostrarArticulos(fam){
                         tr_aux = "<td class=\"success\">";
                     }
 
-                    
+
 
                     if (val.sevende) {
                         var funcion = "add_articulo('" + val.referencia + "','" + descripcion + "','" + val.pvp + "','"
@@ -941,12 +941,12 @@ function mostrarArticulos(fam){
                             datoProducto = val.referencia + "," + descripcion + "," + val.pvp + ","
                                 + val.dtopor + "," + val.codimpuesto + "," + val.cantidad;
                         }
-						
+
 						if(val.es_combo == 1){
 							funcion = "traer_combos('"+val.referencia+"')";
 						}
-                    
-                    
+
+
                         /**/
                         otroHtml += tr_aux + "<a id='pr"+val.referencia+"' value='"+datoProducto+"'  title='"+descripcion_visible+"' href=\"#\" onclick=\"return " + funcion + "\">"+ get_imagen(val.referencia) +"</a> "+"<p class='info'>"+ val.referencia.substr(0, 10) + "</p>"+tdtr;
                         items.push(tr_aux + "<a id='pr"+val.referencia+"' value='"+datoProducto+"'  title='"+descripcion_visible+"' href=\"#\" onclick=\"return " + funcion + "\">"+ get_imagen(val.referencia) +"</a> "+"<p class='info'>"+ val.referencia.substr(0, 10) + "</p>"+tdtr);
@@ -986,17 +986,17 @@ function mostrarArticulos(fam){
 
 function mostrarArticulos1(fam){
 
-    
+
     if (tpv_url !== '') {
-        
+
             fin_busqueda1 = false;
 
 
             $.getJSON(tpv_url, "codcliente=" + document.f_tpv.cliente.value + "&codalmacen="+document.f_tpv.almacen.value+"&coddivisa=" + document.f_tpv.divisa.value + "&query=%20&codfamilia="+fam+"&codfabricante=", function (json) {
-                
+
                 var items = [];
                 var insertar = false;
-                
+
                 //PARA MOSTRAR LOS PRODUCTOS EN CUATRO COLUMNAS... se van colocando los productos en una fila, cuando se cumpla los cuatro, vuelve a 1 y así, hasta completar todos los productos
 
                 var contadorColumnas = 0;
@@ -1006,11 +1006,11 @@ function mostrarArticulos1(fam){
                 $.each(json, function (key, val) {
 
                     con++;
-                    
-                
+
+
                     contadorColumnas++;
-                    var tdtr = "</td>";  
-                    var tr_aux = '<td>';  
+                    var tdtr = "</td>";
+                    var tr_aux = '<td>';
 
                     //ésta es la condición que devuelve el contador en 1
                     if(contadorColumnas == 15){
@@ -1033,7 +1033,7 @@ function mostrarArticulos1(fam){
                         descripcion_visible += ' <span class="label label-default" title="Familia: ' + val.codfamilia + '">'
                                 + val.codfamilia + '</span>';
                     }
-                    
+
                     if (val.codfabricante) {
                         descripcion_visible += ' <span class="label label-default" title="Fabricante: ' + val.codfabricante + '">'
                                 + val.codfabricante + '</span>';
@@ -1042,9 +1042,9 @@ function mostrarArticulos1(fam){
                         descripcion_visible += ' &nbsp; <i class="fa fa-code-fork" aria-hidden="true" title="Trazabilidad activada"></i>';
                     }
                     */
-                   
-                   
-                                        
+
+
+
                     if ((val.bloqueado || (val.stockalm < 1 && !val.controlstock) )) {
                         tr_aux = "<td class=\"danger\">";
                     } else if (val.stockfis < val.stockmin) {
@@ -1053,7 +1053,7 @@ function mostrarArticulos1(fam){
                         tr_aux = "<td class=\"success\">";
                     }
 
-                    
+
 
                     if (val.sevende) {
                         var funcion = "add_articulo('" + val.referencia + "','" + descripcion + "','" + val.pvp + "','"
@@ -1068,12 +1068,12 @@ function mostrarArticulos1(fam){
                             datoProducto = val.referencia + "," + descripcion + "," + val.pvp + ","
                                 + val.dtopor + "," + val.codimpuesto + "," + val.cantidad;
                         }
-						
+
 						if(val.es_combo == 1){
 							funcion = "traer_combos('"+val.referencia+"')";
 						}
-                    
-                    
+
+
                         /**/
                         otroHtml += tr_aux + "<a id='pr"+val.referencia+"' value='"+datoProducto+"'  title='"+descripcion_visible+"' href=\"#\" onclick=\"return " + funcion + "\">"+ get_imagen(val.referencia) +"</a> "+"<p class='info'>"+ val.referencia.substr(0, 10) + "</p>"+tdtr;
                         items.push(tr_aux + "<a id='pr"+val.referencia+"' value='"+datoProducto+"'  title='"+descripcion_visible+"' href=\"#\" onclick=\"return " + funcion + "\">"+ get_imagen(val.referencia) +"</a> "+"<p class='info'>"+ val.referencia.substr(0, 10) + "</p>"+tdtr);
@@ -1114,9 +1114,9 @@ function mostrarArticulos1(fam){
 
 function buscar_articulosManual(ref)
 {
-    
+
     document.f_buscar_articulos.query.value = ref;
-    
+
     if (document.f_buscar_articulos.query.value === '') {
         $("#nav_articulos").show();
         $("#search_results").html('');
@@ -1142,14 +1142,14 @@ function buscar_articulosManual(ref)
 
                 $.each(json, function (key, val) {
                     if(val.referencia == ref){
-                        
+
                         var descripcion = Base64.encode(val.descripcion);
-                        
+
                         //alert(val.referencia+","+ descripcion+","+ val.pvp+","+ val.dtopor+","+ val.codimpuesto+","+ val.cantidad)
                         add_articulo(val.referencia, descripcion, val.pvp, val.dtopor, val.codimpuesto, val.cantidad, val.servicio, val.preciocombo, val.necesita_articulo);
                     }
                 });
-               
+
             });
         }
     }
@@ -1208,16 +1208,16 @@ function traerfamilia(){
     var htmlFam = "<div id='familiaCinta' class='collapse navbar-collapse'><ul class='nav navbar-nav'>";
 
         for(i=2; i<cantFamilia;i++){
-            var bus =  "'"+document.f_buscar_articulos.codfamilia[i].value+"'";   
+            var bus =  "'"+document.f_buscar_articulos.codfamilia[i].value+"'";
             htmlFam += "<li><a href='#' onclick=\"mostrarArticulos("+bus+")\">"+document.f_buscar_articulos.codfamilia[i].value+"</a></li>";
         }
-        
+
     htmlFam += "</ul><div>";
-    $("#familiasManual").html(htmlFam);    
+    $("#familiasManual").html(htmlFam);
     $("#modal_articulos").hide();
-    
+
     return document.f_buscar_articulos.codfamilia[2].value;
-    
+
 }
 
 function show_pvp_iva(pvp, codimpuesto)
@@ -1330,9 +1330,9 @@ function botonfactura(){
 
     var totalito = $("#tpv_total3").val();
         if($("#cliente_existe").val()>0){
-            
+
             getClient($("#ac_cliente").val());
-            
+
             if(parseFloat(totalito)>=0){
                 if(verificar_combo_lineas()){
                     $("#modal_guardar").modal('show');
@@ -1351,7 +1351,7 @@ function botonfactura(){
 }
 
 //obtiene la direccion IP:
- 
+
 
     function obtenerHora(){
         var f = new Date();
@@ -1377,16 +1377,16 @@ function botonfactura(){
                url     : 'cierrecaja.php',
                type    : 'POST',
                dataType: 'json',
-               data    : "idEmpleado=" + idEmpleado +"&peticion=" + "cierrecaja" +"&fecha=" + fecha +"&valor=" + valor +"&idTermi=" + idTermi + "&hora=" + cad 
+               data    : "idEmpleado=" + idEmpleado +"&peticion=" + "cierrecaja" +"&fecha=" + fecha +"&valor=" + valor +"&idTermi=" + idTermi + "&hora=" + cad
            })
            .done(function(data){
                if(data.cierrecaja)
                {
-                 
+
                }
            });
 
-           
+
    }
 
 
@@ -1402,9 +1402,9 @@ function revisar_proveedores(datico){
         if($("#prov_"+i).val() == datico)
             resultadi = false;
     }
-    
+
     return resultadi;
-    
+
 }
 
 
@@ -1412,10 +1412,10 @@ function revisar_proveedores(datico){
 //solamente escribirá el cliente y dará clic
 function crear_cliente_tpv(dato, more_data = null)
 {
-    
+
     dato = dato.toUpperCase();
     $("#ac_cliente").val(dato);
-    
+
     var resultado = false;
     if (tpv_url !== '') {
         let concat = "";
@@ -1432,7 +1432,7 @@ function crear_cliente_tpv(dato, more_data = null)
                 concat += "&email="+more_data.email;
             if(more_data.razonsocial)
                 concat += "&razonsocial="+more_data.razonsocial;
-                
+
         }
         if(document.f_tpv.cliente_existe.value == 1){
             concat += "&cod="+document.f_tpv.cliente.value;
@@ -1466,12 +1466,12 @@ function crear_cliente_tpv(dato, more_data = null)
                 setTimeout(() => {
                     err.innerHTML = "";
                 }, 3000);
-                
+
             }
-            
+
         });
     }
-    
+
     return resultado;
 }
 
@@ -1490,13 +1490,13 @@ function llenar_personas_servicios(datico)
 //con ésta función se trae las líneas de facturas clientes
 //para editarlas
 function traer_lineas_editar(id_fact){
-    
-    
-    
+
+
+
     if (tpv_url !== '') {
         //alert(tpv_url+'editando_lineas=' + id_fact);
         $.getJSON(tpv_url, 'editando_lineas=' + id_fact, function (json) {
-            
+
             if(json)
             {
                 $("#numlineas").val(json.length);
@@ -1515,14 +1515,14 @@ function traer_lineas_editar(id_fact){
                     cantidad = json[i].cantidad;
                     pvp = json[i].pvpunitario;
                     dto = 0;
-                    
-                    
+
+
                     if(desc.indexOf("_COMBO") != -1){
                         combo_activo = true;
                         bot_add_combo = true;
                         $("#addCombo").show();
                     }
-                    
+
                     $("#lineas_doc").prepend("<tr id=\"linea_" + numlineas + "\">\n\
                          <td><input type=\"hidden\" name=\"referencia_" + numlineas + "\" value=\"" + ref + "\"/>\n\
                             <input type=\"hidden\" name=\"codcombinacion_" + numlineas + "\" value=\"" + codcombinacion + "\"/>\n\
@@ -1551,37 +1551,37 @@ function traer_lineas_editar(id_fact){
                             "\" onchange=\"ajustar_total(" + numlineas + ")\" onclick=\"this.select()\" autocomplete=\"off\"/></td></tr>");
                     recalcular();
                }
-               
+
                persona_servicio = json[0].proveedor_servicio;
                $("#ac_cliente").val(json[0].nombrecliente);
                $("#ac_cliente").select();
                fechatemporal = json[0].fecha .substr(8, 2) +"-"+ json[0].fecha .substr(5, 2) +"-"+ json[0].fecha .substr(0, 4);
                $("#fecha").val(fechatemporal);
-               
-               
-               
-               
-              
+
+
+
+
+
             }
-            
+
         });
     }
-    
+
 }
-    
+
 
 function verificar_cliente(){
-    
+
     var estado = 0;
     var dato_escogido ="";
     var buscar = $("#ac_cliente").val();
-    
+
     if(buscar.length>4){
             $("#bot_nuevo_cliente").show();
             document.f_tpv.cliente_existe.value = 0;
-            
+
                 for(i=0 ; i < clientes_db.length ; i++){
-                        
+
                         //if(clientes_db[i].nombre.indexOf(buscar.toUpperCase()) != -1){
                         if(clientes_db[i].nombre.toUpperCase() == buscar.toUpperCase()){
                            estado = 1;
@@ -1589,20 +1589,20 @@ function verificar_cliente(){
                         }
 
                 }
-                
+
                 //alert("ESTADO "+estado);
                 if(estado == 1){
                     $("#bot_nuevo_cliente").hide();
                     document.f_tpv.cliente_existe.value = 1;
                 }
     }
-                    
+
 }
 
 function cerrar_caja()
    {
-       
-       bootbox.prompt("Escriba el dinero que hay en caja", function(result){ 
+
+       bootbox.prompt("Escriba el dinero que hay en caja", function(result){
             if (result) {
                 if((result * 0) == 0){
                     if(result > 0){
@@ -1611,7 +1611,7 @@ function cerrar_caja()
                 }
             }
         });
-       
+
       /*bootbox.confirm({
          message: '¿Realmente desea cerrar la caja ?',
          title: '<b>Atención</b>',
@@ -1625,19 +1625,19 @@ function cerrar_caja()
 
 
 $(document).ready(function () {
-    
-    
-    
+
+
+
     $("#modal_personas").hide();
-    
+
     //base de datos de clientes
         cliente_db();
-    
+
     //SI SE QUIERE EDITAR UNA DE LAS FACTURAS
     if($("#factura_editar").val() != -1 ){
         traer_lineas_editar($("#factura_editar").val());
     }
-    
+
 
     $("#addCombo").hide();
     $("#bot_nuevo_cliente").hide();
@@ -1665,11 +1665,11 @@ $(document).ready(function () {
         if(totalCierreCajaManual>0){
                 cierreCaja($("#empleado").val(), $("#fecha").val(), totalCierreCajaManual, $("#idTerminal").val());
 
-                
+
                setTimeout(function() {
 
                     window.location.href = tpv_url + "&cerrar_caja=TRUE";
-                     
+
                   }, 500);
 
         }*/
@@ -1679,25 +1679,25 @@ $(document).ready(function () {
     $("#referenciaManual").keydown(function (event) {
         //event.preventDefault();
 
-        var cod =event.which; 
-            
+        var cod =event.which;
+
            if(cod == 13){
                var palabra = $(this).val();
                palabra = palabra.toUpperCase();
                if(palabra.indexOf("COMBO") != -1){
                    traer_combos(palabra);
-                   
+
                }
                else
                   buscar_articulosManual($(this).val());
 
            }
     });
-	
+
 	/*$("#balanza").click(function (event) {
 		permitirPeso(1);
             $("#referenciaManual").select();
-		
+
         });*/
 
 
@@ -1738,14 +1738,14 @@ $(document).ready(function () {
     });
 
     $("#b_tpv_guardar").click(function () {
-        
-        
+
+
             botonfactura();
-        
+
         //$("#modal_guardar").modal('show');
         //document.f_tpv.tpv_efectivo.focus();
     });
-	
+
     $("#siImprimir").click(function () {
 		if(!$(this).prop('checked')) {
 			$("#num_tickets").val("0");
@@ -1753,11 +1753,11 @@ $(document).ready(function () {
 		else
 			$("#num_tickets").val("1");
     });
-    
-    
-    
+
+
+
     $("#addCombo").click(function () {
-        
+
 	if(combo_activo){
             combo_activo = false;
             $(this).removeClass("btn-info");
@@ -1768,9 +1768,9 @@ $(document).ready(function () {
             $(this).removeClass("btn-default");
             $(this).addClass("btn-info");
         }
-            
+
     });
-    
+
     $("#bot_nuevo_cliente").click(function () {
         if($("#ac_cliente").val().length > 2){
             $("#modal_guardar").modal('show');
@@ -1779,9 +1779,9 @@ $(document).ready(function () {
             document.f_tpv.tpv_efectivo.focus();
             //crear_cliente_tpv($("#ac_cliente").val());
         }
-                
+
     });
-    
+
     //Si el cliente no existe, se muestra el botón bot_nuevo_cliente para crearlo
     $("#ac_cliente").keyup(function (e) {
         let inputText = $(this).val(); // Obtener el valor del input
@@ -1792,17 +1792,17 @@ $(document).ready(function () {
         }
         verificar_cliente();
     });
-    
+
     $("#ac_cliente").change(function (e) {
-        
+
                 verificar_cliente();
     });
-    
+
 
 
 		//se coloca una variable para saber si la ventana personas está abierta al incio o en TPV
-    
-    
+
+
 		$("#cerrar_personas").click(function () {
 			if(ventana_personas_tpv){
 				$('#linea_'+numlineas).remove();
@@ -1811,8 +1811,8 @@ $(document).ready(function () {
 				//combo_activo = false;
 			}
 		});
-		
-		
+
+
 		$("#agregar_persona").click(function () {
                     if($("#persona1").val() != ""){
 			if(ventana_personas_tpv){
@@ -1824,13 +1824,13 @@ $(document).ready(function () {
 					llenar_personas_servicios($("#persona1").val());
                                         }
 //					$("#prov_"+numlineas).val($("#persona1").val());
-					
-				
+
+
 				//	combo_activo = false;
 			}
                     }
 		});
-	
+
 
 
 
@@ -1843,10 +1843,10 @@ $(document).ready(function () {
     });
 
     $("#tpv_efectivo1").keyup(function (e) {
-           $("#tpv_efectivo").val($(this).val().replace(".",""));
+           $("#tpv_efectivo").val($(this).val().replace(",",""));
         $(this).val(formatNumber($(this).val()));
-        
-        $("#tpv_cambio").val(number_format(Math.round(parseFloat($("#tpv_efectivo").val()) - parseFloat($("#tpv_total2").val())), 2, '.', ''));
+
+        $("#tpv_cambio").val(Math.round(parseFloat($("#tpv_efectivo").val()) - parseFloat($("#tpv_total2").val())), 2, '.', '');
     });
 
 
